@@ -1,3 +1,4 @@
+
 import React, { useContext } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 // Import Swiper styles
@@ -41,7 +42,10 @@ const HomeBannerV2 = (props) => {
               <SwiperSlide key={index}>
 
                 <div className="item w-full rounded-md overflow-hidden relative">
-                  <img src={item?.bannerimages[0]} className="w-full" />
+                  <img 
+                    src={item?.bannerimages[0]} 
+                    className="w-full h-[250px] sm:h-[300px] md:h-[350px] lg:h-[400px] xl:h-[450px] object-cover" 
+                  />
 
                   <div className="info absolute top-0 -right-[100%] opacity-0 w-[50%] h-[100%] z-50 p-8 flex items-center flex-col justify-center transition-all duration-700">
 

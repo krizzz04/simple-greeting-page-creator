@@ -1,3 +1,4 @@
+
 import React, { useContext } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
@@ -32,7 +33,7 @@ const HomeSlider = (props) => {
                     <img
                       src={item?.images[0]}
                       alt="Banner slide"
-                      className="w-full"
+                      className="w-full h-[250px] sm:h-[300px] md:h-[350px] lg:h-[400px] xl:h-[450px] object-cover"
                     />
                   </div>
                 </SwiperSlide>
