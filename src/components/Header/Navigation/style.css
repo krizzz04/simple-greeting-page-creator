@@ -1,0 +1,12 @@
+.categoryPanel button{text-transform: capitalize !important;}
+
+.nav li .submenu{visibility: hidden; z-index: 1000;}
+.nav li .submenu button{font-weight: 400 !important;}
+.nav li:hover .submenu{opacity: 1 !important; visibility: inherit; top: 100%;}
+.nav li .submenu li:hover button{color: #ff5252 !important;}
+
+.nav li .submenu li .submenu{top: 0px !important; left: 120% !important; opacity: 0 !important;}
+.nav li .submenu li:hover .submenu{left: 100% !important; opacity: 1 !important;}
+
+.nav li .submenu li .submenu button{color: rgba(0,0,0,0.80) !important;}
+.nav li .submenu li .submenu button:hover{color: #ff5252 !important;}
