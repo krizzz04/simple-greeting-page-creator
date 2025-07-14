@@ -234,11 +234,11 @@ const Home = () => {
 
               <div className="col2 transform transition-all duration-300 hover:translate-y-1">
                 <p className="mb-0 mt-0 font-[500] text-center animate-pulse">
-                  Free Delivery Now On Your First Order and over $200
+                  Free Delivery Now On Your First Order and over ₹200
                 </p>
               </div>
 
-              <p className="font-bold text-[20px] lg:text-[25px] bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent animate-pulse">- Only $200*</p>
+              <p className="font-bold text-[20px] lg:text-[25px] bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent animate-pulse">- Only ₹200*</p>
             </div>
           </GlassCard>
 
