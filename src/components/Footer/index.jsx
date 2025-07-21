@@ -39,7 +39,7 @@ const Footer = () => {
             <div className="col flex items-center justify-center flex-col group w-[15%]">
               <LiaShippingFastSolid className="text-[40px] transition-all duration-300 group-hover:text-primary group-hover:-translate-y-1" />
               <h3 className="text-[16px] font-[600] mt-3">Free Shipping</h3>
-              <p className="text-[12px] font-[500]">For all Orders Over $100</p>
+              <p className="text-[12px] font-[500]">For all Orders Over ₹100</p>
             </div>
 
             <div className="col flex items-center justify-center flex-col group w-[15%]">
