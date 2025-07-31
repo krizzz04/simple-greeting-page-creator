@@ -10,7 +10,7 @@ import CircularProgress from '@mui/material/CircularProgress';
 import { postData } from "../../utils/api";
 import { FaCheckDouble } from "react-icons/fa";
 import { IoMdHeart } from "react-icons/io";
-
+import { useNavigate } from "react-router-dom";
 
 
 export const ProductDetailsComponent = (props) => {
@@ -23,6 +23,7 @@ export const ProductDetailsComponent = (props) => {
   const [isAddedInMyList, setIsAddedInMyList] = useState(false);
 
   const context = useContext(MyContext);
+  const navigate = useNavigate();
 
   const handleSelecteQty = (qty) => {
     setQuantity(qty);
@@ -65,12 +66,40 @@ export const ProductDetailsComponent = (props) => {
   }, [context?.myListData])
 
   const addToCart = (product, userId, quantity) => {
-
-
     if (userId === undefined) {
-      context?.alertBox("error", "you are not login please login first");
-      return false;
+      // Guest cart logic
+      let guestCart = JSON.parse(localStorage.getItem('guestCart') || '[]');
+      // Check if product already exists (by productId)
+      const existingIndex = guestCart.findIndex(item => item.productId === product?._id);
+      if (existingIndex !== -1) {
+        // Update quantity
+        guestCart[existingIndex].quantity += quantity;
+        guestCart[existingIndex].subTotal = parseInt(product?.price * guestCart[existingIndex].quantity);
+      } else {
+        guestCart.push({
+          productTitle: product?.name,
+          image: product?.images ? product?.images[0] : product?.image,
+          rating: product?.rating,
+          price: product?.price,
+          oldPrice: product?.oldPrice,
+          discount: product?.discount,
+          quantity: quantity,
+          subTotal: parseInt(product?.price * quantity),
+          productId: product?._id,
+          countInStock: product?.countInStock,
+          brand: product?.brand,
+          size: props?.item?.size?.length !== 0 ? selectedTabName : '',
+          weight: props?.item?.productWeight?.length !== 0 ? selectedTabName : '',
+          ram: props?.item?.productRam?.length !== 0 ? selectedTabName : ''
+        });
+      }
+      localStorage.setItem('guestCart', JSON.stringify(guestCart));
+      context.setCartData(guestCart);
+      context.alertBox('success', 'Added to cart!');
+      setIsAdded(true);
+      return true;
     }
+
 
     const productItem = {
       _id: product?._id,
@@ -325,6 +354,15 @@ export const ProductDetailsComponent = (props) => {
               </>
           }
 
+        </Button>
+
+        <Button className="btn-dark flex gap-2 !min-w-[150px]" onClick={() => {
+          addToCart(props?.item, context?.userData?._id, quantity);
+          setTimeout(() => {
+            navigate('/checkout');
+          }, 300);
+        }}>
+          Buy Now
         </Button>
       </div>
 
