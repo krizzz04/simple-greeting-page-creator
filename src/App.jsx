@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { HashRouter, Route, Routes } from "react-router-dom";
 import "./App.css";
 import "./responsive.css";
 import Header from "./components/Header";
@@ -272,7 +272,7 @@ function App() {
 
   return (
     <>
-      <BrowserRouter>
+      <HashRouter>
         <MyContext.Provider value={values}>
           <Header />
           <Routes>
@@ -303,7 +303,7 @@ function App() {
           </Routes>
           <Footer />
         </MyContext.Provider>
-      </BrowserRouter>
+      </HashRouter>
 
 
 
