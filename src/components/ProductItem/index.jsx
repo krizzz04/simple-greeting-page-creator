@@ -14,7 +14,7 @@ import { deleteData, editData, postData } from "../../utils/api";
 import CircularProgress from '@mui/material/CircularProgress';
 import { MdClose } from "react-icons/md";
 import { IoMdHeart } from "react-icons/io";
-
+import { BsLightningCharge } from "react-icons/bs";
 
 
 const ProductItem = (props) => {
@@ -85,10 +85,63 @@ const ProductItem = (props) => {
 
   }
 
+  const buyNow = (product, userId) => {
+    if (!context?.userData) {
+      context?.alertBox("error", "Please login first to buy this product");
+      return;
+    }
+
+    const productItem = {
+      _id: product?._id,
+      name: product?.name,
+      image: product?.images[0],
+      rating: product?.rating,
+      price: product?.price,
+      oldPrice: product?.oldPrice,
+      discount: product?.discount,
+      quantity: 1,
+      subTotal: parseInt(product?.price * 1),
+      productId: product?._id,
+      countInStock: product?.countInStock,
+      brand: product?.brand,
+      size: props?.item?.size?.length !== 0 ? selectedTabName : '',
+      weight: props?.item?.productWeight?.length !== 0 ? selectedTabName : '',
+      ram: props?.item?.productRam?.length !== 0 ? selectedTabName : ''
+    }
+
+    setIsLoading(true);
+
+    // Check if product has variants that need selection
+    if (props?.item?.size?.length !== 0 || props?.item?.productRam?.length !== 0 || props?.item?.productWeight?.length !== 0) {
+      setIsShowTabs(true);
+      setIsLoading(false);
+      context?.alertBox("info", "Please select a variant first");
+      return;
+    }
+
+    // Add to cart and redirect to checkout
+    context?.addToCart(productItem, userId, 1);
+    context?.alertBox("success", "Product added to cart! Redirecting to checkout...");
+    
+    setTimeout(() => {
+      setIsLoading(false);
+      navigate('/checkout');
+    }, 1000);
+  }
+
 
   const handleClickActiveTab = (index, name) => {
     setActiveTab(index)
     setSelectedTabName(name)
+  }
+
+  const handleBuyNowWithVariant = () => {
+    if (activeTab === null) {
+      context?.alertBox("error", "Please select a variant first");
+      return;
+    }
+    
+    buyNow(props?.item, context?.userData?._id);
   }
 
   useEffect(() => {
@@ -205,67 +258,198 @@ const ProductItem = (props) => {
 
 
   return (
-    <div className="product-card flex flex-col rounded-lg shadow-md bg-white overflow-hidden h-full">
-      <div className="relative">
-        <img
-          src={props?.item?.images?.[0]}
-          alt={props?.item?.name}
-          className="w-full h-40 object-cover"
-        />
-        <span className="absolute top-2 left-2 bg-primary text-white text-xs font-semibold rounded px-2 py-1">
+    <div className="productItem shadow-lg rounded-md overflow-hidden border-1 border-[rgba(0,0,0,0.1)]">
+      <div className="group imgWrapper w-[100%]  overflow-hidden  rounded-md rounded-bl-none rounded-br-none relative">
+        <Link to={props?.item?.images[1]}>
+          <div className="img h-[200px] overflow-hidden">
+            <img
+              src={props?.item?.images[0]}
+              className="w-full"
+            />
+
+            {
+              props?.item?.images?.length > 1 &&
+              <img
+                src={props?.item?.images[1]}
+                className="w-full transition-all duration-700 absolute top-0 left-0 opacity-0 group-hover:opacity-100 group-hover:scale-105"
+              />
+            }
+
+
+          </div>
+        </Link>
+
+
+
+        {
+          isShowTabs === true &&
+          <div className="flex items-center justify-center absolute top-0 left-0 w-full h-full 
+      bg-[rgba(0,0,0,0.7)] z-[60] p-3 gap-2">
+
+            <Button className="!absolute top-[10px] right-[10px] !min-w-[30px] !min-h-[30px] !w-[30px] !h-[30px] !rounded-full !bg-[rgba(255,255,255,1)] text-black"
+              onClick={() => setIsShowTabs(false)}
+            > <MdClose className=" text-black z-[90] text-[25px]" /></Button>
+
+            <div className="flex flex-col items-center gap-4 w-full">
+              <div className="flex items-center justify-center gap-2 flex-wrap">
+                {
+                  props?.item?.size?.length !== 0 && props?.item?.size?.map((item, index) => {
+                    return (
+                      <span key={index} className={`flex items-center justify-center p-1 px-2 bg-[rgba(255,555,255,0.8)] max-w-[35px] h-[25px]  
+          rounded-sm cursor-pointer hover:bg-white 
+          ${activeTab === index && '!bg-primary text-white'}`}
+                        onClick={() => handleClickActiveTab(index, item)}
+                      >{item}
+                      </span>)
+                  })
+                }
+
+                {
+                  props?.item?.productRam?.length !== 0 && props?.item?.productRam?.map((item, index) => {
+                    return (
+                      <span key={index} className={`flex items-center justify-center p-1 px-2 bg-[rgba(255,555,255,0.8)] max-w-[45px] h-[25px]  
+          rounded-sm cursor-pointer hover:bg-white 
+          ${activeTab === index && '!bg-primary text-white'}`}
+                        onClick={() => handleClickActiveTab(index, item)}
+                      >{item}
+                      </span>)
+                  })
+                }
+
+
+                {
+                  props?.item?.productWeight?.length !== 0 && props?.item?.productWeight?.map((item, index) => {
+                    return (
+                      <span key={index} className={`flex items-center justify-center p-1 px-2 bg-[rgba(255,555,255,0.8)] max-w-[35px] h-[25px]  
+          rounded-sm cursor-pointer hover:bg-white 
+          ${activeTab === index && '!bg-primary text-white'}`}
+                        onClick={() => handleClickActiveTab(index, item)}
+                      >{item}
+                      </span>)
+                  })
+                }
+              </div>
+
+              {activeTab !== null && (
+                <div className="flex flex-col gap-2 w-full max-w-[200px]">
+                  <Button 
+                    className="btn-org btn-sm gap-2" 
+                    onClick={() => addToCart(props?.item, context?.userData?._id, quantity)}
+                  >
+                    <MdOutlineShoppingCart className="text-[18px]" /> Add to Cart
+                  </Button>
+                  
+                  <Button 
+                    className="btn-dark btn-sm gap-2" 
+                    onClick={handleBuyNowWithVariant}
+                  >
+                    <BsLightningCharge className="text-[18px]" /> Buy Now
+                  </Button>
+                </div>
+              )}
+            </div>
+
+          </div>
+        }
+
+
+        <span className="discount flex items-center absolute top-[10px] left-[10px] z-50 bg-primary text-white rounded-lg p-1 text-[12px] font-[500]">
           {props?.item?.discount}%
         </span>
-        <div className="absolute top-2 right-2 flex flex-col gap-2">
-          <Button className="!w-[35px] !h-[35px] !min-w-[35px] !rounded-full !bg-white text-black hover:!bg-primary hover:text-white group" onClick={() => context.handleOpenProductDetailsModal(true, props?.item)}>
+
+        <div className="actions absolute top-[-20px] right-[5px] z-50 flex items-center gap-2 flex-col w-[50px] transition-all duration-300 group-hover:top-[15px] opacity-0 group-hover:opacity-100">
+
+          <Button className="!w-[35px] !h-[35px] !min-w-[35px] !rounded-full !bg-white  text-black hover:!bg-primary hover:text-white group" onClick={() => context.handleOpenProductDetailsModal(true, props?.item)}>
             <MdZoomOutMap className="text-[18px] !text-black group-hover:text-white hover:!text-white" />
           </Button>
-          <Button className="!w-[35px] !h-[35px] !min-w-[35px] !rounded-full !bg-white text-black hover:!bg-primary hover:text-white group">
+
+          <Button className="!w-[35px] !h-[35px] !min-w-[35px] !rounded-full !bg-white  text-black hover:!bg-primary hover:text-white group">
             <IoGitCompareOutline className="text-[18px] !text-black group-hover:text-white hover:!text-white" />
           </Button>
-          <Button className={`!w-[35px] !h-[35px] !min-w-[35px] !rounded-full !bg-white text-black hover:!bg-primary hover:text-white group`}
+
+          <Button className={`!w-[35px] !h-[35px] !min-w-[35px] !rounded-full !bg-white  text-black hover:!bg-primary hover:text-white group`}
             onClick={() => handleAddToMyList(props?.item)}
           >
-            {isAddedInMyList === true ? <IoMdHeart className="text-[18px] !text-primary group-hover:text-white hover:!text-white" /> :
-              <FaRegHeart className="text-[18px] !text-black group-hover:text-white hover:!text-white" />}
+            {
+              isAddedInMyList === true ? <IoMdHeart className="text-[18px] !text-primary group-hover:text-white hover:!text-white" /> :
+                <FaRegHeart className="text-[18px] !text-black group-hover:text-white hover:!text-white" />
+
+            }
+
           </Button>
         </div>
       </div>
-      <div className="flex flex-col flex-1 p-3">
-        <span className="text-xs text-gray-500">{props?.item?.brand}</span>
-        <Link to={`/product/${props?.item?._id}`} className="font-semibold text-sm text-gray-900 truncate mb-1">
-          {props?.item?.name}
-        </Link>
+
+      <div className="info p-3 py-5 relative pb-[80px] h-[220px]">
+        <h6 className="text-[13px] !font-[400]">
+          <span className="link transition-all">
+            {props?.item?.brand}
+          </span>
+        </h6>
+        <h3 className="text-[12px] lg:text-[13px] title mt-1 font-[500] mb-1 text-[#000]">
+          <Link to={`/product/${props?.item?._id}`} className="link transition-all">
+            {props?.item?.name?.substr(0, 25) + '...'}
+          </Link>
+        </h3>
+
         <Rating name="size-small" defaultValue={props?.item?.rating} size="small" readOnly />
-        <div className="flex items-center gap-2 mt-1">
-          <span className="line-through text-xs text-gray-400">
+
+        <div className="flex items-center gap-4 justify-between">
+          <span className="oldPrice line-through text-gray-500 text-[12px] lg:text-[14px] font-[500]">
             {props?.item?.oldPrice?.toLocaleString('en-US', { style: 'currency', currency: 'INR' })}
           </span>
-          <span className="text-primary font-bold text-sm">
+          <span className="price text-primary text-[12px] lg:text-[14px]  font-[600]">
             {props?.item?.price?.toLocaleString('en-US', { style: 'currency', currency: 'INR' })}
           </span>
         </div>
-        <div className="flex-1" />
-        <div className="flex flex-col gap-2 mt-3 sm:flex-row">
-          <Button
-            className="btn-org btn-border w-full btn-sm"
-            size="small"
-            onClick={() => addToCart(props?.item, context?.userData?._id, quantity)}
-          >
-            <MdOutlineShoppingCart className="text-[18px]" /> Add to Cart
-          </Button>
-          <Button
-            className="btn-dark btn-border w-full btn-sm"
-            size="small"
-            onClick={() => {
-              addToCart(props?.item, context?.userData?._id, 1);
-              setTimeout(() => {
-                navigate('/checkout');
-              }, 300);
-            }}
-          >
-            Buy Now
-          </Button>
+
+
+        <div className="!absolute bottom-[15px] left-0 pl-3 pr-3 w-full">
+
+          {
+            isAdded === false ?
+
+              <div className="flex flex-col gap-2">
+                <Button className="btn-org addToCartBtn btn-border flex w-full btn-sm gap-2 " size="small"
+                  onClick={() => addToCart(props?.item, context?.userData?._id, quantity)}>
+                  <MdOutlineShoppingCart className="text-[18px]" /> Add to Cart
+                </Button>
+                
+                <Button className="btn-dark buyNowBtn btn-border flex w-full btn-sm gap-2" size="small"
+                  onClick={() => buyNow(props?.item, context?.userData?._id)}>
+                  <BsLightningCharge className="text-[18px]" /> Buy Now
+                </Button>
+              </div>
+
+              :
+
+              <>
+                {
+                  isLoading === true ?
+                    <Button className="addtocart btn-org btn-border flex w-full btn-sm gap-2 " size="small">
+                      <CircularProgress />
+                    </Button>
+
+                    :
+
+
+                    <div className="flex items-center justify-between overflow-hidden rounded-full border border-[rgba(0,0,0,0.1)]">
+                      <Button className="!min-w-[35px] !w-[35px] !h-[30px] !bg-[#f1f1f1]  !rounded-none" onClick={minusQty}><FaMinus className="text-[rgba(0,0,0,0.7)]" /></Button>
+                      <span>{quantity}</span>
+                      <Button className="!min-w-[35px] !w-[35px] !h-[30px] !bg-gray-800 !rounded-none"
+                        onClick={addQty}>
+                        <FaPlus className="text-white" /></Button>
+                    </div>
+
+                }
+              </>
+
+          }
+
         </div>
+
+
+
       </div>
     </div>
   );

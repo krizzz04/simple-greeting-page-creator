@@ -86,35 +86,52 @@ function App() {
     localStorage.removeItem("userEmail")
     const token = localStorage.getItem('accessToken');
 
-    if (token !== undefined && token !== null && token !== "") {
+    if (token !== undefined && token !== null && token !== "" && token !== "undefined" && token !== "null") {
       setIsLogin(true);
-
-      getCartItems();
-      getMyListData();
-      getUserDetails();
-
+      // Add a small delay to ensure tokens are properly set
+      setTimeout(() => {
+        // Double check token is still valid
+        const currentToken = localStorage.getItem('accessToken');
+        if (currentToken && currentToken !== "undefined" && currentToken !== "null") {
+          getCartItems();
+          getMyListData();
+          getUserDetails();
+        } else {
+          setIsLogin(false);
+        }
+      }, 200);
     } else {
       setIsLogin(false);
     }
-
 
   }, [isLogin])
 
 
   const getUserDetails = () => {
+    console.log('Getting user details, token:', localStorage.getItem('accessToken') ? 'present' : 'missing');
+    
     fetchDataFromApi(`/api/user/user-details`).then((res) => {
-      setUserData(res.data);
-      if (res?.response?.data?.error === true) {
-        if (res?.response?.data?.message === "You have not login") {
+      console.log('User details response:', res);
+      
+      if (res?.error === false) {
+        setUserData(res.data);
+      } else if (res?.error === true) {
+        console.error('User details error:', res);
+        if (res?.message === "You have not login" || res?.message === "Invalid token" || res?.message === "token is expired") {
           localStorage.removeItem("accessToken");
           localStorage.removeItem("refreshToken");
           alertBox("error", "Your session is closed please login again");
-
-
-          //window.location.href = "/login"
-
           setIsLogin(false);
         }
+      }
+    }).catch((error) => {
+      console.error('Error fetching user details:', error);
+      // Only show session closed error if it's an authentication error
+      if (error?.response?.status === 401 || error?.response?.status === 403) {
+        localStorage.removeItem("accessToken");
+        localStorage.removeItem("refreshToken");
+        alertBox("error", "Your session is closed please login again");
+        setIsLogin(false);
       }
     })
   }
@@ -154,36 +171,8 @@ function App() {
   const addToCart = (product, userId, quantity) => {
 
     if (userId === undefined) {
-      // Guest cart logic
-      let guestCart = JSON.parse(localStorage.getItem('guestCart') || '[]');
-      // Check if product already exists (by productId)
-      const existingIndex = guestCart.findIndex(item => item.productId === product?._id);
-      if (existingIndex !== -1) {
-        // Update quantity
-        guestCart[existingIndex].quantity += quantity;
-        guestCart[existingIndex].subTotal = parseInt(product?.price * guestCart[existingIndex].quantity);
-      } else {
-        guestCart.push({
-          productTitle: product?.name,
-          image: product?.images ? product?.images[0] : product?.image,
-          rating: product?.rating,
-          price: product?.price,
-          oldPrice: product?.oldPrice,
-          discount: product?.discount,
-          quantity: quantity,
-          subTotal: parseInt(product?.price * quantity),
-          productId: product?._id,
-          countInStock: product?.countInStock,
-          brand: product?.brand,
-          size: product?.size,
-          weight: product?.weight,
-          ram: product?.ram
-        });
-      }
-      localStorage.setItem('guestCart', JSON.stringify(guestCart));
-      setCartData(guestCart);
-      alertBox('success', 'Added to cart!');
-      return true;
+      alertBox("error", "you are not login please login first");
+      return false;
     }
 
     const data = {
@@ -223,13 +212,6 @@ function App() {
 
 
   const getCartItems = () => {
-    const token = localStorage.getItem('accessToken');
-    if (!token) {
-      // Guest cart
-      const guestCart = JSON.parse(localStorage.getItem('guestCart') || '[]');
-      setCartData(guestCart);
-      return;
-    }
     fetchDataFromApi(`/api/cart/get`).then((res) => {
       if (res?.error === false) {
         setCartData(res?.data);

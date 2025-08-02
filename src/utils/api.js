@@ -1,5 +1,6 @@
 import axios from "axios";
-const apiUrl = import.meta.env.VITE_API_URL;
+// Temporarily use local server for testing phone authentication
+const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8000";
 
 export const postData = async (url, formData) => {
     try {

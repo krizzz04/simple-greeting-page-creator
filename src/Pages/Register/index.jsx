@@ -5,10 +5,13 @@ import { IoMdEye } from "react-icons/io";
 import { IoMdEyeOff } from "react-icons/io";
 import { Link } from "react-router-dom";
 import { FcGoogle } from "react-icons/fc";
+import { FiPhone } from "react-icons/fi";
+import { MdEmail } from "react-icons/md";
 import { MyContext } from "../../App";
 import { postData } from "../../utils/api";
 import CircularProgress from '@mui/material/CircularProgress';
 import { useNavigate } from "react-router-dom";
+import PhoneRegister from "../../components/PhoneRegister";
 
 import { getAuth, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
 import { firebaseApp } from "../../firebase";
@@ -19,6 +22,7 @@ const Register = () => {
 
   const [isLoading, setIsLoading] = useState(false);
   const [isPasswordShow, setIsPasswordShow] = useState(false);
+  const [registerMethod, setRegisterMethod] = useState('email'); // 'email' or 'phone'
   const [formFields, setFormFields] = useState({
     name: "",
     email: "",
@@ -90,7 +94,10 @@ const Register = () => {
 
   }
 
-
+  const handlePhoneRegisterSuccess = (data) => {
+    context.setIsLogin(true);
+    history("/");
+  }
 
   const authWithGoogle = () => {
 
@@ -156,79 +163,103 @@ const Register = () => {
             Register with a new account
           </h3>
 
-          <form className="w-full mt-5" onSubmit={handleSubmit}>
-            <div className="form-group w-full mb-5">
-              <TextField
-                type="text"
-                id="name"
-                name="name"
-                value={formFields.name}
-                disabled={isLoading === true ? true : false}
-                label="Full Name"
-                variant="outlined"
-                className="w-full"
-                onChange={onChangeInput}
-              />
-            </div>
+          {/* Register Method Toggle */}
+          <div className="flex bg-gray-100 rounded-lg p-1 mt-5 mb-5">
+            <Button
+              className={`flex-1 ${registerMethod === 'email' ? '!bg-white !text-black !shadow-md' : '!text-gray-600'}`}
+              onClick={() => setRegisterMethod('email')}
+            >
+              <MdEmail className="mr-2" />
+              Email
+            </Button>
+            <Button
+              className={`flex-1 ${registerMethod === 'phone' ? '!bg-white !text-black !shadow-md' : '!text-gray-600'}`}
+              onClick={() => setRegisterMethod('phone')}
+            >
+              <FiPhone className="mr-2" />
+              Phone
+            </Button>
+          </div>
+
+          {registerMethod === 'email' ? (
+            <form className="w-full" onSubmit={handleSubmit}>
+              <div className="form-group w-full mb-5">
+                <TextField
+                  type="text"
+                  id="name"
+                  name="name"
+                  value={formFields.name}
+                  disabled={isLoading === true ? true : false}
+                  label="Full Name"
+                  variant="outlined"
+                  className="w-full"
+                  onChange={onChangeInput}
+                />
+              </div>
 
 
-            <div className="form-group w-full mb-5">
-              <TextField
-                type="emai"
-                id="email"
-                name="email"
-                label="Email Id"
-                value={formFields.email}
-                disabled={isLoading === true ? true : false}
-                variant="outlined"
-                className="w-full"
-                onChange={onChangeInput}
-              />
-            </div>
+              <div className="form-group w-full mb-5">
+                <TextField
+                  type="email"
+                  id="email"
+                  name="email"
+                  label="Email Id"
+                  value={formFields.email}
+                  disabled={isLoading === true ? true : false}
+                  variant="outlined"
+                  className="w-full"
+                  onChange={onChangeInput}
+                />
+              </div>
 
-            <div className="form-group w-full mb-5 relative">
-              <TextField
-                type={isPasswordShow === false ? 'password' : 'text'}
-                id="password"
-                name="password"
-                label="Password"
-                variant="outlined"
-                className="w-full"
-                value={formFields.password}
-                disabled={isLoading === true ? true : false}
-                onChange={onChangeInput}
-              />
-              <Button className="!absolute top-[10px] right-[10px] z-50 !w-[35px] !h-[35px] !min-w-[35px] !rounded-full !text-black" onClick={() => {
-                setIsPasswordShow(!isPasswordShow)
-              }}>
-                {
-                  isPasswordShow === false ? <IoMdEye className="text-[20px] opacity-75" /> :
-                    <IoMdEyeOff className="text-[20px] opacity-75" />
-                }
-              </Button>
-            </div>
+              <div className="form-group w-full mb-5 relative">
+                <TextField
+                  type={isPasswordShow === false ? 'password' : 'text'}
+                  id="password"
+                  name="password"
+                  label="Password"
+                  variant="outlined"
+                  className="w-full"
+                  value={formFields.password}
+                  disabled={isLoading === true ? true : false}
+                  onChange={onChangeInput}
+                />
+                <Button className="!absolute top-[10px] right-[10px] z-50 !w-[35px] !h-[35px] !min-w-[35px] !rounded-full !text-black" onClick={() => {
+                  setIsPasswordShow(!isPasswordShow)
+                }}>
+                  {
+                    isPasswordShow === false ? <IoMdEye className="text-[20px] opacity-75" /> :
+                      <IoMdEyeOff className="text-[20px] opacity-75" />
+                  }
+                </Button>
+              </div>
 
-            <div className="flex items-center w-full mt-3 mb-3">
-              <Button type="submit" disabled={!valideValue} className="btn-org btn-lg w-full flex gap-3">
-                {
-                  isLoading === true ? <CircularProgress color="inherit" />
-                    :
-                    'Register'
-                }
+              <div className="flex items-center w-full mt-3 mb-3">
+                <Button type="submit" disabled={!valideValue} className="btn-org btn-lg w-full flex gap-3">
+                  {
+                    isLoading === true ? <CircularProgress color="inherit" />
+                      :
+                      'Register'
+                  }
 
-              </Button>
-            </div>
+                </Button>
+              </div>
+            </form>
+          ) : (
+            <PhoneRegister 
+              onSuccess={handlePhoneRegisterSuccess}
+              onBack={() => setRegisterMethod('email')}
+            />
+          )}
 
-            <p className="text-center">Already have an account? <Link className="link text-[14px] font-[600] text-primary" to="/login"> Login</Link></p>
+          <p className="text-center">Already have an account? <Link className="link text-[14px] font-[600] text-primary" to="/login"> Login</Link></p>
 
+          <p className="text-center font-[500]">Or continue with social account</p>
 
-            <p className="text-center font-[500]">Or continue with social account</p>
+          <Button className="flex gap-3 w-full !bg-[#f1f1f1] btn-lg !text-black"
+            onClick={authWithGoogle}>
+            <FcGoogle className="text-[20px]" /> Sign Up with Google</Button>
 
-            <Button className="flex gap-3 w-full !bg-[#f1f1f1] btn-lg !text-black"
-              onClick={authWithGoogle}>
-              <FcGoogle className="text-[20px]" /> Sign Up with Google</Button>
-
-          </form>
         </div>
       </div>
     </section>

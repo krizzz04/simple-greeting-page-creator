@@ -1,83 +1,103 @@
-import React, { useContext, useEffect, useState } from "react";
-import OtpBox from "../../components/OtpBox";
-import Button from "@mui/material/Button";
-import { postData } from "../../utils/api";
-import { useNavigate } from "react-router-dom";
-import { MyContext } from "../../App";
+// src/Pages/Verify/index.jsx
+
+import React, { useState, useContext } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { MyContext } from '../../App';
+import OtpInput from 'react-otp-input';
+import Button from '@mui/material/Button';
+import { postData } from '../../utils/api'; // We'll use this to register the user on our backend
 
 const Verify = () => {
-  const [otp, setOtp] = useState("");
-  const handleOtpChange = (value) => {
-    setOtp(value);
-  };
-
-  const history = useNavigate();
-  const context = useContext(MyContext)
-
-  const verityOTP = (e) => {
-    e.preventDefault();
-
-    const actionType = localStorage.getItem("actionType");
-
-    if (actionType !== "forgot-password") {
-
-      postData("/api/user/verifyEmail", {
-        email: localStorage.getItem("userEmail"),
-        otp: otp
-      }).then((res) => {
-        if (res?.error === false) {
-          context.alertBox("success", res?.message);
-          localStorage.removeItem("userEmail")
-          history("/login")
-        } else {
-          context.alertBox("error", res?.message);
-        }
-      })
-    }
+    const [otp, setOtp] = useState('');
+    const [error, setError] = useState('');
     
-    else{
-      postData("/api/user/verify-forgot-password-otp", {
-        email: localStorage.getItem("userEmail"),
-        otp: otp
-      }).then((res) => {
-        if (res?.error === false) {
-          context.alertBox("success", res?.message);
-          history("/forgot-password")
-        } else {
-          context.alertBox("error", res?.message);
-        }
-      })
+    const navigate = useNavigate();
+    const location = useLocation();
+    const context = useContext(MyContext);
+
+    const phoneNumber = location.state?.phoneNumber;
+
+    if (!phoneNumber) {
+        navigate('/login');
+        return null;
     }
 
-  }
+    const handleVerify = async (e) => {
+        e.preventDefault();
+        setError('');
 
-  return (
-    <section className="section py-5 lg:py-10">
-      <div className="container">
-        <div className="card shadow-md w-full sm:w-[400px] m-auto rounded-md bg-white p-5 px-10">
-          <div className="text-center flex items-center justify-center">
-            <img src="/verify3.png" width="80" />
-          </div>
-          <h3 className="text-center text-[18px] text-black mt-4 mb-1">
-            Verify OTP
-          </h3>
+        if (otp.length < 6) {
+            setError("Please enter a valid 6-digit OTP.");
+            return;
+        }
 
-          <p className="text-center mt-0 mb-4">
-            OTP send to{" "}
-            <span className="text-primary font-bold">{localStorage.getItem("userEmail")}</span>
-          </p>
+        context.setLoading(true);
+        try {
+            const confirmationResult = window.confirmationResult;
+            const result = await confirmationResult.confirm(otp);
+            const user = result.user;
 
-          <form onSubmit={verityOTP}>
-            <OtpBox length={6} onChange={handleOtpChange} />
+            // User is signed in with Firebase. Now, let's get a token from our own backend.
+            // This is a common pattern: authenticate with Firebase, then get a session token from your server.
+            const firebaseToken = await user.getIdToken();
+            const backendRes = await postData('/user/firebase-login', { token: firebaseToken });
 
-            <div className="flex items-center justify-center mt-5 px-3">
-              <Button type="submit" className="w-full btn-org btn-lg">Verify OTP</Button>
+            context.setLoading(false);
+
+            if (backendRes.error) {
+                setError(backendRes.error);
+            } else {
+                 // Login successful on our backend as well
+                context.setIsLogin(true);
+                localStorage.setItem('isLogin', true);
+                localStorage.setItem('user', JSON.stringify(backendRes.user));
+                localStorage.setItem('accessToken', backendRes.token);
+                navigate('/');
+            }
+
+        } catch (error) {
+            context.setLoading(false);
+            console.error("Firebase OTP verification error:", error);
+            setError("Verification failed. Incorrect code or the code has expired.");
+        }
+    };
+
+    return (
+        <section className='loginSection'>
+            <div className='container'>
+                <div className='box'>
+                    <form onSubmit={handleVerify}>
+                        <h2>Verify Your Phone Number</h2>
+                        <p>An OTP has been sent to <strong>{phoneNumber}</strong></p>
+                        
+                        {error && <div className="alert alert-danger" role="alert">{error}</div>}
+
+                        <div className='form-group otp-input-container d-flex justify-content-center'>
+                            <OtpInput
+                                value={otp}
+                                onChange={setOtp}
+                                numInputs={6}
+                                separator={<span>-</span>}
+                                inputStyle={{
+                                    width: '3rem',
+                                    height: '3rem',
+                                    margin: '0 0.5rem',
+                                    fontSize: '1.5rem',
+                                    borderRadius: '4px',
+                                    border: '1px solid #ccc',
+                                }}
+                                renderInput={(props) => <input {...props} />}
+                            />
+                        </div>
+                        
+                        <div className='form-group mt-4'>
+                            <Button type="submit" className='btn-blue btn-lg w-100'>Verify & Login</Button>
+                        </div>
+                    </form>
+                </div>
             </div>
-          </form>
-        </div>
-      </div>
-    </section>
-  );
+        </section>
+    );
 };
 
 export default Verify;

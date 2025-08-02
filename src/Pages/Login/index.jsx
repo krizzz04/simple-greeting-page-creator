@@ -5,9 +5,12 @@ import { IoMdEye } from "react-icons/io";
 import { IoMdEyeOff } from "react-icons/io";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { FcGoogle } from "react-icons/fc";
+import { FiPhone } from "react-icons/fi";
+import { MdEmail } from "react-icons/md";
 import { MyContext } from "../../App";
 import CircularProgress from '@mui/material/CircularProgress';
 import { postData } from "../../utils/api";
+import PhoneAuth from "../../components/PhoneAuth";
 
 import { getAuth, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
 import { firebaseApp } from "../../firebase";
@@ -17,6 +20,7 @@ const googleProvider = new GoogleAuthProvider();
 const Login = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isPasswordShow, setIsPasswordShow] = useState(false);
+  const [loginMethod, setLoginMethod] = useState('email'); // 'email' or 'phone'
   const [formFields, setFormsFields] = useState({
     email:'',
     password:''
@@ -120,7 +124,9 @@ const Login = () => {
   
     }
 
-
+    const handlePhoneAuthSuccess = (data) => {
+      history("/");
+    }
 
       const authWithGoogle = () => {
     
@@ -187,67 +193,89 @@ const Login = () => {
             Login to your account
           </h3>
 
-          <form className="w-full mt-5"  onSubmit={handleSubmit}>
-            <div className="form-group w-full mb-5">
-              <TextField
-                type="emai"
-                id="email"
-                name="email"
-                value={formFields.email}
-                disabled={isLoading === true ? true : false}
-                label="Email Id"
-                variant="outlined"
-                className="w-full"
-                onChange={onChangeInput}
-              />
-            </div>
-
-            <div className="form-group w-full mb-5 relative">
-              <TextField
-                type={isPasswordShow===false ? 'password' : 'text'}
-                id="password"
-                label="Password"
-                variant="outlined"
-                className="w-full"
-                name="password"
-                value={formFields.password}
-                disabled={isLoading === true ? true : false}
-                onChange={onChangeInput}
-              />
-              <Button className="!absolute top-[10px] right-[10px] z-50 !w-[35px] !h-[35px] !min-w-[35px] !rounded-full !text-black" onClick={()=>{
-                setIsPasswordShow(!isPasswordShow)
-              }}>
-              {
-                isPasswordShow===false ? <IoMdEye className="text-[20px] opacity-75"/> :
-                <IoMdEyeOff className="text-[20px] opacity-75"/>
-              }
-              </Button>
-            </div>
-
-
-            <a className="link cursor-pointer text-[14px] font-[600]" onClick={forgotPassword}>Forgot Password?</a>
-
-            <div className="flex items-center w-full mt-3 mb-3">
-            <Button type="submit" disabled={!valideValue} className="btn-org btn-lg w-full flex gap-3">
-              {
-                isLoading === true ? <CircularProgress color="inherit" />
-                  :
-                  'Login'
-              }
-
+          {/* Login Method Toggle */}
+          <div className="flex bg-gray-100 rounded-lg p-1 mt-5 mb-5">
+            <Button
+              className={`flex-1 ${loginMethod === 'email' ? '!bg-white !text-black !shadow-md' : '!text-gray-600'}`}
+              onClick={() => setLoginMethod('email')}
+            >
+              <MdEmail className="mr-2" />
+              Email
+            </Button>
+            <Button
+              className={`flex-1 ${loginMethod === 'phone' ? '!bg-white !text-black !shadow-md' : '!text-gray-600'}`}
+              onClick={() => setLoginMethod('phone')}
+            >
+              <FiPhone className="mr-2" />
+              Phone
             </Button>
           </div>
 
-            <p className="text-center">Not Registered? <Link className="link text-[14px] font-[600] text-primary" to="/register"> Sign Up</Link></p>
+          {loginMethod === 'email' ? (
+            <form className="w-full" onSubmit={handleSubmit}>
+              <div className="form-group w-full mb-5">
+                <TextField
+                  type="email"
+                  id="email"
+                  name="email"
+                  value={formFields.email}
+                  disabled={isLoading === true ? true : false}
+                  label="Email Id"
+                  variant="outlined"
+                  className="w-full"
+                  onChange={onChangeInput}
+                />
+              </div>
 
+              <div className="form-group w-full mb-5 relative">
+                <TextField
+                  type={isPasswordShow===false ? 'password' : 'text'}
+                  id="password"
+                  label="Password"
+                  variant="outlined"
+                  className="w-full"
+                  name="password"
+                  value={formFields.password}
+                  disabled={isLoading === true ? true : false}
+                  onChange={onChangeInput}
+                />
+                <Button className="!absolute top-[10px] right-[10px] z-50 !w-[35px] !h-[35px] !min-w-[35px] !rounded-full !text-black" onClick={()=>{
+                  setIsPasswordShow(!isPasswordShow)
+                }}>
+                {
+                  isPasswordShow===false ? <IoMdEye className="text-[20px] opacity-75"/> :
+                  <IoMdEyeOff className="text-[20px] opacity-75"/>
+                }
+                </Button>
+              </div>
 
-            <p className="text-center font-[500]">Or continue with social account</p>
+              <a className="link cursor-pointer text-[14px] font-[600]" onClick={forgotPassword}>Forgot Password?</a>
 
-            <Button className="flex gap-3 w-full !bg-[#f1f1f1] btn-lg !text-black"
-            onClick={authWithGoogle}>
-            <FcGoogle className="text-[20px]"/> Login with Google</Button>
+              <div className="flex items-center w-full mt-3 mb-3">
+                <Button type="submit" disabled={!valideValue} className="btn-org btn-lg w-full flex gap-3">
+                  {
+                    isLoading === true ? <CircularProgress color="inherit" />
+                      :
+                      'Login'
+                  }
+                </Button>
+              </div>
+            </form>
+          ) : (
+            <PhoneAuth 
+              onSuccess={handlePhoneAuthSuccess}
+              onBack={() => setLoginMethod('email')}
+            />
+          )}
 
-          </form>
+          <p className="text-center">Not Registered? <Link className="link text-[14px] font-[600] text-primary" to="/register"> Sign Up</Link></p>
+
+          <p className="text-center font-[500]">Or continue with social account</p>
+
+          <Button className="flex gap-3 w-full !bg-[#f1f1f1] btn-lg !text-black"
+          onClick={authWithGoogle}>
+          <FcGoogle className="text-[20px]"/> Login with Google</Button>
+
         </div>
       </div>
     </section>

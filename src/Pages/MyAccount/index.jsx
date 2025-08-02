@@ -47,19 +47,23 @@ const MyAccount = () => {
 
   useEffect(() => {
     if (context?.userData?._id !== "" && context?.userData?._id !== undefined) {
+      console.log('User data received:', context?.userData);
       setUserId(context?.userData?._id);
       setTimeout(() => {
         setFormsFields({
-          name: context?.userData?.name,
-          email: context?.userData?.email,
-          mobile: context?.userData?.mobile
+          name: context?.userData?.name || '',
+          email: context?.userData?.email || '',
+          mobile: context?.userData?.mobile || ''
         })
       }, 200);
-      const ph = `"${context?.userData?.mobile}"`
-      setPhone(ph)
+      
+      // Set phone number without extra quotes
+      const phoneNumber = context?.userData?.mobile || '';
+      console.log('Setting phone number:', phoneNumber);
+      setPhone(phoneNumber);
 
       setChangePassword({
-        email: context?.userData?.email
+        email: context?.userData?.email || ''
       })
     }
 
@@ -69,21 +73,32 @@ const MyAccount = () => {
 
   const onChangeInput = (e) => {
     const { name, value } = e.target;
-    setFormsFields(() => {
+    setFormsFields(prev => {
       return {
-        ...formFields,
+        ...prev,
         [name]: value
       }
     })
 
-    setChangePassword(() => {
+    // Only update changePassword if it's the email field
+    if (name === 'email') {
+      setChangePassword(prev => {
+        return {
+          ...prev,
+          [name]: value
+        }
+      })
+    }
+  }
+
+  const onChangePasswordInput = (e) => {
+    const { name, value } = e.target;
+    setChangePassword(prev => {
       return {
-        ...formFields,
+        ...prev,
         [name]: value
       }
     })
-
-
   }
 
 
@@ -229,9 +244,19 @@ const MyAccount = () => {
                     disabled={isLoading === true ? true : false}
                     onChange={(phone) => {
                       setPhone(phone);
-                      setFormsFields({
+                      setFormsFields(prev => ({
+                        ...prev,
                         mobile: phone
-                      })
+                      }));
+                    }}
+                    placeholder="Enter phone number"
+                    inputStyle={{
+                      width: '100%',
+                      height: '40px',
+                      fontSize: '16px',
+                      border: '1px solid #ccc',
+                      borderRadius: '4px',
+                      padding: '8px 12px'
                     }}
                   />
 
@@ -281,7 +306,7 @@ const MyAccount = () => {
                         name="oldPassword"
                         value={changePassword.oldPassword}
                         disabled={isLoading2 === true ? true : false}
-                        onChange={onChangeInput}
+                        onChange={onChangePasswordInput}
                       />
                     </div>
                   }
@@ -297,7 +322,7 @@ const MyAccount = () => {
                       className="w-full"
                       name="newPassword"
                       value={changePassword.newPassword}
-                      onChange={onChangeInput}
+                      onChange={onChangePasswordInput}
                     />
                   </div>
 
@@ -309,7 +334,7 @@ const MyAccount = () => {
                       className="w-full"
                       name="confirmPassword"
                       value={changePassword.confirmPassword}
-                      onChange={onChangeInput}
+                      onChange={onChangePasswordInput}
                     />
                   </div>
 
