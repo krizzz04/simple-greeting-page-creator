@@ -22,3 +22,10 @@ const firebaseConfig = {
 export const firebaseApp = initializeApp(firebaseConfig);
 export const auth = getAuth(firebaseApp);
 export const phoneProvider = new PhoneAuthProvider(auth);
+
+// Add error handling for Firebase auth
+auth.onAuthStateChanged((user) => {
+  // Handle auth state changes
+}, (error) => {
+  console.warn('Firebase auth error:', error);
+});
