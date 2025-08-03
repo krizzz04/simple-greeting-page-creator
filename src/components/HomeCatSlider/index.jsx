@@ -59,9 +59,9 @@ const HomeCatSlider = (props) => {
                           
                           {/* Image with proper sizing and object-fit */}
                           <img
-                            src={cat?.images?.[0] || "/homeBannerPlaceholder.jpg"}
+                            src={cat?.images[0]}
                             className="relative w-full h-full object-cover rounded-full p-2 transition-all duration-300 group-hover:brightness-110 group-hover:p-1"
-                            alt={cat?.name || "Category"}
+                            alt={cat?.name}
                           />
                           
                           {/* Subtle glow effect */}

@@ -1,11 +1,10 @@
 import axios from "axios";
-
-// Use production API URL for Vercel deployment
-const apiUrl = import.meta.env.VITE_API_URL || 
-  (import.meta.env.PROD ? "https://your-backend-domain.com" : "http://localhost:8000");
+// Temporarily use local server for testing phone authentication
+const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:8000";
 
 export const postData = async (url, formData) => {
     try {
+        
         const response = await fetch(apiUrl + url, {
             method: 'POST',
             headers: {
@@ -28,7 +27,6 @@ export const postData = async (url, formData) => {
 
     } catch (error) {
         console.error('Error:', error);
-        return { error: true, message: 'Network error occurred' };
     }
 
 }
@@ -49,7 +47,7 @@ export const fetchDataFromApi = async (url) => {
         return data;
     } catch (error) {
         console.log(error);
-        return { error: true, message: 'Network error occurred' };
+        return error;
     }
 }
 

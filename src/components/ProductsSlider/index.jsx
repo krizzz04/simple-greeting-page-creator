@@ -17,31 +17,26 @@ const ProductsSlider = (props) => {
       <Swiper
         slidesPerView={props.items}
         spaceBetween={10}
-        slidesPerGroup={1}
+        slidesPerGroup={4}
         navigation={context?.windowWidth<992 ? false : true}
         modules={[Navigation, FreeMode]}
         freeMode={true}
-        loop={props?.data?.length > 6}
         breakpoints={{
           250: {
             slidesPerView: 1,
             spaceBetween: 10,
-            slidesPerGroup: 1,
           },
           330: {
             slidesPerView: 2,
             spaceBetween: 10,
-            slidesPerGroup: 1,
           },
           500: {
             slidesPerView: 3,
             spaceBetween: 10,
-            slidesPerGroup: 1,
           },
           1100: {
             slidesPerView: 6,
             spaceBetween: 10,
-            slidesPerGroup: 1,
           },
         }}
         className="mySwiper"

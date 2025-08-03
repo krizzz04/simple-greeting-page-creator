@@ -318,36 +318,29 @@ const Home = () => {
               <Swiper
                 slidesPerView={4}
                 spaceBetween={30}
-                slidesPerGroup={1}
                 navigation={context?.windowWidth < 992 ? false : true}
                 modules={[Navigation, FreeMode]}
                 freeMode={true}
-                loop={blogData?.length > 4}
                 breakpoints={{
                   250: {
                     slidesPerView: 1,
                     spaceBetween: 10,
-                    slidesPerGroup: 1,
                   },
                   330: {
                     slidesPerView: 1,
                     spaceBetween: 10,
-                    slidesPerGroup: 1,
                   },
                   500: {
                     slidesPerView: 2,
                     spaceBetween: 20,
-                    slidesPerGroup: 1,
                   },
                   700: {
                     slidesPerView: 3,
                     spaceBetween: 20,
-                    slidesPerGroup: 1,
                   },
                   1100: {
                     slidesPerView: 4,
                     spaceBetween: 30,
-                    slidesPerGroup: 1,
                   },
                 }}
                 className="blogSlider"
