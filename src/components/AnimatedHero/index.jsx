@@ -6,7 +6,7 @@ const AnimatedHero = () => {
   const [isVisible, setIsVisible] = useState(false);
   
   const heroTexts = [
-    "Welcome to Amazing Shopping",
+    "Welcome to Roar of south",
     "Discover Premium Products",
     "Experience Quality & Style",
     "Shop with Confidence"
