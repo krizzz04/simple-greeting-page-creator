@@ -34,7 +34,7 @@ const MobileNav = () => {
 
     return (
         <div className='mobileNav bg-white p-1 px-3 w-full flex items-center justify-between fixed bottom-0 left-0 gap-0 z-[51]'>
-            <NavLink to="/" exact={true} activeClassName="isActive" onClick={()=>context?.setOpenSearchPanel(false)}>
+            <NavLink to="/" end activeclassname="isActive" onClick={()=>context?.setOpenSearchPanel(false)}>
                 <Button className="flex-col !w-[40px] !min-w-[40px] !capitalize !text-gray-700">
                     <IoHomeOutline size={18} />
                     <span className='text-[12px]'>Home</span>
@@ -58,7 +58,7 @@ const MobileNav = () => {
 
 
 
-            <NavLink to="/my-list" exact={true} activeClassName="isActive" onClick={()=>context?.setOpenSearchPanel(false)}>
+            <NavLink to="/my-list" end activeclassname="isActive" onClick={()=>context?.setOpenSearchPanel(false)}>
                 <Button className="flex-col !w-[40px] !min-w-[40px] !capitalize !text-gray-700">
                     <LuHeart size={18} />
                     <span className='text-[12px]'>Wishlist</span>
@@ -66,14 +66,14 @@ const MobileNav = () => {
             </NavLink>
 
 
-            <NavLink to="/my-orders" exact={true} activeClassName="isActive" onClick={()=>context?.setOpenSearchPanel(false)}>
+            <NavLink to="/my-orders" end activeclassname="isActive" onClick={()=>context?.setOpenSearchPanel(false)}>
                 <Button className="flex-col !w-[40px] !min-w-[40px] !capitalize !text-gray-700">
                     <BsBagCheck size={18} />
                     <span className='text-[12px]'>Orders</span>
                 </Button>
             </NavLink>
 
-            <NavLink to="/my-account" exact={true} activeClassName="isActive" onClick={()=>context?.setOpenSearchPanel(false)}>
+            <NavLink to="/my-account" end activeclassname="isActive" onClick={()=>context?.setOpenSearchPanel(false)}>
                 <Button className="flex-col !w-[40px] !min-w-[40px] !capitalize !text-gray-700">
                     <FiUser size={18} />
                     <span className='text-[12px]'>Account</span>

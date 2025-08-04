@@ -126,7 +126,7 @@ function App() {
 
   const getUserDetails = () => {
     try {
-      fetchDataFromApi("/api/user/profile").then((res) => {
+      fetchDataFromApi("/api/user/user-details").then((res) => {
         if (res?.error === false) {
           setUserData(res?.data)
         }
@@ -161,11 +161,48 @@ function App() {
 
   const addToCart = (product, userId, quantity) => {
     try {
+      // Validate required fields
+      if (!product.productTitle && !product.name) {
+        alertBox("error", "Product title is missing");
+        return;
+      }
+      if (!product.image) {
+        alertBox("error", "Product image is missing");
+        return;
+      }
+      if (product.rating === undefined || product.rating === null) {
+        alertBox("error", "Product rating is missing");
+        return;
+      }
+      if (!product.price) {
+        alertBox("error", "Product price is missing");
+        return;
+      }
+      if (!product.countInStock) {
+        alertBox("error", "Product stock information is missing");
+        return;
+      }
+
+      // Use the complete product object that contains all required fields
       const formData = {
-        productId: product._id,
+        productId: product.productId || product._id,
         userId: userId,
-        quantity: quantity
+        quantity: quantity,
+        productTitle: product.productTitle || product.name,
+        image: product.image,
+        rating: product.rating || 0,
+        price: product.price,
+        oldPrice: product.oldPrice,
+        discount: product.discount,
+        subTotal: product.subTotal,
+        countInStock: product.countInStock,
+        brand: product.brand,
+        size: product.size,
+        weight: product.weight,
+        ram: product.ram
       };
+
+      console.log("🛒 Adding to cart - Form data:", formData);
 
       postData("/api/cart/add", formData).then((res) => {
         if (res?.error === false) {
@@ -186,7 +223,7 @@ function App() {
 
   const getCartItems = () => {
     try {
-      fetchDataFromApi("/api/cart").then((res) => {
+      fetchDataFromApi("/api/cart/get").then((res) => {
         if (res?.error === false) {
           setCartData(res?.data)
         }

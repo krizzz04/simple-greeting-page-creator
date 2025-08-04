@@ -37,7 +37,7 @@ const ProductItem = (props) => {
 
     const productItem = {
       _id: product?._id,
-      name: product?.name,
+      productTitle: product?.name,
       image: product?.images[0],
       rating: product?.rating,
       price: product?.price,
@@ -93,7 +93,7 @@ const ProductItem = (props) => {
 
     const productItem = {
       _id: product?._id,
-      name: product?.name,
+      productTitle: product?.name,
       image: product?.images[0],
       rating: product?.rating,
       price: product?.price,

@@ -28,6 +28,14 @@ const Checkout = () => {
 
   useEffect(() => {
     window.scrollTo(0, 0);
+    
+    // Check if user is authenticated
+    if (!context?.userData) {
+      context?.alertBox("error", "Please login first to access checkout");
+      history("/login");
+      return;
+    }
+    
     setUserData(context?.userData)
     if (context?.userData?.address_details && context?.userData?.address_details.length > 0) {
         setSelectedAddress(context?.userData?.address_details[0]?._id);
