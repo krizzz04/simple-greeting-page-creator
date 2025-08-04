@@ -8,13 +8,13 @@ const BannerBox = (props) => {
       {
         props?.item?.subCatId !== undefined && props?.item?.subCatId !== null &&  props?.item?.subCatId !== ""  ?
           <Link to={`/products?subCatId=${props?.item?.subCatId}`} className="text-[16px] font-[600] link">
-            <img src={props.img} className="w-full transition-all group-hover:scale-105 group-hover:rotate-1" alt="banner" />
+            <img src={props.img || "/homeBannerPlaceholder.jpg"} className="w-full transition-all group-hover:scale-105 group-hover:rotate-1" alt="banner" />
           </Link>
           :
 
           <Link to={`/products?catId=${props?.item?.catId}`} className="text-[16px] font-[600] link">
         
-            <img src={props.img} className="w-full transition-all group-hover:scale-105 group-hover:rotate-1" alt="banner" />
+            <img src={props.img || "/homeBannerPlaceholder.jpg"} className="w-full transition-all group-hover:scale-105 group-hover:rotate-1" alt="banner" />
           </Link>
 
       }

@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from "react";
 import "../ProductItem/style.css";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Rating from "@mui/material/Rating";
 import Button from "@mui/material/Button";
 import { FaRegHeart } from "react-icons/fa";
@@ -14,7 +14,7 @@ import { deleteData, editData, postData } from "../../utils/api";
 import CircularProgress from '@mui/material/CircularProgress';
 import { MdClose } from "react-icons/md";
 import { IoMdHeart } from "react-icons/io";
-
+import { BsLightningCharge } from "react-icons/bs";
 
 
 const ProductItem = (props) => {
@@ -31,6 +31,7 @@ const ProductItem = (props) => {
 
 
   const context = useContext(MyContext);
+  const navigate = useNavigate();
 
   const addToCart = (product, userId, quantity) => {
 
@@ -84,10 +85,63 @@ const ProductItem = (props) => {
 
   }
 
+  const buyNow = (product, userId) => {
+    if (!context?.userData) {
+      context?.alertBox("error", "Please login first to buy this product");
+      return;
+    }
+
+    const productItem = {
+      _id: product?._id,
+      name: product?.name,
+      image: product?.images[0],
+      rating: product?.rating,
+      price: product?.price,
+      oldPrice: product?.oldPrice,
+      discount: product?.discount,
+      quantity: 1,
+      subTotal: parseInt(product?.price * 1),
+      productId: product?._id,
+      countInStock: product?.countInStock,
+      brand: product?.brand,
+      size: props?.item?.size?.length !== 0 ? selectedTabName : '',
+      weight: props?.item?.productWeight?.length !== 0 ? selectedTabName : '',
+      ram: props?.item?.productRam?.length !== 0 ? selectedTabName : ''
+    }
+
+    setIsLoading(true);
+
+    // Check if product has variants that need selection
+    if (props?.item?.size?.length !== 0 || props?.item?.productRam?.length !== 0 || props?.item?.productWeight?.length !== 0) {
+      setIsShowTabs(true);
+      setIsLoading(false);
+      context?.alertBox("info", "Please select a variant first");
+      return;
+    }
+
+    // Add to cart and redirect to checkout
+    context?.addToCart(productItem, userId, 1);
+    context?.alertBox("success", "Product added to cart! Redirecting to checkout...");
+    
+    setTimeout(() => {
+      setIsLoading(false);
+      navigate('/checkout');
+    }, 1000);
+  }
+
 
   const handleClickActiveTab = (index, name) => {
     setActiveTab(index)
     setSelectedTabName(name)
+  }
+
+  const handleBuyNowWithVariant = () => {
+    if (activeTab === null) {
+      context?.alertBox("error", "Please select a variant first");
+      return;
+    }
+    
+    buyNow(props?.item, context?.userData?._id);
   }
 
   useEffect(() => {
@@ -206,18 +260,20 @@ const ProductItem = (props) => {
   return (
     <div className="productItem shadow-lg rounded-md overflow-hidden border-1 border-[rgba(0,0,0,0.1)]">
       <div className="group imgWrapper w-[100%]  overflow-hidden  rounded-md rounded-bl-none rounded-br-none relative">
-        <Link to={props?.item?.images[1]}>
+        <Link to={props?.item?.images?.[1] || "#"}>
           <div className="img h-[200px] overflow-hidden">
             <img
-              src={props?.item?.images[0]}
+              src={props?.item?.images?.[0] || "/homeBannerPlaceholder.jpg"}
               className="w-full"
+              alt={props?.item?.name || "Product"}
             />
 
             {
               props?.item?.images?.length > 1 &&
               <img
-                src={props?.item?.images[1]}
+                src={props?.item?.images?.[1] || "/homeBannerPlaceholder.jpg"}
                 className="w-full transition-all duration-700 absolute top-0 left-0 opacity-0 group-hover:opacity-100 group-hover:scale-105"
+                alt={props?.item?.name || "Product"}
               />
             }
 
@@ -236,42 +292,64 @@ const ProductItem = (props) => {
               onClick={() => setIsShowTabs(false)}
             > <MdClose className=" text-black z-[90] text-[25px]" /></Button>
 
-            {
-              props?.item?.size?.length !== 0 && props?.item?.size?.map((item, index) => {
-                return (
-                  <span key={index} className={`flex items-center justify-center p-1 px-2 bg-[rgba(255,555,255,0.8)] max-w-[35px] h-[25px]  
+            <div className="flex flex-col items-center gap-4 w-full">
+              <div className="flex items-center justify-center gap-2 flex-wrap">
+                {
+                  props?.item?.size?.length !== 0 && props?.item?.size?.map((item, index) => {
+                    return (
+                      <span key={index} className={`flex items-center justify-center p-1 px-2 bg-[rgba(255,555,255,0.8)] max-w-[35px] h-[25px]  
           rounded-sm cursor-pointer hover:bg-white 
           ${activeTab === index && '!bg-primary text-white'}`}
-                    onClick={() => handleClickActiveTab(index, item)}
-                  >{item}
-                  </span>)
-              })
-            }
+                        onClick={() => handleClickActiveTab(index, item)}
+                      >{item}
+                      </span>)
+                  })
+                }
 
-            {
-              props?.item?.productRam?.length !== 0 && props?.item?.productRam?.map((item, index) => {
-                return (
-                  <span key={index} className={`flex items-center justify-center p-1 px-2 bg-[rgba(255,555,255,0.8)] max-w-[45px] h-[25px]  
+                {
+                  props?.item?.productRam?.length !== 0 && props?.item?.productRam?.map((item, index) => {
+                    return (
+                      <span key={index} className={`flex items-center justify-center p-1 px-2 bg-[rgba(255,555,255,0.8)] max-w-[45px] h-[25px]  
           rounded-sm cursor-pointer hover:bg-white 
           ${activeTab === index && '!bg-primary text-white'}`}
-                    onClick={() => handleClickActiveTab(index, item)}
-                  >{item}
-                  </span>)
-              })
-            }
+                        onClick={() => handleClickActiveTab(index, item)}
+                      >{item}
+                      </span>)
+                  })
+                }
 
 
-            {
-              props?.item?.productWeight?.length !== 0 && props?.item?.productWeight?.map((item, index) => {
-                return (
-                  <span key={index} className={`flex items-center justify-center p-1 px-2 bg-[rgba(255,555,255,0.8)] max-w-[35px] h-[25px]  
+                {
+                  props?.item?.productWeight?.length !== 0 && props?.item?.productWeight?.map((item, index) => {
+                    return (
+                      <span key={index} className={`flex items-center justify-center p-1 px-2 bg-[rgba(255,555,255,0.8)] max-w-[35px] h-[25px]  
           rounded-sm cursor-pointer hover:bg-white 
           ${activeTab === index && '!bg-primary text-white'}`}
-                    onClick={() => handleClickActiveTab(index, item)}
-                  >{item}
-                  </span>)
-              })
-            }
+                        onClick={() => handleClickActiveTab(index, item)}
+                      >{item}
+                      </span>)
+                  })
+                }
+              </div>
+
+              {activeTab !== null && (
+                <div className="flex flex-col gap-2 w-full max-w-[200px]">
+                  <Button 
+                    className="btn-org btn-sm gap-2" 
+                    onClick={() => addToCart(props?.item, context?.userData?._id, quantity)}
+                  >
+                    <MdOutlineShoppingCart className="text-[18px]" /> Add to Cart
+                  </Button>
+                  
+                  <Button 
+                    className="btn-dark btn-sm gap-2" 
+                    onClick={handleBuyNowWithVariant}
+                  >
+                    <BsLightningCharge className="text-[18px]" /> Buy Now
+                  </Button>
+                </div>
+              )}
+            </div>
 
           </div>
         }
@@ -304,7 +382,7 @@ const ProductItem = (props) => {
         </div>
       </div>
 
-      <div className="info p-3 py-5 relative pb-[50px] h-[190px]">
+      <div className="info p-3 py-5 relative pb-[80px] h-[220px]">
         <h6 className="text-[13px] !font-[400]">
           <span className="link transition-all">
             {props?.item?.brand}
@@ -333,10 +411,17 @@ const ProductItem = (props) => {
           {
             isAdded === false ?
 
-              <Button className="btn-org addToCartBtn btn-border flex w-full btn-sm gap-2 " size="small"
-                onClick={() => addToCart(props?.item, context?.userData?._id, quantity)}>
-                <MdOutlineShoppingCart className="text-[18px]" /> Add to Cart
-              </Button>
+              <div className="flex flex-col gap-2">
+                <Button className="btn-org addToCartBtn btn-border flex w-full btn-sm gap-2 " size="small"
+                  onClick={() => addToCart(props?.item, context?.userData?._id, quantity)}>
+                  <MdOutlineShoppingCart className="text-[18px]" /> Add to Cart
+                </Button>
+                
+                <Button className="btn-dark buyNowBtn btn-border flex w-full btn-sm gap-2" size="small"
+                  onClick={() => buyNow(props?.item, context?.userData?._id)}>
+                  <BsLightningCharge className="text-[18px]" /> Buy Now
+                </Button>
+              </div>
 
               :
 

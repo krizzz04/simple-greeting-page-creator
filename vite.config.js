@@ -7,5 +7,21 @@ export default defineConfig({
   plugins: [react()],
   server: {
     port: 8080
+  },
+  build: {
+    outDir: 'dist',
+    sourcemap: false,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          vendor: ['react', 'react-dom'],
+          firebase: ['firebase/app', 'firebase/auth'],
+          router: ['react-router-dom']
+        }
+      }
+    }
+  },
+  define: {
+    global: 'globalThis',
   }
 })
