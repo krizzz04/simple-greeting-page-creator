@@ -1,6 +1,6 @@
 import axios from "axios";
 // Temporarily use local server for testing phone authentication
-const apiUrl = import.meta.env.VITE_API_URL || "ra-g1nf.onrender.com";
+const apiUrl = import.meta.env.VITE_API_URL || "https://ra-g1nf.onrender.com";
 
 export const postData = async (url, formData) => {
     try {
