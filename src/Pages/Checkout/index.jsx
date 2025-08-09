@@ -325,166 +325,90 @@ const Checkout = () => {
     });
   }
 
-  const sendSmsMessage = (user, orderDetails, deliveryAddress, fullOrderId) => {
-      const mobileNumber = deliveryAddress?.mobile || user?.mobile;
-
-      if (!mobileNumber) {
-          console.error("Cannot send SMS. Mobile number is missing.");
-          return;
-      }
-
-      const accountSid = 'ACf74e64cff1951f00979bd00c78d44cba';
-      const authToken = '496fb1f1959ff3d6ce5a82cdcc7a157e';
-      const twilioPhoneNumber = '+17692012048';
-
-      // Format phone number properly - handle various formats
-      let recipientPhoneNumber = mobileNumber.toString().trim();
-      
-      // If it already has a country code (starts with +), use as is
-      if (recipientPhoneNumber.startsWith('+')) {
-          // Already formatted, use as is
-      } else if (recipientPhoneNumber.startsWith('91') && recipientPhoneNumber.length === 12) {
-          // Number starts with 91 and is 12 digits (91 + 10 digits), add + prefix
-          recipientPhoneNumber = `+${recipientPhoneNumber}`;
-      } else {
-          // Remove any leading zeros and add +91 for India
-          const cleanPhone = recipientPhoneNumber.replace(/^0+/, '');
-          recipientPhoneNumber = `+91${cleanPhone}`;
-      }
-
-      const shortOrderId = fullOrderId ? fullOrderId.slice(-8) : '';
-      const orderIdString = shortOrderId ? ` #${shortOrderId}` : '';
-
-      const messageBody = `Hello ${user.name}, your order${orderIdString} has been placed successfully! Total: ₹${orderDetails.totalAmt}. Payment: ${orderDetails.payment_status}.`;
-
-      const messageData = new URLSearchParams();
-      messageData.append('To', recipientPhoneNumber);
-      messageData.append('From', twilioPhoneNumber);
-      messageData.append('Body', messageBody);
-
-      const url = `https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Messages.json`;
-
-      const headers = {
-        'Authorization': 'Basic ' + btoa(`${accountSid}:${authToken}`),
-        'Content-Type': 'application/x-www-form-urlencoded',
-      };
-
-      axios.post(url, messageData, { headers })
-        .then(response => {
-          console.log('SMS message sent successfully! SID:', response.data.sid);
-        })
-        .catch(error => {
-          console.error('Error sending SMS message:', error.response ? error.response.data : error.message);
-        });
-  };
-
-  const sendWhatsAppMessage = (user, orderDetails, deliveryAddress, fullOrderId) => {
+  // Replace Twilio-based messaging functions with WAsender API calls
+const sendSmsMessage = async (user, orderDetails, deliveryAddress, fullOrderId) => {
     const mobileNumber = deliveryAddress?.mobile || user?.mobile;
+    if (!mobileNumber) {
+        console.error("Cannot send SMS. Mobile number is missing.");
+        return;
+    }
 
+    // Ensure +91 format
+    let recipientPhoneNumber = mobileNumber.toString().trim();
+    if (!recipientPhoneNumber.startsWith('+')) {
+        recipientPhoneNumber = `+91${recipientPhoneNumber.replace(/^0+/, '')}`;
+    }
+
+    const shortOrderId = fullOrderId ? fullOrderId.slice(-8) : '';
+    const orderIdString = shortOrderId ? ` #${shortOrderId}` : '';
+    const message = `Hello ${user.name}, your order${orderIdString} has been placed successfully! Total: ₹${orderDetails.totalAmt}. Payment: ${orderDetails.payment_status}.`;
+
+    try {
+        const response = await axios.post(
+            "https://wasenderapi.com/api/send-message",
+            { to: recipientPhoneNumber, text: message },
+            { headers: { Authorization: "Bearer 300eba78c31a5207aafa8caa3d94c74c75ca0edf2cc47431142e117ff149d5f4", "Content-Type": "application/json" } }
+        );
+        console.log("SMS via WAsender sent successfully:", response.data);
+    } catch (error) {
+        console.error("Error sending SMS via WAsender:", error.response ? error.response.data : error.message);
+    }
+};
+
+const sendWhatsAppMessage = async (user, orderDetails, deliveryAddress, fullOrderId) => {
+    const mobileNumber = deliveryAddress?.mobile || user?.mobile;
     if (!mobileNumber) {
         console.error("Cannot send WhatsApp. Mobile number is missing.");
         return;
     }
 
-    const accountSid = 'ACf74e64cff1951f00979bd00c78d44cba';
-    const authToken = '496fb1f1959ff3d6ce5a82cdcc7a157e';
-    const contentSid = 'HX350d429d32e64a552466cafecbe95f3c';
-
-    // Format phone number properly - handle various formats
     let recipientPhoneNumber = mobileNumber.toString().trim();
-    
-    // If it already has a country code (starts with +), use as is
-    if (recipientPhoneNumber.startsWith('+')) {
-        // Already formatted, use as is
-    } else if (recipientPhoneNumber.startsWith('91') && recipientPhoneNumber.length === 12) {
-        // Number starts with 91 and is 12 digits (91 + 10 digits), add + prefix
-        recipientPhoneNumber = `+${recipientPhoneNumber}`;
-    } else {
-        // Remove any leading zeros and add +91 for India
-        const cleanPhone = recipientPhoneNumber.replace(/^0+/, '');
-        recipientPhoneNumber = `+91${cleanPhone}`;
+    if (!recipientPhoneNumber.startsWith('+')) {
+        recipientPhoneNumber = `+91${recipientPhoneNumber.replace(/^0+/, '')}`;
     }
 
     const shortOrderId = fullOrderId ? fullOrderId.slice(-8) : 'N/A';
-    const contentVariables = JSON.stringify({
-        '1': user.name,
-        '2': shortOrderId
-    });
+    const message = `Hello ${user.name}, your order #${shortOrderId} has been placed successfully! Total: ₹${orderDetails.totalAmt}. Payment: ${orderDetails.payment_status}.`;
 
-    const messageData = new URLSearchParams();
-    messageData.append('From', 'whatsapp:+14155238886');
-    messageData.append('To', `whatsapp:${recipientPhoneNumber}`);
-    messageData.append('ContentSid', contentSid);
-    messageData.append('ContentVariables', contentVariables);
+    try {
+        const response = await axios.post(
+            "https://wasenderapi.com/api/send-message",
+            { to: recipientPhoneNumber, text: message },
+            { headers: { Authorization: "Bearer 300eba78c31a5207aafa8caa3d94c74c75ca0edf2cc47431142e117ff149d5f4", "Content-Type": "application/json" } }
+        );
+        console.log("WhatsApp order message via WAsender sent successfully:", response.data);
+    } catch (error) {
+        console.error("Error sending WhatsApp order message:", error.response ? error.response.data : error.message);
+    }
+};
 
-    const url = `https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Messages.json`;
-
-    const headers = {
-        'Authorization': 'Basic ' + btoa(`${accountSid}:${authToken}`),
-        'Content-Type': 'application/x-www-form-urlencoded',
-    };
-
-    axios.post(url, messageData, { headers })
-        .then(response => {
-            console.log('WhatsApp template message sent successfully! SID:', response.data.sid);
-        })
-        .catch(error => {
-            console.error('Error sending WhatsApp template message:', error.response ? error.response.data : error.message);
-        });
-  };
-
-  const sendWhatsAppConfirmationMessage = (user, deliveryAddress) => {
+const sendWhatsAppConfirmationMessage = async (user, deliveryAddress) => {
     const mobileNumber = deliveryAddress?.mobile || user?.mobile;
-
     if (!mobileNumber) {
         console.error("Cannot send WhatsApp confirmation. Mobile number is missing.");
         return;
     }
 
-    const accountSid = 'ACf74e64cff1951f00979bd00c78d44cba';
-    const authToken = '496fb1f1959ff3d6ce5a82cdcc7a157e';
-
-    // Format phone number properly - handle various formats
     let recipientPhoneNumber = mobileNumber.toString().trim();
-    
-    // If it already has a country code (starts with +), use as is
-    if (recipientPhoneNumber.startsWith('+')) {
-        // Already formatted, use as is
-    } else if (recipientPhoneNumber.startsWith('91') && recipientPhoneNumber.length === 12) {
-        // Number starts with 91 and is 12 digits (91 + 10 digits), add + prefix
-        recipientPhoneNumber = `+${recipientPhoneNumber}`;
-    } else {
-        // Remove any leading zeros and add +91 for India
-        const cleanPhone = recipientPhoneNumber.replace(/^0+/, '');
-        recipientPhoneNumber = `+91${cleanPhone}`;
+    if (!recipientPhoneNumber.startsWith('+')) {
+        recipientPhoneNumber = `+91${recipientPhoneNumber.replace(/^0+/, '')}`;
     }
 
-    const messageBody = 'Your Order Is Confirmed, Check Our Website To Track Your Order www.test.com';
+    const message = 'Your Order Is Confirmed, Check Our Website To Track Your Order www.test.com';
 
-    const messageData = new URLSearchParams();
-    messageData.append('From', 'whatsapp:+14155238886');
-    messageData.append('To', `whatsapp:${recipientPhoneNumber}`);
-    messageData.append('Body', messageBody);
+    try {
+        const response = await axios.post(
+            "https://wasenderapi.com/api/send-message",
+            { to: recipientPhoneNumber, text: message },
+            { headers: { Authorization: "Bearer 300eba78c31a5207aafa8caa3d94c74c75ca0edf2cc47431142e117ff149d5f4", "Content-Type": "application/json" } }
+        );
+        console.log("WhatsApp confirmation via WAsender sent successfully:", response.data);
+    } catch (error) {
+        console.error("Error sending WhatsApp confirmation via WAsender:", error.response ? error.response.data : error.message);
+    }
+};
 
-    const url = `https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Messages.json`;
-
-    const headers = {
-        'Authorization': 'Basic ' + btoa(`${accountSid}:${authToken}`),
-        'Content-Type': 'application/x-www-form-urlencoded',
-    };
-
-    axios.post(url, messageData, { headers })
-        .then(response => {
-            console.log('WhatsApp confirmation message sent successfully! SID:', response.data.sid);
-        })
-        .catch(error => {
-            console.error('Error sending WhatsApp confirmation message:', error.response ? error.response.data : error.message);
-            // Check for the specific error related to the 24-hour window
-            if (error.response && error.response.data && error.response.data.code === 63016) {
-                 console.warn("Twilio Warning: The free-form WhatsApp message failed, likely because the 24-hour window to reply to the user has closed. Only template messages can be sent outside this window.");
-            }
-        });
-  };
+    
 
   return (
     <section className="py-3 lg:py-10 px-3">
