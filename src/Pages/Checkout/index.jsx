@@ -10,7 +10,6 @@ import { useNavigate } from "react-router-dom";
 import CircularProgress from '@mui/material/CircularProgress';
 
 const VITE_APP_RAZORPAY_KEY_ID = import.meta.env.VITE_APP_RAZORPAY_KEY_ID;
-const VITE_APP_RAZORPAY_KEY_SECRET = import.meta.env.VITE_APP_RAZORPAY_KEY_SECRET;
 
 const VITE_APP_PAYPAL_CLIENT_ID = import.meta.env.VITE_APP_PAYPAL_CLIENT_ID;
 const VITE_API_URL = API_BASE_URL;
@@ -206,7 +205,6 @@ const Checkout = () => {
     if (userData?.address_details?.length !== 0) {
       var options = {
         key: VITE_APP_RAZORPAY_KEY_ID,
-        key_secret: VITE_APP_RAZORPAY_KEY_SECRET,
         amount: parseInt(totalAmount * 100),
         currency: "INR",
         order_receipt: context?.userData?.name,
