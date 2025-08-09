@@ -4,7 +4,7 @@ import { BsFillBagCheckFill } from "react-icons/bs";
 import { MyContext } from '../../App';
 import { FaPlus } from "react-icons/fa6";
 import Radio from '@mui/material/Radio';
-import { deleteData, fetchDataFromApi, postData } from "../../utils/api";
+import { deleteData, fetchDataFromApi, postData, API_BASE_URL } from "../../utils/api";
 import axios from 'axios';
 import { useNavigate } from "react-router-dom";
 import CircularProgress from '@mui/material/CircularProgress';
@@ -13,7 +13,7 @@ const VITE_APP_RAZORPAY_KEY_ID = import.meta.env.VITE_APP_RAZORPAY_KEY_ID;
 const VITE_APP_RAZORPAY_KEY_SECRET = import.meta.env.VITE_APP_RAZORPAY_KEY_SECRET;
 
 const VITE_APP_PAYPAL_CLIENT_ID = import.meta.env.VITE_APP_PAYPAL_CLIENT_ID;
-const VITE_API_URL = import.meta.env.VITE_API_URL;
+const VITE_API_URL = API_BASE_URL;
 
 const Checkout = () => {
 

@@ -1,19 +1,11 @@
 import axios from "axios";
 
-// Use production API URL for Vercel deployment
-const apiUrl = import.meta.env.VITE_API_URL || 
-  (import.meta.env.PROD ? "https://tara-g1nf.onrender.com" : "http://localhost:8000");
-
-// Debug: Log API URL (remove in production)
-if (import.meta.env.DEV) {
-  console.log('API URL:', apiUrl);
-  console.log('Environment:', import.meta.env.MODE);
-  console.log('VITE_API_URL set:', !!import.meta.env.VITE_API_URL);
-}
+// Use env-provided API URL with a localhost fallback for development
+export const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
 
 export const postData = async (url, formData) => {
     try {
-        const response = await fetch(apiUrl + url, {
+        const response = await fetch(API_BASE_URL + url, {
             method: 'POST',
             headers: {
                 'Authorization': `Bearer ${localStorage.getItem('accessToken')}`, // Include your API key in the Authorization header
@@ -52,7 +44,7 @@ export const fetchDataFromApi = async (url) => {
         
         } 
 
-        const { data } = await axios.get(apiUrl + url,params)
+        const { data } = await axios.get(API_BASE_URL + url,params)
         return data;
     } catch (error) {
         console.log(error);
@@ -71,7 +63,7 @@ export const uploadImage = async (url, updatedData ) => {
     } 
 
     var response;
-    await axios.put(apiUrl + url,updatedData, params).then((res)=>{
+    await axios.put(API_BASE_URL + url,updatedData, params).then((res)=>{
         response=res;
         
     })
@@ -92,7 +84,7 @@ export const editData = async (url, updatedData ) => {
     } 
 
     var response;
-    await axios.put(apiUrl + url,updatedData, params).then((res)=>{
+    await axios.put(API_BASE_URL + url,updatedData, params).then((res)=>{
         response=res;
         
     })
@@ -109,6 +101,6 @@ export const deleteData = async (url ) => {
           },
     
     } 
-    const { res } = await axios.delete(apiUrl +url,params)
+    const { res } = await axios.delete(API_BASE_URL +url,params)
     return res;
 }
