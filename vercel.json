@@ -3,7 +3,8 @@
   "outputDirectory": "dist",
   "framework": "vite",
   "env": {
-    "VITE_API_URL": "https://tara-g1nf.onrender.com"
+    "VITE_API_URL": "https://tara-g1nf.onrender.com",
+    "VITE_APP_RAZORPAY_KEY_ID": "rzp_live_C5jAKcSofsPajy"
   },
   "rewrites": [
     {
