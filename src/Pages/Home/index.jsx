@@ -356,18 +356,112 @@ const Home = () => {
 
         .mobile-product-actions {
           display: flex;
-          gap: 10px;
-          opacity: 0.9;
+          gap: 8px;
+          opacity: 0.95;
           transition: opacity 0.3s ease;
+          margin-top: 8px;
+          width: 100%;
         }
 
         .mobile-product-card:hover .mobile-product-actions {
           opacity: 1;
         }
 
+        .mobile-product-actions > * {
+          flex: 1;
+          min-width: 0;
+        }
+
         .mobile-btn {
           flex: 1;
-          padding: 10px 14px;
+          padding: 12px 16px;
+          border: 2px solid transparent;
+          border-radius: 25px;
+          font-size: 12px;
+          font-weight: 600;
+          cursor: pointer;
+          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+          text-transform: uppercase;
+          letter-spacing: 0.8px;
+          position: relative;
+          overflow: hidden;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          min-height: 44px;
+          font-family: inherit;
+          outline: none;
+          user-select: none;
+          -webkit-user-select: none;
+          -moz-user-select: none;
+          -ms-user-select: none;
+          backdrop-filter: blur(10px);
+          box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .mobile-btn::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: -100%;
+          width: 100%;
+          height: 100%;
+          background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+          transition: left 0.6s ease;
+          pointer-events: none;
+        }
+
+        .mobile-btn:hover::before {
+          left: 100%;
+        }
+
+        .mobile-btn-primary {
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+          color: white !important;
+          border-color: rgba(255, 255, 255, 0.2) !important;
+          box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4) !important;
+        }
+
+        .mobile-btn-primary:hover {
+          background: linear-gradient(135deg, #5a67d8 0%, #6b46c1 100%) !important;
+          color: white !important;
+          transform: translateY(-3px);
+          box-shadow: 0 10px 25px rgba(102, 126, 234, 0.5) !important;
+        }
+
+        .mobile-btn-secondary {
+          background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%) !important;
+          color: white !important;
+          border-color: rgba(255, 255, 255, 0.2) !important;
+          box-shadow: 0 6px 20px rgba(240, 147, 251, 0.4) !important;
+        }
+
+        .mobile-btn-secondary:hover {
+          background: linear-gradient(135deg, #e91e63 0%, #f44336 100%) !important;
+          color: white !important;
+          transform: translateY(-3px);
+          box-shadow: 0 10px 25px rgba(240, 147, 251, 0.5) !important;
+        }
+
+        .mobile-btn:hover {
+          transform: translateY(-3px);
+          box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        .mobile-btn:active {
+          transform: translateY(-1px);
+          transition: transform 0.1s ease;
+        }
+
+        .mobile-btn:focus {
+          outline: none;
+          box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.3);
+        }
+
+        /* Ensure buttons are visible and properly styled */
+        .mobile-product-actions .mobile-btn {
+          flex: 1;
+          padding: 12px 16px;
           border: none;
           border-radius: 12px;
           font-size: 12px;
@@ -378,42 +472,43 @@ const Home = () => {
           letter-spacing: 0.5px;
           position: relative;
           overflow: hidden;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          min-height: 44px;
+          font-family: inherit;
+          outline: none;
+          user-select: none;
+          -webkit-user-select: none;
+          -moz-user-select: none;
+          -ms-user-select: none;
+          background: transparent;
         }
 
-        .mobile-btn::before {
-          content: '';
-          position: absolute;
-          top: 0;
-          left: -100%;
-          width: 100%;
-          height: 100%;
-          background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-          transition: left 0.5s ease;
+        /* Force button visibility and styling */
+        .mobile-product-actions button.mobile-btn {
+          display: flex !important;
+          visibility: visible !important;
+          opacity: 1 !important;
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+          color: white !important;
+          border: 2px solid rgba(255, 255, 255, 0.2) !important;
+          border-radius: 25px !important;
+          padding: 12px 16px !important;
+          font-size: 12px !important;
+          font-weight: 600 !important;
+          cursor: pointer !important;
+          text-transform: uppercase !important;
+          letter-spacing: 0.8px !important;
+          min-height: 44px !important;
+          align-items: center !important;
+          justify-content: center !important;
+          box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4) !important;
         }
 
-        .mobile-btn:hover::before {
-          left: 100%;
-        }
-
-        .mobile-btn-primary {
-          background: linear-gradient(135deg, #3b82f6, #2563eb);
-          color: white;
-          box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
-        }
-
-        .mobile-btn-secondary {
-          background: linear-gradient(135deg, #10b981, #059669);
-          color: white;
-          box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
-        }
-
-        .mobile-btn:hover {
-          transform: translateY(-2px);
-          box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
-        }
-
-        .mobile-btn:active {
-          transform: translateY(0);
+        .mobile-product-actions button.mobile-btn.mobile-btn-secondary {
+          background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%) !important;
+          box-shadow: 0 6px 20px rgba(240, 147, 251, 0.4) !important;
         }
 
         /* Section Headers */
@@ -468,11 +563,40 @@ const Home = () => {
             grid-template-columns: repeat(4, 1fr);
             gap: 20px;
           }
+
+          .mobile-btn {
+            padding: 14px 18px;
+            font-size: 13px;
+            min-height: 48px;
+          }
+
+          .mobile-product-actions {
+            gap: 10px;
+          }
         }
 
         @media (min-width: 1024px) {
           .mobile-products-grid {
             grid-template-columns: repeat(5, 1fr);
+          }
+
+          .mobile-btn {
+            padding: 16px 20px;
+            font-size: 14px;
+            min-height: 52px;
+          }
+        }
+
+        /* Mobile specific improvements */
+        @media (max-width: 767px) {
+          .mobile-btn {
+            padding: 10px 12px;
+            font-size: 11px;
+            min-height: 40px;
+          }
+
+          .mobile-product-actions {
+            gap: 6px;
           }
         }
       `}</style>

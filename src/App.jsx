@@ -25,6 +25,7 @@ import Address from "./Pages/MyAccount/address";
 import { OrderSuccess } from "./Pages/Orders/success";
 import { OrderFailed } from "./Pages/Orders/failed";
 import SearchPage from "./Pages/Search";
+import About from "./Pages/About";
 
 
 const MyContext = createContext();
@@ -358,6 +359,7 @@ function App() {
             <Route path={"/order/failed"} exact={true} element={<OrderFailed />} />
             <Route path={"/address"} exact={true} element={<Address />} />
             <Route path={"/search"} exact={true} element={<SearchPage />} />
+            <Route path={"/about"} exact={true} element={<About />} />
           </Routes>
           <Footer />
         </MyContext.Provider>
