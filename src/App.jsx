@@ -89,18 +89,10 @@ function App() {
 
       if (token !== undefined && token !== null && token !== "" && token !== "undefined" && token !== "null") {
         setIsLogin(true);
-        // Add a small delay to ensure tokens are properly set
-        setTimeout(() => {
-          // Double check token is still valid
-          const currentToken = localStorage.getItem('accessToken');
-          if (currentToken && currentToken !== "undefined" && currentToken !== "null") {
-            getCartItems();
-            getMyListData();
-            getUserDetails();
-          } else {
-            setIsLogin(false);
-          }
-        }, 100);
+        // Fetch user data and cart items immediately
+        getUserDetails();
+        getCartItems();
+        getMyListData();
       } else {
         setIsLogin(false);
       }
@@ -129,12 +121,79 @@ function App() {
       fetchDataFromApi("/api/user/user-details").then((res) => {
         if (res?.error === false) {
           setUserData(res?.data)
+        } else {
+          // If user details fetch fails, user might be logged out
+          console.log('User details fetch failed, clearing auth state');
+          handleLogout();
         }
       }).catch((error) => {
         console.error('Error fetching user details:', error);
+        handleLogout();
       });
     } catch (error) {
       console.error('Error in getUserDetails:', error);
+      handleLogout();
+    }
+  };
+
+  const getCartItems = () => {
+    try {
+      fetchDataFromApi("/api/cart/get").then((res) => {
+        console.log("🛒 Cart Items Response:", res);
+        if (res?.error === false) {
+          setCartData(res?.data)
+          console.log("🛒 Cart Data Updated:", res?.data);
+        }
+      }).catch((error) => {
+        console.error('Error fetching cart items:', error);
+      });
+    } catch (error) {
+      console.error('Error in getCartItems:', error);
+    }
+  };
+
+  const getMyListData = () => {
+    try {
+      fetchDataFromApi("/api/mylist/get-mylist").then((res) => {
+        if (res?.error === false) {
+          setMyListData(res?.data)
+        }
+      }).catch((error) => {
+        console.error('Error fetching my list data:', error);
+      });
+    } catch (error) {
+      console.error('Error in getMyListData:', error);
+    }
+  };
+
+  // Function to handle login and update all necessary state
+  const handleLogin = (accessToken, refreshToken) => {
+    try {
+      localStorage.setItem("accessToken", accessToken);
+      localStorage.setItem("refreshToken", refreshToken);
+      setIsLogin(true);
+      
+      // Fetch user data and cart items
+      getUserDetails();
+      getCartItems();
+      getMyListData();
+    } catch (error) {
+      console.error('Error in handleLogin:', error);
+    }
+  };
+
+  // Function to handle logout and clear all state
+  const handleLogout = () => {
+    try {
+      localStorage.removeItem("accessToken");
+      localStorage.removeItem("refreshToken");
+      localStorage.removeItem("userEmail");
+      setIsLogin(false);
+      setUserData(null);
+      setCartData([]);
+      setMyListData([]);
+    } catch (error) {
+      console.error('Error in handleLogout:', error);
     }
   };
 
@@ -205,8 +264,9 @@ function App() {
       console.log("🛒 Adding to cart - Form data:", formData);
 
       postData("/api/cart/add", formData).then((res) => {
+        console.log("🛒 Cart API Response:", res);
         if (res?.error === false) {
-          alertBox("success", "Product added to cart successfully");
+          alertBox("success", res?.message || "Product added to cart successfully");
           getCartItems();
         } else {
           alertBox("error", res?.message || "Failed to add product to cart");
@@ -221,33 +281,9 @@ function App() {
     }
   };
 
-  const getCartItems = () => {
-    try {
-      fetchDataFromApi("/api/cart/get").then((res) => {
-        if (res?.error === false) {
-          setCartData(res?.data)
-        }
-      }).catch((error) => {
-        console.error('Error fetching cart items:', error);
-      });
-    } catch (error) {
-      console.error('Error in getCartItems:', error);
-    }
-  };
 
-  const getMyListData = () => {
-    try {
-      fetchDataFromApi("/api/myList").then((res) => {
-        if (res?.error === false) {
-          setMyListData(res?.data)
-        }
-      }).catch((error) => {
-        console.error('Error fetching my list data:', error);
-      });
-    } catch (error) {
-      console.error('Error in getMyListData:', error);
-    }
-  }
+
+
 
   const values = {
     openProductDetailsModal,
@@ -275,6 +311,8 @@ function App() {
     setMyListData,
     getMyListData,
     getUserDetails,
+    handleLogin,
+    handleLogout,
     setAddressMode,
     addressMode,
     addressId,

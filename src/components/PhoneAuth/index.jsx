@@ -108,12 +108,8 @@ const PhoneAuth = ({ onSuccess, onBack }) => {
           refreshToken: response.data.refreshToken ? 'present' : 'missing'
         });
         
-        // Store tokens
-        localStorage.setItem("accessToken", response.data.accesstoken);
-        localStorage.setItem("refreshToken", response.data.refreshToken);
-        
-        // Update login state
-        context.setIsLogin(true);
+        // Use the new handleLogin function to properly update auth state
+        context.handleLogin(response.data.accesstoken, response.data.refreshToken);
         
         // Call success callback
         onSuccess && onSuccess(response.data);

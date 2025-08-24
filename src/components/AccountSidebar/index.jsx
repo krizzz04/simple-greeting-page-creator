@@ -81,18 +81,11 @@ const AccountSidebar = () => {
 
       fetchDataFromApi(`/api/user/logout?token=${localStorage.getItem('accessToken')}`, { withCredentials: true }).then((res) => {
         if (res?.error === false) {
-          context.setIsLogin(false);
-          localStorage.removeItem("accessToken");
-          localStorage.removeItem("refreshToken");
-          context.setUserData(null);
-          context?.setCartData([]);
-          context?.setMyListData([]);
+          // Use the new handleLogout function to properly clear all state
+          context.handleLogout();
           history("/");
         }
-  
-  
       })
-  
     }
   return (
     <div className="card bg-white shadow-md rounded-md sticky top-[160px]">

@@ -95,7 +95,12 @@ const Register = () => {
   }
 
   const handlePhoneRegisterSuccess = (data) => {
-    context.setIsLogin(true);
+    // For phone registration, we need to handle the tokens from the success data
+    if (data?.accessToken && data?.refreshToken) {
+      context.handleLogin(data.accessToken, data.refreshToken);
+    } else {
+      context.setIsLogin(true);
+    }
     history("/");
   }
 
@@ -125,10 +130,9 @@ const Register = () => {
             setIsLoading(false);
             context.alertBox("success", res?.message);
             localStorage.setItem("userEmail", fields.email)
-            localStorage.setItem("accessToken", res?.data?.accesstoken);
-            localStorage.setItem("refreshToken", res?.data?.refreshToken);
-
-            context.setIsLogin(true);
+            
+            // Use the new handleLogin function to properly update auth state
+            context.handleLogin(res?.data?.accesstoken, res?.data?.refreshToken);
 
             history("/")
           } else {

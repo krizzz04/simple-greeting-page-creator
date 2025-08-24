@@ -48,10 +48,7 @@ const Verify = () => {
                 setError(backendRes.error);
             } else {
                  // Login successful on our backend as well
-                context.setIsLogin(true);
-                localStorage.setItem('isLogin', true);
-                localStorage.setItem('user', JSON.stringify(backendRes.user));
-                localStorage.setItem('accessToken', backendRes.token);
+                context.handleLogin(backendRes.token, backendRes.refreshToken);
                 navigate('/');
             }
 

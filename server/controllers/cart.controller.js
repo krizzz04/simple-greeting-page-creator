@@ -20,9 +20,25 @@ export const addToCartItemController = async (request, response) => {
         })
 
         if (checkItemCart) {
-            return response.status(400).json({
-                message: "Item already in cart"
-            })
+            // If item already exists, update the quantity instead of preventing addition
+            const newQuantity = checkItemCart.quantity + quantity;
+            const newSubTotal = checkItemCart.price * newQuantity;
+            
+            const updatedCartItem = await CartProductModel.findByIdAndUpdate(
+                checkItemCart._id,
+                {
+                    quantity: newQuantity,
+                    subTotal: newSubTotal
+                },
+                { new: true }
+            );
+
+            return response.status(200).json({
+                data: updatedCartItem,
+                message: "Item quantity updated in cart",
+                error: false,
+                success: true
+            });
         }
 
 

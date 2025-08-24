@@ -29,18 +29,51 @@ const Checkout = () => {
   useEffect(() => {
     window.scrollTo(0, 0);
     
-    // Check if user is authenticated
-    if (!context?.userData) {
-      context?.alertBox("error", "Please login first to access checkout");
-      history("/login");
-      return;
-    }
+    // Add a small delay to ensure context is fully loaded
+    const checkAuth = () => {
+      console.log("🔍 Checkout Auth Check:", {
+        isLogin: context?.isLogin,
+        hasUserData: !!context?.userData,
+        userId: context?.userData?._id,
+        token: !!localStorage.getItem('accessToken')
+      });
+      
+      // Check if user is authenticated - be more lenient
+      const token = localStorage.getItem('accessToken');
+      if (!token) {
+        context?.alertBox("error", "Please login first to access checkout");
+        history("/login");
+        return;
+      }
+      
+      // If we have a token but no user data yet, wait a bit more
+      if (token && (!context?.userData || !context?.userData._id)) {
+        console.log("⏳ Waiting for user data to load...");
+        return;
+      }
+      
+      // If we have both token and user data, proceed
+      if (token && context?.userData && context?.userData._id) {
+        console.log("✅ Authentication successful, proceeding to checkout");
+        setUserData(context?.userData)
+        if (context?.userData?.address_details && context?.userData?.address_details.length > 0) {
+            setSelectedAddress(context?.userData?.address_details[0]?._id);
+        }
+      }
+    };
+
+    // Check immediately
+    checkAuth();
     
-    setUserData(context?.userData)
-    if (context?.userData?.address_details && context?.userData?.address_details.length > 0) {
-        setSelectedAddress(context?.userData?.address_details[0]?._id);
-    }
-  }, [context?.userData])
+    // Also check after delays to handle async loading
+    const timeoutId1 = setTimeout(checkAuth, 500);
+    const timeoutId2 = setTimeout(checkAuth, 2000);
+    
+    return () => {
+      clearTimeout(timeoutId1);
+      clearTimeout(timeoutId2);
+    };
+  }, [context?.userData, context?.isLogin])
 
   useEffect(() => {
     setTotalAmount(

@@ -38,7 +38,7 @@ const ProductsSlider = (props) => {
           500: { slidesPerView: 3, spaceBetween: 12 },
           1100: { slidesPerView: 6, spaceBetween: 15 },
         }}
-        className="mySwiper"
+        className="mySwiper productSlider"
       >
         {props?.data?.map((item, index) => (
           <SwiperSlide

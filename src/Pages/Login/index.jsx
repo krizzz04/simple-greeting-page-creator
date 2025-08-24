@@ -108,10 +108,8 @@ const Login = () => {
             password: ""
           })
 
-          localStorage.setItem("accessToken",res?.data?.accesstoken);
-          localStorage.setItem("refreshToken",res?.data?.refreshToken);
-
-          context.setIsLogin(true);
+          // Use the new handleLogin function to properly update auth state
+          context.handleLogin(res?.data?.accesstoken, res?.data?.refreshToken);
   
           history("/")
         } else {
@@ -154,10 +152,9 @@ const Login = () => {
                 setIsLoading(false);
                 context.alertBox("success", res?.message);
                 localStorage.setItem("userEmail", fields.email)
-                localStorage.setItem("accessToken", res?.data?.accesstoken);
-                localStorage.setItem("refreshToken", res?.data?.refreshToken);
-    
-                context.setIsLogin(true);
+                
+                // Use the new handleLogin function to properly update auth state
+                context.handleLogin(res?.data?.accesstoken, res?.data?.refreshToken);
     
                 history("/")
               } else {

@@ -18,6 +18,11 @@ const CartPage = () => {
 
     window.scrollTo(0, 0)
 
+    // Fetch cart data when component mounts
+    if (context?.isLogin) {
+      context.getCartItems();
+    }
+
     fetchDataFromApi("/api/product/productSize/get").then((res) => {
       if (res?.error === false) {
         setProductSizeData(res?.data)
@@ -35,7 +40,7 @@ const CartPage = () => {
         setProductWeightData(res?.data)
       }
     })
-  }, []);
+  }, [context?.isLogin]);
 
 
 
