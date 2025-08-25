@@ -361,7 +361,7 @@ export const ProductDetailsComponent = (props) => {
 
       <div className="bg-blue-50 p-3 rounded-lg mb-4">
         <p className="text-[13px] sm:text-[14px] text-blue-800 font-medium">
-          🚚 Free Shipping (Est. Delivery: 2-3 Days)
+          🚚 Free Shipping (Est. Delivery: 10-15 Days)
         </p>
       </div>
 
