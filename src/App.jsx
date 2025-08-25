@@ -43,6 +43,8 @@ function App() {
 
   const [openCartPanel, setOpenCartPanel] = useState(false);
   const [openAddressPanel, setOpenAddressPanel] = useState(false);
+  const [openComparePanel, setOpenComparePanel] = useState(false);
+  const [compareData, setCompareData] = useState([]);
 
   const [addressMode, setAddressMode] = useState("add");
   const [addressId, setAddressId] = useState("");
@@ -80,6 +82,10 @@ function App() {
     setOpenAddressPanel(newOpen);
   };
 
+  const toggleComparePanel = (newOpen) => () => {
+    setOpenComparePanel(newOpen);
+  };
+
 
 
 
@@ -94,6 +100,7 @@ function App() {
         getUserDetails();
         getCartItems();
         getMyListData();
+        getCompareData();
       } else {
         setIsLogin(false);
       }
@@ -153,17 +160,24 @@ function App() {
     }
   };
 
-  const getMyListData = () => {
+  const getMyListData = async () => {
     try {
-      fetchDataFromApi("/api/mylist/get-mylist").then((res) => {
-        if (res?.error === false) {
-          setMyListData(res?.data)
-        }
-      }).catch((error) => {
-        console.error('Error fetching my list data:', error);
-      });
+      const response = await fetchDataFromApi('/api/myList/getMyList');
+      if (response?.error === false) {
+        setMyListData(response.data);
+      }
     } catch (error) {
-      console.error('Error in getMyListData:', error);
+      console.error('Error fetching my list data:', error);
+    }
+  };
+
+  const getCompareData = () => {
+    try {
+      const compareItems = JSON.parse(localStorage.getItem('compareItems') || '[]');
+      setCompareData(compareItems);
+    } catch (error) {
+      console.error('Error loading compare data:', error);
+      setCompareData([]);
     }
   };
 
@@ -326,7 +340,13 @@ function App() {
     setisFilterBtnShow,
     isFilterBtnShow,
     setOpenSearchPanel,
-    openSearchPanel
+    openSearchPanel,
+    toggleComparePanel,
+    openComparePanel,
+    setOpenComparePanel,
+    compareData,
+    setCompareData,
+    getCompareData
   };
 
   return (

@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { FaFacebookF, FaInstagram, FaWhatsapp } from "react-icons/fa";
 import { AiOutlineYoutube } from "react-icons/ai";
 import { MdEmail, MdPhone, MdLocationOn } from "react-icons/md";
+import { IoCloseSharp, IoGitCompareOutline } from "react-icons/io5";
 
 import Drawer from "@mui/material/Drawer";
 import CartPanel from "../CartPanel";
@@ -13,7 +14,6 @@ import Dialog from "@mui/material/Dialog";
 import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
 import { ProductZoom } from "../ProductZoom";
-import { IoCloseSharp } from "react-icons/io5";
 import { ProductDetailsComponent } from "../ProductDetails";
 import AddAddress from "../../Pages/MyAccount/addAddress";
 
@@ -23,6 +23,7 @@ const Footer = () => {
   const [openTermsConditions, setOpenTermsConditions] = useState(false);
   const [openHelp, setOpenHelp] = useState(false);
   const [openAbout, setOpenAbout] = useState(false);
+  const [showComparison, setShowComparison] = useState(false);
 
   const handleOpenPrivacyPolicy = () => {
     setOpenPrivacyPolicy(true);
@@ -87,6 +88,8 @@ const Footer = () => {
                 <li><Link to="/products" className="hover:text-gray-900 transition-colors">Products</Link></li>
                 <li><Link to="/contact" className="hover:text-gray-900 transition-colors">Contact</Link></li>
                 <li><button onClick={handleOpenHelp} className="hover:text-gray-900 transition-colors text-left">Help</button></li>
+                <li><button onClick={handleOpenPrivacyPolicy} className="hover:text-gray-900 transition-colors text-left">Privacy Policy</button></li>
+                <li><button onClick={handleOpenTermsConditions} className="hover:text-gray-900 transition-colors text-left">Terms & Conditions</button></li>
               </ul>
             </div>
 
@@ -156,13 +159,6 @@ const Footer = () => {
               
               <div className="flex items-center space-x-4">
                 <button 
-                  onClick={handleOpenAbout}
-                  className="text-xs text-gray-500 hover:text-gray-700 transition-colors"
-                >
-                  About
-                </button>
-                <span className="text-xs text-gray-400">|</span>
-                <button 
                   onClick={handleOpenPrivacyPolicy}
                   className="text-xs text-gray-500 hover:text-gray-700 transition-colors"
                 >
@@ -174,13 +170,6 @@ const Footer = () => {
                   className="text-xs text-gray-500 hover:text-gray-700 transition-colors"
                 >
                   Terms & Conditions
-                </button>
-                <span className="text-xs text-gray-400">|</span>
-                <button 
-                  onClick={handleOpenHelp}
-                  className="text-xs text-gray-500 hover:text-gray-700 transition-colors"
-                >
-                  Help
                 </button>
                 <div className="flex items-center space-x-2 text-xs text-gray-400">
                   <span>Payments:</span>
@@ -641,6 +630,202 @@ const Footer = () => {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Compare Panel */}
+      {context.openComparePanel && (
+        <div 
+          style={{
+            position: 'fixed',
+            top: 0,
+            right: 0,
+            width: '400px',
+            height: '100vh',
+            backgroundColor: 'white',
+            zIndex: 9999,
+            border: '1px solid #ccc',
+            overflow: 'auto'
+          }}
+        >
+          <div className="flex items-center justify-between py-3 px-4 gap-3 border-b border-[rgba(0,0,0,0.1)] overflow-hidden">
+            <h4 className="flex items-center gap-2">
+              <IoGitCompareOutline className="text-[20px]" />
+              Compare Products ({context?.compareData?.length || 0})
+            </h4>
+            <div className="flex items-center gap-2">
+              <IoCloseSharp className="text-[20px] cursor-pointer" onClick={() => {
+                context.setOpenComparePanel(false);
+                setShowComparison(false);
+              }} />
+            </div>
+          </div>
+
+          {context?.compareData?.length !== 0 ? (
+            <div className="w-full max-h-[100vh] overflow-auto p-4">
+              {!showComparison ? (
+                // List view
+                <div className="space-y-4">
+                  {context.compareData.map((item, index) => (
+                    <div key={index} className="border border-gray-200 rounded-lg p-3">
+                      <div className="flex items-start gap-3">
+                        <img 
+                          src={item.image} 
+                          alt={item.productTitle}
+                          className="w-16 h-16 object-cover rounded-md"
+                        />
+                        <div className="flex-1 min-w-0">
+                          <h5 className="text-sm font-medium text-gray-900 truncate">
+                            {item.productTitle}
+                          </h5>
+                          <p className="text-xs text-gray-500 mb-1">{item.brand}</p>
+                          <div className="flex items-center gap-2 mb-2">
+                            <span className="text-xs line-through text-gray-500">
+                              ₹{item.oldPrice}
+                            </span>
+                            <span className="text-sm font-semibold text-primary">
+                              ₹{item.price}
+                            </span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs bg-gray-100 px-2 py-1 rounded">
+                              {item.discount}% OFF
+                            </span>
+                          </div>
+                        </div>
+                        <button
+                          onClick={() => {
+                            const updatedCompareData = context.compareData.filter((_, i) => i !== index);
+                            localStorage.setItem('compareItems', JSON.stringify(updatedCompareData));
+                            context.setCompareData(updatedCompareData);
+                          }}
+                          className="text-red-500 hover:text-red-700 text-sm"
+                        >
+                          Remove
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                  
+                  <div className="pt-4 border-t border-gray-200">
+                    <Button 
+                      className="btn-org w-full"
+                      onClick={() => setShowComparison(true)}
+                    >
+                      Compare Now ({context.compareData.length} Products)
+                    </Button>
+                    
+                    <Button 
+                      className="btn-dark w-full mt-2"
+                      onClick={() => {
+                        localStorage.removeItem('compareItems');
+                        context.setCompareData([]);
+                      }}
+                    >
+                      Clear All
+                    </Button>
+                  </div>
+                </div>
+              ) : (
+                // Comparison view
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between mb-4">
+                    <h5 className="text-lg font-semibold">Product Comparison</h5>
+                    <Button 
+                      className="btn-sm"
+                      onClick={() => setShowComparison(false)}
+                    >
+                      Back to List
+                    </Button>
+                  </div>
+                  
+                  <div className="grid grid-cols-1 gap-4">
+                    {context.compareData.map((item, index) => (
+                      <div key={index} className="border border-gray-200 rounded-lg p-4 bg-white">
+                        <div className="flex items-start gap-4">
+                          <img 
+                            src={item.image} 
+                            alt={item.productTitle}
+                            className="w-24 h-24 object-cover rounded-lg"
+                          />
+                          <div className="flex-1">
+                            <h6 className="text-lg font-semibold text-gray-900 mb-2">
+                              {item.productTitle}
+                            </h6>
+                            <p className="text-sm text-gray-600 mb-3">{item.brand}</p>
+                            
+                            <div className="grid grid-cols-2 gap-4 text-sm">
+                              <div>
+                                <span className="font-medium text-gray-700">Original Price:</span>
+                                <span className="line-through text-gray-500 ml-2">₹{item.oldPrice}</span>
+                              </div>
+                              <div>
+                                <span className="font-medium text-gray-700">Current Price:</span>
+                                <span className="text-green-600 font-semibold ml-2">₹{item.price}</span>
+                              </div>
+                              <div>
+                                <span className="font-medium text-gray-700">Discount:</span>
+                                <span className="text-red-600 font-semibold ml-2">{item.discount}% OFF</span>
+                              </div>
+                              <div>
+                                <span className="font-medium text-gray-700">Savings:</span>
+                                <span className="text-green-600 font-semibold ml-2">₹{item.oldPrice - item.price}</span>
+                              </div>
+                            </div>
+                            
+                            <div className="mt-4 flex gap-2">
+                              <Button 
+                                className="btn-org btn-sm"
+                                onClick={() => {
+                                  // Add to cart functionality
+                                  context.addToCart(item, context.userData?._id, 1);
+                                }}
+                              >
+                                Add to Cart
+                              </Button>
+                              <Button 
+                                className="btn-dark btn-sm"
+                                onClick={() => {
+                                  // Add to wishlist functionality
+                                  // You can implement this based on your wishlist system
+                                }}
+                              >
+                                Add to Wishlist
+                              </Button>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  
+                  <div className="pt-4 border-t border-gray-200">
+                    <Button 
+                      className="btn-dark w-full"
+                      onClick={() => {
+                        localStorage.removeItem('compareItems');
+                        context.setCompareData([]);
+                        setShowComparison(false);
+                      }}
+                    >
+                      Clear All & Close
+                    </Button>
+                  </div>
+                </div>
+              )}
+            </div>
+          ) : (
+            <div className="flex items-center justify-center flex-col pt-[100px] gap-5">
+              <IoGitCompareOutline className="text-[60px] text-gray-300" />
+              <h4>Your Compare List is Empty</h4>
+              <p className="text-sm text-gray-500 text-center px-4">
+                Add products to compare their features, prices, and specifications
+              </p>
+              <Button className="btn-org btn-sm" onClick={() => context.setOpenComparePanel(false)}>
+                Continue Shopping
+              </Button>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Existing Drawers and Modals - keeping your functionality */}
       <Drawer

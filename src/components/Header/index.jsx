@@ -302,6 +302,19 @@ const Header = () => {
                     </IconButton>
                   </Tooltip>
                 </li>
+
+                <li>
+                  <Tooltip title="Compare Products">
+                    <IconButton
+                      aria-label="compare"
+                      onClick={() => context.setOpenComparePanel(true)}
+                    >
+                      <StyledBadge badgeContent={context?.compareData?.length !== 0 ? context?.compareData?.length : 0} color="secondary">
+                        <IoGitCompareOutline />
+                      </StyledBadge>
+                    </IconButton>
+                  </Tooltip>
+                </li>
               </ul>
             </div>
           </div>

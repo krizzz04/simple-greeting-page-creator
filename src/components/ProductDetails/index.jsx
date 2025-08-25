@@ -24,6 +24,7 @@ export const ProductDetailsComponent = (props) => {
   const [tabError, setTabError] = useState(false);
   const [isAdded, setIsAdded] = useState(false);
   const [isAddedInMyList, setIsAddedInMyList] = useState(false);
+  const [isAddedToCompare, setIsAddedToCompare] = useState(false);
 
   const context = useContext(MyContext);
   const navigate = useNavigate();
@@ -59,7 +60,6 @@ export const ProductDetailsComponent = (props) => {
       item.productId.includes(props?.item?._id)
     )
 
-
     if (myListItem?.length !== 0) {
       setIsAddedInMyList(true);
     } else {
@@ -67,6 +67,13 @@ export const ProductDetailsComponent = (props) => {
     }
 
   }, [context?.myListData])
+
+  useEffect(() => {
+    // Check if product is already in compare list
+    const existingCompareItems = JSON.parse(localStorage.getItem('compareItems') || '[]');
+    const isAlreadyInCompare = existingCompareItems.some(compareItem => compareItem.productId === props?.item?._id);
+    setIsAddedToCompare(isAlreadyInCompare);
+  }, [props?.item?._id]);
 
   const addToCart = (product, userId, quantity) => {
 
@@ -244,6 +251,51 @@ export const ProductDetailsComponent = (props) => {
     }
   }
 
+  const handleAddToCompare = (item) => {
+    if (context?.userData === null) {
+      context?.alertBox("error", "you are not login please login first");
+      return false;
+    }
+
+    // Check if product is already in compare list
+    const existingCompareItems = JSON.parse(localStorage.getItem('compareItems') || '[]');
+    const isAlreadyInCompare = existingCompareItems.some(compareItem => compareItem.productId === item._id);
+
+    if (isAlreadyInCompare) {
+      context?.alertBox("info", "Product is already in compare list");
+      return;
+    }
+
+    // Limit compare list to 4 items
+    if (existingCompareItems.length >= 4) {
+      context?.alertBox("info", "You can compare up to 4 products at a time. Please remove an item from compare list first.");
+      return;
+    }
+
+    const compareItem = {
+      productId: item._id,
+      productTitle: item.name,
+      image: item.images[0],
+      rating: item.rating,
+      price: item.price,
+      oldPrice: item.oldPrice,
+      brand: item.brand,
+      discount: item.discount,
+      description: item.description
+    };
+
+    existingCompareItems.push(compareItem);
+    localStorage.setItem('compareItems', JSON.stringify(existingCompareItems));
+    
+    setIsAddedToCompare(true);
+    context?.alertBox("success", "Product added to compare list successfully!");
+    
+    // Update context if compare data exists
+    if (context?.setCompareData) {
+      context.setCompareData(existingCompareItems);
+    }
+  }
+
 
   return (
     <div className="w-full">
@@ -415,9 +467,16 @@ export const ProductDetailsComponent = (props) => {
           Add to Wishlist
         </span>
 
-        <span className="flex items-center gap-2 text-[13px] sm:text-[14px] link cursor-pointer font-[500] hover:text-primary transition-colors">
-          <IoGitCompareOutline className="text-[16px] sm:text-[18px] !text-gray-600 hover:!text-primary" /> 
-          Add to Compare
+        <span 
+          className="flex items-center gap-2 text-[13px] sm:text-[14px] link cursor-pointer font-[500] hover:text-primary transition-colors"
+          onClick={() => handleAddToCompare(props?.item)}
+        >
+          {
+            isAddedToCompare === true ? 
+              <IoGitCompareOutline className="text-[16px] sm:text-[18px] !text-primary" /> :
+              <IoGitCompareOutline className="text-[16px] sm:text-[18px] !text-gray-600 hover:!text-primary" />
+          }
+          {isAddedToCompare ? 'Added to Compare' : 'Add to Compare'}
         </span>
       </div>
     </div>
