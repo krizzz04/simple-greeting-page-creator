@@ -10,3 +10,57 @@
 
 .nav li .submenu li .submenu button{color: rgba(0,0,0,0.80) !important;}
 .nav li .submenu li .submenu button:hover{color: #ff5252 !important;}
+
+/* Custom scrollbar for category panel */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 4px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 10px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+
+/* Category drawer animations */
+.category-drawer .MuiDrawer-paper {
+  border-radius: 0 20px 20px 0;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+}
+
+/* Hover effects for category items */
+.categoryPanel .hover\:bg-gray-50:hover {
+  background-color: #f9fafb;
+  transform: translateX(4px);
+}
+
+.categoryPanel .group:hover .group-hover\:shadow-sm {
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+}
+
+/* Smooth transitions */
+.categoryPanel * {
+  transition: all 0.2s ease-in-out;
+}
+
+/* Decorative elements animation */
+.categoryPanel .bg-white\/10 {
+  animation: float 6s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}

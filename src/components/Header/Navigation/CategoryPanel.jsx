@@ -7,6 +7,8 @@ import { Button } from "@mui/material";
 import { MyContext } from "../../../App";
 import { Link, useNavigate } from "react-router-dom";
 import { fetchDataFromApi } from "../../../utils/api";
+import { MdCategory, MdShoppingCart, MdPerson } from "react-icons/md";
+import { FaRegHeart } from "react-icons/fa";
 
 const CategoryPanel = (props) => {
 
@@ -18,61 +20,132 @@ const CategoryPanel = (props) => {
     props.propsSetIsOpenCatPanel(newOpen)
   };
 
-
   const DrawerList = (
-    <Box sx={{ width: 250 }} role="presentation" className="categoryPanel">
+    <Box sx={{ width: 320 }} role="presentation" className="categoryPanel bg-gradient-to-b from-gray-50 to-white">
 
-      <div className="p-3">
-                        <img src={localStorage.getItem('logo') || "/logo.jpg"} className="w-[170px]" alt="Logo" />
+      {/* Header with Logo and Close */}
+      <div className="bg-gradient-to-r from-primary to-orange-500 p-4 relative">
+        <div className="flex items-center justify-between">
+          <img src={localStorage.getItem('logo') || "/logo.jpg"} className="w-[140px] brightness-0 invert" alt="Logo" />
+          <button
+            onClick={toggleDrawer(false)}
+            className="w-8 h-8 bg-white/20 hover:bg-white/30 rounded-full flex items-center justify-center transition-all duration-300"
+          >
+            <IoCloseSharp className="text-white text-lg" />
+          </button>
+        </div>
+        
+        {/* Decorative elements */}
+        <div className="absolute top-0 right-0 w-20 h-20 bg-white/10 rounded-full -translate-y-10 translate-x-10"></div>
+        <div className="absolute bottom-0 left-0 w-16 h-16 bg-white/10 rounded-full translate-y-8 -translate-x-8"></div>
       </div>
 
-      <h3 className="p-3 text-[16px] font-[500] flex items-center justify-between">
-        Shop By Categories{" "}
-        <IoCloseSharp
-          onClick={toggleDrawer(false)}
-          className="cursor-pointer text-[20px]"
-        />
-      </h3>
+      {/* Navigation Menu */}
+      <div className="p-4 space-y-2">
+        <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
+          <MdCategory className="text-primary text-xl" />
+          Shop By Categories
+        </h3>
 
-      {
-        props?.data?.length !== 0 && <CategoryCollapse data={props?.data} />
-      }
-
-      {
-        context?.windowWidth < 992 && context?.isLogin === false &&
-        <Link to="/login" className="p-3 block" onClick={() => {
-          props.setIsOpenCatPanel(false);
-          props.propsSetIsOpenCatPanel(false)
-        }}>
-          <Button className="btn-org w-full">Login</Button>
-        </Link>
-      }
-
-
-      {
-        context?.windowWidth < 992 && context?.isLogin === true &&
-        <div className="p-3 block" onClick={() => {
-          props.setIsOpenCatPanel(false);
-          props.propsSetIsOpenCatPanel(false)
-          fetchDataFromApi(`/api/user/logout?token=${localStorage.getItem('accessToken')}`, { withCredentials: true }).then((res) => {
-            if (res?.error === false) {
-              // Use the new handleLogout function to properly clear all state
-              context.handleLogout();
-              history("/");
-            }
-          })
-        }}>
-          <Button className="btn-org w-full">Logout</Button>
+        {/* Quick Actions */}
+        <div className="grid grid-cols-2 gap-3 mb-6">
+          <Link 
+            to="/products" 
+            className="bg-white rounded-lg p-3 shadow-sm border border-gray-100 hover:shadow-md transition-all duration-300 group"
+            onClick={() => {
+              props.setIsOpenCatPanel(false);
+              props.propsSetIsOpenCatPanel(false);
+            }}
+          >
+            <div className="flex items-center gap-2">
+              <MdShoppingCart className="text-primary text-lg group-hover:scale-110 transition-transform" />
+              <span className="text-sm font-medium text-gray-700">All Products</span>
+            </div>
+          </Link>
+          
+          <Link 
+            to="/my-list" 
+            className="bg-white rounded-lg p-3 shadow-sm border border-gray-100 hover:shadow-md transition-all duration-300 group"
+            onClick={() => {
+              props.setIsOpenCatPanel(false);
+              props.propsSetIsOpenCatPanel(false);
+            }}
+          >
+            <div className="flex items-center gap-2">
+              <FaRegHeart className="text-primary text-lg group-hover:scale-110 transition-transform" />
+              <span className="text-sm font-medium text-gray-700">Wishlist</span>
+            </div>
+          </Link>
         </div>
-      }
 
+        {/* Categories Section */}
+        <div className="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden">
+          {
+            props?.data?.length !== 0 && <CategoryCollapse data={props?.data} />
+          }
+        </div>
+
+        {/* User Actions */}
+        <div className="mt-6 space-y-3">
+          {
+            context?.windowWidth < 992 && context?.isLogin === false &&
+            <Link 
+              to="/login" 
+              className="block" 
+              onClick={() => {
+                props.setIsOpenCatPanel(false);
+                props.propsSetIsOpenCatPanel(false)
+              }}
+            >
+              <Button className="w-full bg-gradient-to-r from-primary to-orange-500 hover:from-orange-500 hover:to-primary text-white font-medium py-3 rounded-lg transition-all duration-300 shadow-md hover:shadow-lg transform hover:-translate-y-0.5">
+                <MdPerson className="mr-2" />
+                Login to Your Account
+              </Button>
+            </Link>
+          }
+
+          {
+            context?.windowWidth < 992 && context?.isLogin === true &&
+            <div 
+              className="block" 
+              onClick={() => {
+                props.setIsOpenCatPanel(false);
+                props.propsSetIsOpenCatPanel(false)
+                fetchDataFromApi(`/api/user/logout?token=${localStorage.getItem('accessToken')}`, { withCredentials: true }).then((res) => {
+                  if (res?.error === false) {
+                    context.handleLogout();
+                    history("/");
+                  }
+                })
+              }}
+            >
+              <Button className="w-full bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white font-medium py-3 rounded-lg transition-all duration-300 shadow-md hover:shadow-lg transform hover:-translate-y-0.5">
+                <MdPerson className="mr-2" />
+                Logout
+              </Button>
+            </div>
+          }
+        </div>
+
+        {/* Footer */}
+        <div className="mt-8 pt-4 border-t border-gray-200">
+          <p className="text-xs text-gray-500 text-center">
+            Discover our handcrafted tiger-head décor inspired by Mangalore's iconic Pilivesha
+          </p>
+        </div>
+      </div>
 
     </Box>
   );
 
   return (
     <>
-      <Drawer open={props.isOpenCatPanel} onClose={toggleDrawer(false)}>
+      <Drawer 
+        open={props.isOpenCatPanel} 
+        onClose={toggleDrawer(false)}
+        anchor="left"
+        className="category-drawer"
+      >
         {DrawerList}
       </Drawer>
     </>
