@@ -10,6 +10,8 @@ import CircularProgress from '@mui/material/CircularProgress';
 import { postData } from "../../utils/api";
 import { FaCheckDouble } from "react-icons/fa";
 import { IoMdHeart } from "react-icons/io";
+import { BsLightningCharge } from "react-icons/bs";
+import { useNavigate } from "react-router-dom";
 
 
 
@@ -18,11 +20,13 @@ export const ProductDetailsComponent = (props) => {
   const [quantity, setQuantity] = useState(1);
   const [selectedTabName, setSelectedTabName] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [isBuyNowLoading, setIsBuyNowLoading] = useState(false);
   const [tabError, setTabError] = useState(false);
   const [isAdded, setIsAdded] = useState(false);
   const [isAddedInMyList, setIsAddedInMyList] = useState(false);
 
   const context = useContext(MyContext);
+  const navigate = useNavigate();
 
   const handleSelecteQty = (qty) => {
     setQuantity(qty);
@@ -77,11 +81,11 @@ export const ProductDetailsComponent = (props) => {
       productTitle: product?.name,
       image: product?.images[0],
       rating: product?.rating,
-      price: product?.price,
-      oldPrice: product?.oldPrice,
+      price: product?.price, // Current selling price
+      oldPrice: product?.oldPrice, // Original price
       discount: product?.discount,
       quantity: quantity,
-      subTotal: parseInt(product?.price * quantity),
+      subTotal: parseInt(product?.price * quantity), // Use current selling price
       productId: product?._id,
       countInStock: product?.countInStock,
       brand: product?.brand,
@@ -142,6 +146,70 @@ export const ProductDetailsComponent = (props) => {
     }
   }
 
+  const buyNow = (product, userId, quantity) => {
+    if (userId === undefined) {
+      context?.alertBox("error", "you are not login please login first");
+      return false;
+    }
+
+    const productItem = {
+      _id: product?._id,
+      productTitle: product?.name,
+      image: product?.images[0],
+      rating: product?.rating,
+      price: product?.price, // Current selling price
+      oldPrice: product?.oldPrice, // Original price
+      discount: product?.discount,
+      quantity: quantity,
+      subTotal: parseInt(product?.price * quantity), // Use current selling price
+      productId: product?._id,
+      countInStock: product?.countInStock,
+      brand: product?.brand,
+      size: props?.item?.size?.length !== 0 ? selectedTabName : '',
+      weight: props?.item?.productWeight?.length !== 0 ? selectedTabName : '',
+      ram: props?.item?.productRam?.length !== 0 ? selectedTabName : ''
+    }
+
+    if (props?.item?.size?.length !== 0 || props?.item?.productWeight?.length !== 0 || props?.item?.productRam?.length !== 0) {
+      if (selectedTabName !== null) {
+        setIsBuyNowLoading(true);
+
+        postData("/api/cart/add", productItem).then((res) => {
+          if (res?.error === false) {
+            context?.getCartItems();
+            setTimeout(() => {
+              setIsBuyNowLoading(false);
+              navigate('/checkout');
+            }, 500);
+          } else {
+            context?.alertBox("error", res?.message);
+            setTimeout(() => {
+              setIsBuyNowLoading(false);
+            }, 500);
+          }
+        })
+      } else {
+        setTabError(true);
+      }
+    } else {
+      setIsBuyNowLoading(true);
+      postData("/api/cart/add", productItem).then((res) => {
+        if (res?.error === false) {
+          context?.getCartItems();
+          setTimeout(() => {
+            setIsBuyNowLoading(false);
+            navigate('/checkout');
+          }, 500);
+        } else {
+          context?.alertBox("error", res?.message);
+          setTimeout(() => {
+            setIsBuyNowLoading(false);
+          }, 500);
+        }
+      })
+    }
+  }
+
 
   const handleAddToMyList = (item) => {
     if (context?.userData === null) {
@@ -156,8 +224,8 @@ export const ProductDetailsComponent = (props) => {
         productTitle: item?.name,
         image: item?.images[0],
         rating: item?.rating,
-        price: item?.price,
-        oldPrice: item?.oldPrice,
+        price: item?.price, // Current selling price
+        oldPrice: item?.oldPrice, // Original price
         brand: item?.brand,
         discount: item?.discount
       }
@@ -178,60 +246,60 @@ export const ProductDetailsComponent = (props) => {
 
 
   return (
-    <>
-      <h1 className="text-[18px] sm:text-[22px] font-[600] mb-2">
+    <div className="w-full">
+      <h1 className="text-[18px] sm:text-[22px] lg:text-[24px] font-[600] mb-3 leading-tight">
         {props?.item?.name}
       </h1>
-      <div className="flex items-start sm:items-center lg:items-center flex-col sm:flex-row md:flex-row lg:flex-row gap-3 justify-start">
-        <span className="text-gray-400 text-[13px]">
-          Brands :{" "}
+      
+      <div className="flex items-start sm:items-center flex-col sm:flex-row gap-2 sm:gap-3 mb-4">
+        <span className="text-gray-400 text-[13px] sm:text-[14px]">
+          Brand:{" "}
           <span className="font-[500] text-black opacity-75">
             {props?.item?.brand}
           </span>
         </span>
 
-        <Rating name="size-small" value={props?.item?.rating} size="small" readOnly />
-        <span className="text-[13px] cursor-pointer" onClick={props.gotoReviews}>Review ({props.reviewsCount})</span>
+        <div className="flex items-center gap-2">
+          <Rating name="size-small" value={props?.item?.rating} size="small" readOnly />
+          <span className="text-[13px] sm:text-[14px] cursor-pointer text-primary hover:underline" onClick={props.gotoReviews}>
+            Reviews ({props.reviewsCount})
+          </span>
+        </div>
       </div>
 
-      <div className="flex flex-col sm:flex-row md:flex-row lg:flex-row items-start sm:items-center gap-4 mt-4">
-        <div className="flex items-center gap-4">
-          <span className="oldPrice line-through text-gray-500 text-[20px] font-[500]">
-            &#x20b9;{props?.item?.price}
-          </span>
-          <span className="price text-primary text-[20px]  font-[600]">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 mb-4">
+        <div className="flex items-center gap-3">
+          <span className="oldPrice line-through text-gray-500 text-[18px] sm:text-[20px] font-[500]">
             &#x20b9;{props?.item?.oldPrice}
+          </span>
+          <span className="price text-primary text-[18px] sm:text-[20px] lg:text-[22px] font-[600]">
+            &#x20b9;{props?.item?.price}
           </span>
         </div>
 
-        <div className="flex items-center gap-4">
-          <span className="text-[14px]">
-            Available In Stock:{" "}
-            <span className="text-green-600 text-[14px] font-bold">
+        <div className="flex items-center">
+          <span className="text-[13px] sm:text-[14px]">
+            In Stock:{" "}
+            <span className="text-green-600 text-[13px] sm:text-[14px] font-bold">
               {props?.item?.countInStock} Items
             </span>
           </span>
         </div>
       </div>
 
-      <p className="mt-3 pr-10 mb-5">
-        {props?.item?.description}
-      </p>
-
-
       {
         props?.item?.productRam?.length !== 0 &&
-        <div className="flex items-center gap-3">
-          <span className="text-[16px]">RAM:</span>
-          <div className="flex items-center gap-1 actions">
+        <div className="mb-4">
+          <span className="text-[15px] sm:text-[16px] font-medium mb-2 block">RAM:</span>
+          <div className="flex flex-wrap items-center gap-2">
             {
               props?.item?.productRam?.map((item, index) => {
                 return (
                   <Button
                     key={index}
                     className={`${productActionIndex === index ?
-                      "!bg-primary !text-white" : ""
-                      }  ${tabError === true && 'error'}`}
+                      "!bg-primary !text-white" : "!bg-gray-100 !text-gray-700 hover:!bg-gray-200"
+                      }  ${tabError === true && '!border-red-500 !border-2'} !min-w-0 !px-3 !py-2 !text-[13px] sm:!text-[14px]`}
                     onClick={() => handleClickActiveTab(index, item)}
                   >
                     {item}
@@ -239,27 +307,23 @@ export const ProductDetailsComponent = (props) => {
                 )
               })
             }
-
-
           </div>
         </div>
       }
 
-
-
       {
         props?.item?.size?.length !== 0 &&
-        <div className="flex items-center gap-3">
-          <span className="text-[16px]">SIZE:</span>
-          <div className="flex items-center gap-1 actions">
+        <div className="mb-4">
+          <span className="text-[15px] sm:text-[16px] font-medium mb-2 block">Size:</span>
+          <div className="flex flex-wrap items-center gap-2">
             {
               props?.item?.size?.map((item, index) => {
                 return (
                   <Button
                     key={index}
                     className={`${productActionIndex === index ?
-                      "!bg-primary !text-white" : ""
-                      } ${tabError === true && 'error'}`}
+                      "!bg-primary !text-white" : "!bg-gray-100 !text-gray-700 hover:!bg-gray-200"
+                      } ${tabError === true && '!border-red-500 !border-2'} !min-w-0 !px-3 !py-2 !text-[13px] sm:!text-[14px]`}
                     onClick={() => handleClickActiveTab(index, item)}
                   >
                     {item}
@@ -267,27 +331,23 @@ export const ProductDetailsComponent = (props) => {
                 )
               })
             }
-
-
           </div>
         </div>
       }
 
-
-
       {
         props?.item?.productWeight?.length !== 0 &&
-        <div className="flex items-center gap-3">
-          <span className="text-[16px]">WEIGHT:</span>
-          <div className="flex items-center gap-1 actions">
+        <div className="mb-4">
+          <span className="text-[15px] sm:text-[16px] font-medium mb-2 block">Weight:</span>
+          <div className="flex flex-wrap items-center gap-2">
             {
               props?.item?.productWeight?.map((item, index) => {
                 return (
                   <Button
                     key={index}
                     className={`${productActionIndex === index ?
-                      "!bg-primary !text-white" : ""
-                      }  ${tabError === true && 'error'}`}
+                      "!bg-primary !text-white" : "!bg-gray-100 !text-gray-700 hover:!bg-gray-200"
+                      }  ${tabError === true && '!border-red-500 !border-2'} !min-w-0 !px-3 !py-2 !text-[13px] sm:!text-[14px]`}
                     onClick={() => handleClickActiveTab(index, item)}
                   >
                     {item}
@@ -295,53 +355,71 @@ export const ProductDetailsComponent = (props) => {
                 )
               })
             }
-
-
           </div>
         </div>
       }
 
+      <div className="bg-blue-50 p-3 rounded-lg mb-4">
+        <p className="text-[13px] sm:text-[14px] text-blue-800 font-medium">
+          🚚 Free Shipping (Est. Delivery: 2-3 Days)
+        </p>
+      </div>
 
-
-      <p className="text-[14px] mt-5 mb-2 text-[#000]">
-        Free Shipping (Est. Delivery Time 2-3 Days)
-      </p>
-      <div className="flex items-center gap-4 py-4">
-        <div className="qtyBoxWrapper w-[70px]">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 mb-4">
+        <div className="qtyBoxWrapper w-[80px] sm:w-[70px]">
           <QtyBox handleSelecteQty={handleSelecteQty} />
         </div>
 
-        <Button className="btn-org flex gap-2 !min-w-[150px]" onClick={() => addToCart(props?.item, context?.userData?._id, quantity)}>
-          {
-            isLoading === true ? <CircularProgress /> :
-              <>
-                {
-                  isAdded === true ? <><FaCheckDouble /> Added</> :
-                    <>
-                      <MdOutlineShoppingCart className="text-[22px]" /> Add to Cart
-                    </>
-                }
+        <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 w-full sm:w-auto">
+          <Button 
+            className="btn-org flex gap-2 !min-w-[140px] sm:!min-w-[150px] !h-[40px] sm:!h-[44px] !text-[14px] sm:!text-[15px]" 
+            onClick={() => addToCart(props?.item, context?.userData?._id, quantity)}
+          >
+            {
+              isLoading === true ? <CircularProgress size={20} /> :
+                <>
+                  {
+                    isAdded === true ? <><FaCheckDouble /> Added</> :
+                      <>
+                        <MdOutlineShoppingCart className="text-[18px] sm:text-[20px]" /> Add to Cart
+                      </>
+                  }
+                </>
+            }
+          </Button>
 
-              </>
-          }
-
-        </Button>
+          <Button 
+            className="btn-dark flex gap-2 !min-w-[140px] sm:!min-w-[150px] !h-[40px] sm:!h-[44px] !text-[14px] sm:!text-[15px] !bg-green-600 hover:!bg-green-700" 
+            onClick={() => buyNow(props?.item, context?.userData?._id, quantity)}
+          >
+            {
+              isBuyNowLoading === true ? <CircularProgress size={20} /> :
+                <>
+                  <BsLightningCharge className="text-[18px] sm:text-[20px]" /> Buy Now
+                </>
+            }
+          </Button>
+        </div>
       </div>
 
-      <div className="flex items-center gap-4 mt-4">
-        <span className="flex items-center gap-2 text-[14px] sm:text-[15px] link cursor-pointer font-[500]" onClick={() => handleAddToMyList(props?.item)}>
+      <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4 mt-4 pt-4 border-t border-gray-200">
+        <span 
+          className="flex items-center gap-2 text-[13px] sm:text-[14px] link cursor-pointer font-[500] hover:text-primary transition-colors" 
+          onClick={() => handleAddToMyList(props?.item)}
+        >
           {
-            isAddedInMyList === true ? <IoMdHeart className="text-[18px] !text-primary group-hover:text-white hover:!text-white" /> :
-              <FaRegHeart className="text-[18px] !text-black group-hover:text-white hover:!text-white" />
-
+            isAddedInMyList === true ? 
+              <IoMdHeart className="text-[16px] sm:text-[18px] !text-primary" /> :
+              <FaRegHeart className="text-[16px] sm:text-[18px] !text-gray-600 hover:!text-primary" />
           }
           Add to Wishlist
         </span>
 
-        <span className="flex items-center gap-2  text-[14px] sm:text-[15px] link cursor-pointer font-[500]">
-          <IoGitCompareOutline className="text-[18px]" /> Add to Compare
+        <span className="flex items-center gap-2 text-[13px] sm:text-[14px] link cursor-pointer font-[500] hover:text-primary transition-colors">
+          <IoGitCompareOutline className="text-[16px] sm:text-[18px] !text-gray-600 hover:!text-primary" /> 
+          Add to Compare
         </span>
       </div>
-    </>
+    </div>
   );
 };

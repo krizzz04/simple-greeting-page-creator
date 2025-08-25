@@ -66,7 +66,7 @@ export const ProductDetails = () => {
 
   return (
     <>
-      <div className="py-5 hidden">
+      <div className="py-3 sm:py-5 hidden">
         <div className="container">
           <Breadcrumbs aria-label="breadcrumb">
             <Link
@@ -97,86 +97,79 @@ export const ProductDetails = () => {
         </div>
       </div>
 
-
-
-      <section className="bg-white py-5">
+      <section className="bg-white py-3 sm:py-5">
         {
           isLoading === true ?
             <div className="flex items-center justify-center min-h-[300px]">
               <CircularProgress />
             </div>
-
-
             :
-
-
             <>
-              <div className="container flex gap-8 flex-col lg:flex-row items-start lg:items-center">
-                <div className="productZoomContainer w-full lg:w-[40%]">
-                  <ProductZoom images={productData?.images} />
+              <div className="container">
+                <div className="flex gap-4 sm:gap-6 lg:gap-8 flex-col lg:flex-row items-start">
+                  <div className="productZoomContainer w-full lg:w-[45%] xl:w-[40%]">
+                    <ProductZoom images={productData?.images} />
+                  </div>
+
+                  <div className="productContent w-full lg:w-[55%] xl:w-[60%] px-4 sm:px-6 lg:px-8 xl:px-10">
+                    <ProductDetailsComponent item={productData} reviewsCount={reviewsCount} gotoReviews={gotoReviews} />
+                  </div>
                 </div>
 
-                <div className="productContent w-full lg:w-[60%] pr-2 pl-2 lg:pr-10 lg:pl-10">
-                  <ProductDetailsComponent item={productData} reviewsCount={reviewsCount} gotoReviews={gotoReviews} />
-                </div>
-              </div>
-
-              <div className="container pt-10">
-                <div className="flex items-center gap-8 mb-5">
-                  <span
-                    className={`link text-[17px] cursor-pointer font-[500] ${activeTab === 0 && "text-primary"
+                <div className="mt-8 sm:mt-10 lg:mt-12">
+                  <div className="flex items-center gap-4 sm:gap-6 lg:gap-8 mb-4 sm:mb-6 border-b border-gray-200">
+                    <span
+                      className={`link text-[15px] sm:text-[16px] lg:text-[17px] cursor-pointer font-[500] pb-3 px-2 transition-colors ${
+                        activeTab === 0 
+                          ? "text-primary border-b-2 border-primary" 
+                          : "text-gray-600 hover:text-gray-800"
                       }`}
-                    onClick={() => setActiveTab(0)}
-                  >
-                    Description
-                  </span>
+                      onClick={() => setActiveTab(0)}
+                    >
+                      Description
+                    </span>
 
-
-                  <span
-                    className={`link text-[17px] cursor-pointer font-[500] ${activeTab === 1 && "text-primary"
+                    <span
+                      className={`link text-[15px] sm:text-[16px] lg:text-[17px] cursor-pointer font-[500] pb-3 px-2 transition-colors ${
+                        activeTab === 1 
+                          ? "text-primary border-b-2 border-primary" 
+                          : "text-gray-600 hover:text-gray-800"
                       }`}
-                    onClick={() => setActiveTab(1)}
-                    ref={reviewSec}
-                  >
-                    Reviews ({reviewsCount})
-                  </span>
+                      onClick={() => setActiveTab(1)}
+                      ref={reviewSec}
+                    >
+                      Reviews ({reviewsCount})
+                    </span>
+                  </div>
+
+                  {activeTab === 0 && (
+                    <div className="bg-gray-50 sm:shadow-md w-full py-4 sm:py-6 px-4 sm:px-6 lg:px-8 rounded-lg sm:rounded-md text-[14px] sm:text-[15px] leading-relaxed">
+                      <div className="prose prose-sm sm:prose max-w-none">
+                        {productData?.description}
+                      </div>
+                    </div>
+                  )}
+
+                  {activeTab === 1 && (
+                    <div className="w-full">
+                      {productData?.length !== 0 && (
+                        <Reviews productId={productData?._id} setReviewsCount={setReviewsCount} />
+                      )}
+                    </div>
+                  )}
                 </div>
 
-                {activeTab === 0 && (
-                  <div className="shadow-md w-full py-5 px-8 rounded-md text-[14px]">
-                    {
-                      productData?.description
-                    }
+                {relatedProductData?.length !== 0 && (
+                  <div className="mt-8 sm:mt-10 lg:mt-12">
+                    <h2 className="text-[18px] sm:text-[20px] lg:text-[22px] font-[600] pb-4 sm:pb-6 mb-4 sm:mb-6 border-b border-gray-200">
+                      Related Products
+                    </h2>
+                    <ProductsSlider items={6} data={relatedProductData}/>
                   </div>
                 )}
-
-
-                {activeTab === 1 && (
-                  <div className="shadow-none lg:shadow-md w-full sm:w-[80%] py-0  lg:py-5 px-0 lg:px-8 rounded-md">
-                    {
-                      productData?.length !== 0 && <Reviews productId={productData?._id} setReviewsCount={setReviewsCount} />
-                    }
-
-                  </div>
-                )}
               </div>
-
-              {
-                relatedProductData?.length !== 0 &&
-                <div className="container pt-8">
-                  <h2 className="text-[20px] font-[600] pb-0">Related Products</h2>
-                  <ProductsSlider items={6} data={relatedProductData}/>
-                </div>
-              }
-
-
             </>
-
         }
-
-
-
-
       </section>
     </>
   );

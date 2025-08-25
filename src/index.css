@@ -194,3 +194,115 @@ header{box-shadow: 0px 1px 5px #0000001a;}
 table td{padding: 8px 17px !important; font-size: 13px !important;}
 
 .searchBox .MuiCircularProgress-root{width: 20px !important; height: 20px !important;}
+
+/* Mobile-specific styles for product page */
+@media (max-width: 768px) {
+  .productZoomContainer {
+    margin-bottom: 1rem;
+  }
+  
+  .productContent {
+    padding: 0 1rem;
+  }
+  
+  /* Improve button touch targets on mobile */
+  .btn-org {
+    min-height: 44px !important;
+    padding: 12px 20px !important;
+  }
+  
+  /* Better spacing for mobile */
+  .container {
+    width: 100%;
+    padding: 0 1rem;
+  }
+  
+  /* Improve tab navigation on mobile */
+  .tab-navigation {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  /* Better text readability on mobile */
+  .product-description {
+    font-size: 15px;
+    line-height: 1.6;
+  }
+  
+  /* Improve form elements on mobile */
+  input, select, textarea {
+    font-size: 16px !important; /* Prevents zoom on iOS */
+  }
+  
+  /* Better spacing for action buttons */
+  .action-buttons {
+    gap: 0.75rem;
+  }
+  
+  /* Improve product image display */
+  .product-image {
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  
+  /* Better price display on mobile */
+  .price-display {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+  
+  /* Improve variant selection on mobile */
+  .variant-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  
+  .variant-buttons button {
+    min-width: 60px;
+    padding: 8px 12px;
+    font-size: 13px;
+  }
+}
+
+/* Tablet-specific improvements */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .productContent {
+    padding: 0 2rem;
+  }
+  
+  .container {
+    width: 90%;
+  }
+}
+
+/* Smooth transitions for better UX */
+.product-details-transition {
+  transition: all 0.3s ease-in-out;
+}
+
+/* Improve focus states for accessibility */
+button:focus,
+input:focus,
+select:focus,
+textarea:focus {
+  outline: 2px solid #ff5252;
+  outline-offset: 2px;
+}
+
+/* Better loading states */
+.loading-skeleton {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: loading 1.5s infinite;
+}
+
+@keyframes loading {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}

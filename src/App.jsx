@@ -238,7 +238,7 @@ function App() {
         alertBox("error", "Product price is missing");
         return;
       }
-      if (!product.countInStock) {
+      if (product.countInStock === undefined || product.countInStock === null) {
         alertBox("error", "Product stock information is missing");
         return;
       }
