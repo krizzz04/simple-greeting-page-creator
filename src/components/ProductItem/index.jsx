@@ -454,7 +454,7 @@ const ProductItem = (props) => {
         }
 
 
-        <span className="discount flex items-center absolute top-[10px] left-[10px] z-50 bg-primary text-white rounded-lg p-1 text-[12px] font-[500]">
+        <span className="discount flex items-center absolute top-[10px] left-[10px] z-50 bg-gradient-to-r from-primary to-orange-500 text-white rounded-lg p-1 text-[12px] font-[500] shadow-md">
           {props?.item?.discount}%
         </span>
 
@@ -515,7 +515,7 @@ const ProductItem = (props) => {
           <span className="oldPrice line-through text-gray-500 text-[12px] lg:text-[14px] font-[500]">
             {props?.item?.oldPrice?.toLocaleString('en-US', { style: 'currency', currency: 'INR' })}
           </span>
-          <span className="price text-primary text-[12px] lg:text-[14px]  font-[600]">
+          <span className="price bg-gradient-to-r from-primary to-orange-500 bg-clip-text text-transparent text-[12px] lg:text-[14px] font-[600]">
             {props?.item?.price?.toLocaleString('en-US', { style: 'currency', currency: 'INR' })}
           </span>
         </div>

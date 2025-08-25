@@ -335,7 +335,7 @@ const ProductItem = (props) => {
         }
 
 
-        <span className="discount flex items-center absolute top-[10px] left-[10px] z-50 bg-primary text-white rounded-lg p-1 text-[12px] font-[500]">
+        <span className="discount flex items-center absolute top-[10px] left-[10px] z-50 bg-gradient-to-r from-primary to-orange-500 text-white rounded-lg p-1 text-[12px] font-[500] shadow-md">
           {props?.item?.discount}%
         </span>
 
@@ -389,7 +389,7 @@ const ProductItem = (props) => {
           <span className="oldPrice line-through text-gray-500 text-[15px] font-[500]">
           &#x20b9;{props?.item?.oldPrice}
           </span>
-          <span className="price text-primary text-[15px]  font-[600]">
+          <span className="price bg-gradient-to-r from-primary to-orange-500 bg-clip-text text-transparent text-[15px] font-[600]">
             &#x20b9;{props?.item?.price}
           </span>
         </div>

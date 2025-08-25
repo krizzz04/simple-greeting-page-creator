@@ -19,18 +19,18 @@ h1, h2, h3, h4, h5, h6{font-weight: 600;}
 
 
 ::-webkit-scrollbar{width: 8px !important; height: 8px !important;}
-::-webkit-scrollbar-thumb{background: #ff5252;}
+::-webkit-scrollbar-thumb{background: linear-gradient(to bottom, #ff5252, #f97316);}
 ::-webkit-scrollbar-track{background: #fff;}
 
 .overflow-x-auto::-webkit-scrollbar-thumb{background: #ccc;}
 
 .container{width: 95%; margin: auto;}
 
-.btn-org{background: #ff5252 !important; color: #fff !important; font-weight: 500; font-size: 16px; padding: 7px 20px !important; border:1px solid transparent !important; }
-.btn-org:hover{background: #171717 !important;}
+.btn-org{background: linear-gradient(to right, #ff5252, #f97316) !important; color: #fff !important; font-weight: 500; font-size: 16px; padding: 7px 20px !important; border:1px solid transparent !important; }
+.btn-org:hover{background: linear-gradient(to right, #f97316, #ff5252) !important; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(249, 115, 22, 0.3);}
 
 .btn-org.btn-border{background: none !important; color: #ff5252 !important; border:1px solid #ff5252 !important; font-weight: 500; font-size: 16px; padding: 7px 20px !important;}
-.btn-org.btn-border:hover{background: #171717 !important; color: #fff !important;  border:1px solid #171717 !important;}
+.btn-org.btn-border:hover{background: linear-gradient(to right, #ff5252, #f97316) !important; color: #fff !important;  border:1px solid transparent !important;}
 
 .btn-dark{background: #363636 !important; color: #fff !important;  border:1px solid #171717 !important;}
 .btn-dark:hover{background: #171717 !important; }
@@ -41,7 +41,7 @@ h1, h2, h3, h4, h5, h6{font-weight: 600;}
 
 .link:hover,.Mui-checked{color: #ff5252 !important;}
 
-.MuiBadge-badge{background-color: #ff5252 !important;}
+.MuiBadge-badge{background: linear-gradient(to right, #ff5252, #f97316) !important;}
 
 nav ul button{text-transform: capitalize !important;}
 
@@ -71,13 +71,13 @@ nav ul button:hover{background: none !important;}
 
 .homeCatSlider .item{border: 1px solid rgba(0,0,0,0.1);}
 
-.swiper-button-prev:hover,.swiper-button-next:hover{background: #ff5252 !important;}
+.swiper-button-prev:hover,.swiper-button-next:hover{background: linear-gradient(to right, #ff5252, #f97316) !important;}
 .swiper-button-prev:hover::after,.swiper-button-next:hover::after{color: #fff !important;}
 
 .homeCatSlider .item:hover img{transform:scale(1.1);}
 
 
-.MuiTabs-indicator{background-color: #ff5252 !important;}
+.MuiTabs-indicator{background: linear-gradient(to right, #ff5252, #f97316) !important;}
 .MuiTab-textColorPrimary.Mui-selected{color:#ff5252 !important;}
 
 .productsSlider .swiper-wrapper{padding: 15px 8px; margin-left: -15px; margin-right: -15px;}
@@ -90,7 +90,7 @@ footer form input::placeholder{font-size: 14px;}
 
 .MuiFormControlLabel-label{font-size: 13px !important; color: rgba(0,0,0,0.8);}
 
-.swiper-pagination-bullet-active{background: #ff5252 !important;}
+.swiper-pagination-bullet-active{background: linear-gradient(to right, #ff5252, #f97316) !important;}
 
 
 .homeSliderV2 .swiper-slide-active .info{right: 0px !important; opacity: 1;}

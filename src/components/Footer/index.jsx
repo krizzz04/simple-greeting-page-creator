@@ -60,7 +60,7 @@ const Footer = () => {
   return (
     <>
       {/* Minimal Footer */}
-      <footer className="bg-gray-50 border-t border-gray-200 py-8">
+      <footer className="bg-gradient-to-b from-gray-50 to-orange-50 border-t border-orange-200 py-8">
         <div className="container">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
             {/* Brand & Contact */}
@@ -68,13 +68,13 @@ const Footer = () => {
               <h2 className="text-lg font-medium text-gray-900 mb-3">RoarOfSouth</h2>
               <div className="space-y-2 text-sm text-gray-600">
                 <div className="flex items-center space-x-2">
-                  <MdEmail className="text-gray-400 text-sm" />
-                  <Link to="mailto:roarofsouth2025@gmail.com" className="hover:text-gray-900 transition-colors">
+                  <MdEmail className="text-primary text-sm" />
+                  <Link to="mailto:roarofsouth2025@gmail.com" className="hover:text-primary transition-colors">
                     roarofsouth2025@gmail.com
                   </Link>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <MdPhone className="text-gray-400 text-sm" />
+                  <MdPhone className="text-primary text-sm" />
                   <span>+91 8073687598</span>
                 </div>
               </div>
@@ -84,12 +84,12 @@ const Footer = () => {
             <div>
               <h3 className="text-sm font-medium text-gray-900 mb-3">Quick Links</h3>
               <ul className="space-y-2 text-sm text-gray-600">
-                <li><button onClick={handleOpenAbout} className="hover:text-gray-900 transition-colors text-left">About</button></li>
-                <li><Link to="/products" className="hover:text-gray-900 transition-colors">Products</Link></li>
-                <li><Link to="/contact" className="hover:text-gray-900 transition-colors">Contact</Link></li>
-                <li><button onClick={handleOpenHelp} className="hover:text-gray-900 transition-colors text-left">Help</button></li>
-                <li><button onClick={handleOpenPrivacyPolicy} className="hover:text-gray-900 transition-colors text-left">Privacy Policy</button></li>
-                <li><button onClick={handleOpenTermsConditions} className="hover:text-gray-900 transition-colors text-left">Terms & Conditions</button></li>
+                <li><button onClick={handleOpenAbout} className="hover:text-primary transition-colors text-left">About</button></li>
+                <li><Link to="/products" className="hover:text-primary transition-colors">Products</Link></li>
+                <li><Link to="/contact" className="hover:text-primary transition-colors">Contact</Link></li>
+                <li><button onClick={handleOpenHelp} className="hover:text-primary transition-colors text-left">Help</button></li>
+                <li><button onClick={handleOpenPrivacyPolicy} className="hover:text-primary transition-colors text-left">Privacy Policy</button></li>
+                <li><button onClick={handleOpenTermsConditions} className="hover:text-primary transition-colors text-left">Terms & Conditions</button></li>
               </ul>
             </div>
 
@@ -141,9 +141,9 @@ const Footer = () => {
                 <input
                   type="email"
                   placeholder="Your email"
-                  className="flex-1 px-3 py-2 bg-white border border-gray-200 rounded-l focus:outline-none focus:border-gray-300 text-sm"
+                  className="flex-1 px-3 py-2 bg-white border border-gray-200 rounded-l focus:outline-none focus:border-primary text-sm"
                 />
-                <Button className="px-4 py-2 bg-gray-900 hover:bg-gray-800 text-white rounded-r text-xs">
+                <Button className="px-4 py-2 bg-gradient-to-r from-primary to-orange-500 hover:from-orange-500 hover:to-primary text-white rounded-r text-xs transition-all duration-300">
                   Subscribe
                 </Button>
               </div>
@@ -151,7 +151,7 @@ const Footer = () => {
           </div>
 
           {/* Bottom Bar */}
-          <div className="border-t border-gray-200 pt-4 pb-16 lg:pb-4">
+          <div className="border-t border-orange-200 pt-4 pb-16 lg:pb-4">
             <div className="flex flex-col lg:flex-row items-center justify-between space-y-3 lg:space-y-0">
               <p className="text-xs text-gray-500">
                 © {new Date().getFullYear()} Roar Of South. All rights reserved.
@@ -160,14 +160,14 @@ const Footer = () => {
               <div className="flex items-center space-x-4">
                 <button 
                   onClick={handleOpenPrivacyPolicy}
-                  className="text-xs text-gray-500 hover:text-gray-700 transition-colors"
+                  className="text-xs text-gray-500 hover:text-primary transition-colors"
                 >
                   Privacy Policy
                 </button>
                 <span className="text-xs text-gray-400">|</span>
                 <button 
                   onClick={handleOpenTermsConditions}
-                  className="text-xs text-gray-500 hover:text-gray-700 transition-colors"
+                  className="text-xs text-gray-500 hover:text-primary transition-colors"
                 >
                   Terms & Conditions
                 </button>

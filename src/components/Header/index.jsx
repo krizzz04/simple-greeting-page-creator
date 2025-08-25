@@ -88,11 +88,11 @@ const Header = () => {
   return (
     <>
       <header className="bg-white fixed lg:sticky left-0 w-full top-0 lg:-top-[47px] z-[101]">
-        <div className="top-strip hidden lg:block py-2 border-t-[1px] border-gray-250  border-b-[1px]">
+        <div className="top-strip hidden lg:block py-2 bg-gradient-to-r from-primary to-orange-500 text-white">
           <div className="container">
             <div className="flex items-center justify-between">
               <div className="col1 w-[50%] hidden lg:block">
-                <p className="text-[12px] font-[500] mt-0 mb-0">
+                <p className="text-[12px] font-[500] mt-0 mb-0 text-white">
                   Get up to 50% off new season styles, limited time only
                 </p>
               </div>
@@ -102,7 +102,7 @@ const Header = () => {
                   <li className="list-none">
                     <Link
                       to="/help-center"
-                      className="text-[11px] lg:text-[13px] link font-[500] transition"
+                      className="text-[11px] lg:text-[13px] text-white hover:text-orange-200 font-[500] transition"
                     >
                       Help Center{" "}
                     </Link>
@@ -110,7 +110,7 @@ const Header = () => {
                   <li className="list-none">
                     <Link
                       to="/order-tracking"
-                      className="text-[11px] lg:text-[13px] link font-[500] transition"
+                      className="text-[11px] lg:text-[13px] text-white hover:text-orange-200 font-[500] transition"
                     >
                       Order Tracking
                     </Link>
