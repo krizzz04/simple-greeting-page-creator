@@ -705,7 +705,7 @@ const Footer = () => {
                     </div>
                   ))}
                   
-                  <div className="pt-4 border-t border-gray-200">
+                  <div className="pt-4 border-t border-gray-200 space-y-4">
                     <Button 
                       className="btn-org w-full"
                       onClick={() => setShowComparison(true)}
@@ -714,7 +714,7 @@ const Footer = () => {
                     </Button>
                     
                     <Button 
-                      className="btn-dark w-full mt-2"
+                      className="btn-dark w-full"
                       onClick={() => {
                         localStorage.removeItem('compareItems');
                         context.setCompareData([]);

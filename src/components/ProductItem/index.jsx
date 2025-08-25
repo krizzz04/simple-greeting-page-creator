@@ -22,6 +22,7 @@ const ProductItem = (props) => {
   const [quantity, setQuantity] = useState(1);
   const [isAdded, setIsAdded] = useState(false);
   const [isAddedInMyList, setIsAddedInMyList] = useState(false);
+  const [isAddedToCompare, setIsAddedToCompare] = useState(false);
   const [cartItem, setCartItem] = useState([]);
 
   const [activeTab, setActiveTab] = useState(null);
@@ -129,6 +130,59 @@ const ProductItem = (props) => {
     }, 1000);
   }
 
+  const handleAddToCompare = (item) => {
+    if (!context?.userData) {
+      context?.alertBox("error", "Please login first to add products to compare");
+      return;
+    }
+
+    try {
+      const compareItem = {
+        _id: item?._id,
+        productTitle: item?.name,
+        image: item?.images[0],
+        brand: item?.brand,
+        price: item?.price,
+        oldPrice: item?.oldPrice,
+        discount: item?.discount,
+        rating: item?.rating
+      };
+
+      // Get existing compare items from localStorage
+      const existingCompareItems = JSON.parse(localStorage.getItem('compareItems') || '[]');
+      
+      // Check if item is already in compare list
+      const isAlreadyAdded = existingCompareItems.some(compareItem => compareItem._id === item._id);
+      
+      if (isAlreadyAdded) {
+        context?.alertBox("warning", "Product is already in your compare list");
+        return;
+      }
+
+      // Check if compare list has reached maximum limit (4 items)
+      if (existingCompareItems.length >= 4) {
+        context?.alertBox("warning", "You can compare up to 4 products at a time. Please remove some items first.");
+        return;
+      }
+
+      // Add new item to compare list
+      const updatedCompareItems = [...existingCompareItems, compareItem];
+      localStorage.setItem('compareItems', JSON.stringify(updatedCompareItems));
+      
+      // Update context state
+      if (context?.setCompareData) {
+        context.setCompareData(updatedCompareItems);
+      }
+      
+      setIsAddedToCompare(true);
+      context?.alertBox("success", "Product added to compare list successfully");
+      
+    } catch (error) {
+      console.error('Error adding to compare:', error);
+      context?.alertBox("error", "Failed to add product to compare list");
+    }
+  };
+
 
   const handleClickActiveTab = (index, name) => {
     setActiveTab(index)
@@ -169,6 +223,17 @@ const ProductItem = (props) => {
     }
 
   }, [context?.cartData]);
+
+  // Check if item is already in compare list on component mount
+  useEffect(() => {
+    try {
+      const existingCompareItems = JSON.parse(localStorage.getItem('compareItems') || '[]');
+      const isAlreadyAdded = existingCompareItems.some(compareItem => compareItem._id === props?.item?._id);
+      setIsAddedToCompare(isAlreadyAdded);
+    } catch (error) {
+      console.error('Error checking compare status:', error);
+    }
+  }, [props?.item?._id]);
 
 
   const minusQty = () => {
@@ -407,9 +472,12 @@ const ProductItem = (props) => {
 
           <Button 
             className="!w-[35px] !h-[35px] !min-w-[35px] !rounded-full !bg-white  text-black hover:!bg-primary hover:text-white group"
-            onClick={(e) => e.stopPropagation()}
+            onClick={(e) => {
+              e.stopPropagation();
+              handleAddToCompare(props?.item);
+            }}
           >
-            <IoGitCompareOutline className="text-[18px] !text-black group-hover:text-white hover:!text-white" />
+            <IoGitCompareOutline className={`text-[18px] ${isAddedToCompare ? '!text-primary' : '!text-black'} group-hover:text-white hover:!text-white`} />
           </Button>
 
           <Button 
