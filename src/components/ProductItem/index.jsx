@@ -258,28 +258,29 @@ const ProductItem = (props) => {
 
 
   return (
-    <div className="productItem shadow-lg rounded-md overflow-hidden border-1 border-[rgba(0,0,0,0.1)]">
+    <div 
+      className="productItem shadow-lg rounded-md overflow-hidden border-1 border-[rgba(0,0,0,0.1)] cursor-pointer transition-all duration-300 hover:shadow-xl hover:scale-[1.02]"
+      onClick={() => navigate(`/product/${props?.item?._id}`)}
+    >
       <div className="group imgWrapper w-[100%]  overflow-hidden  rounded-md rounded-bl-none rounded-br-none relative">
-        <Link to={props?.item?.images?.[1] || "#"}>
-          <div className="img h-[200px] overflow-hidden">
+        <div className="img h-[200px] overflow-hidden">
+          <img
+            src={props?.item?.images?.[0] || "/homeBannerPlaceholder.jpg"}
+            className="w-full"
+            alt={props?.item?.name || "Product"}
+          />
+
+          {
+            props?.item?.images?.length > 1 &&
             <img
-              src={props?.item?.images?.[0] || "/homeBannerPlaceholder.jpg"}
-              className="w-full"
+              src={props?.item?.images?.[1] || "/homeBannerPlaceholder.jpg"}
+              className="w-full transition-all duration-700 absolute top-0 left-0 opacity-0 group-hover:opacity-100 group-hover:scale-105"
               alt={props?.item?.name || "Product"}
             />
-
-            {
-              props?.item?.images?.length > 1 &&
-              <img
-                src={props?.item?.images?.[1] || "/homeBannerPlaceholder.jpg"}
-                className="w-full transition-all duration-700 absolute top-0 left-0 opacity-0 group-hover:opacity-100 group-hover:scale-105"
-                alt={props?.item?.name || "Product"}
-              />
-            }
+          }
 
 
-          </div>
-        </Link>
+        </div>
 
 
 
@@ -288,33 +289,53 @@ const ProductItem = (props) => {
           <div className="flex items-center justify-center absolute top-0 left-0 w-full h-full 
       bg-[rgba(0,0,0,0.7)] z-[60] p-3 gap-2">
 
-            <Button className="!absolute top-[10px] right-[10px] !min-w-[30px] !min-h-[30px] !w-[30px] !h-[30px] !rounded-full !bg-[rgba(255,255,255,1)] text-black"
-              onClick={() => setIsShowTabs(false)}
-            > <MdClose className=" text-black z-[90] text-[25px]" /></Button>
+            <Button 
+              className="!absolute top-[10px] right-[10px] !min-w-[30px] !min-h-[30px] !w-[30px] !h-[30px] !rounded-full !bg-[rgba(255,255,255,1)] text-black"
+              onClick={(e) => {
+                e.stopPropagation();
+                setIsShowTabs(false);
+              }}
+            > 
+              <MdClose className=" text-black z-[90] text-[25px]" />
+            </Button>
 
             <div className="flex flex-col items-center gap-4 w-full">
               <div className="flex items-center justify-center gap-2 flex-wrap">
                 {
                   props?.item?.size?.length !== 0 && props?.item?.size?.map((item, index) => {
                     return (
-                      <span key={index} className={`flex items-center justify-center p-1 px-2 bg-[rgba(255,555,255,0.8)] max-w-[35px] h-[25px]  
+                      <span 
+                        key={index} 
+                        className={`flex items-center justify-center p-1 px-2 bg-[rgba(255,555,255,0.8)] max-w-[35px] h-[25px]  
           rounded-sm cursor-pointer hover:bg-white 
           ${activeTab === index && '!bg-primary text-white'}`}
-                        onClick={() => handleClickActiveTab(index, item)}
-                      >{item}
-                      </span>)
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleClickActiveTab(index, item);
+                        }}
+                      >
+                        {item}
+                      </span>
+                    )
                   })
                 }
 
                 {
                   props?.item?.productRam?.length !== 0 && props?.item?.productRam?.map((item, index) => {
                     return (
-                      <span key={index} className={`flex items-center justify-center p-1 px-2 bg-[rgba(255,555,255,0.8)] max-w-[45px] h-[25px]  
+                      <span 
+                        key={index} 
+                        className={`flex items-center justify-center p-1 px-2 bg-[rgba(255,555,255,0.8)] max-w-[45px] h-[25px]  
           rounded-sm cursor-pointer hover:bg-white 
           ${activeTab === index && '!bg-primary text-white'}`}
-                        onClick={() => handleClickActiveTab(index, item)}
-                      >{item}
-                      </span>)
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleClickActiveTab(index, item);
+                        }}
+                      >
+                        {item}
+                      </span>
+                    )
                   })
                 }
 
@@ -322,12 +343,19 @@ const ProductItem = (props) => {
                 {
                   props?.item?.productWeight?.length !== 0 && props?.item?.productWeight?.map((item, index) => {
                     return (
-                      <span key={index} className={`flex items-center justify-center p-1 px-2 bg-[rgba(255,555,255,0.8)] max-w-[35px] h-[25px]  
+                      <span 
+                        key={index} 
+                        className={`flex items-center justify-center p-1 px-2 bg-[rgba(255,555,255,0.8)] max-w-[35px] h-[25px]  
           rounded-sm cursor-pointer hover:bg-white 
           ${activeTab === index && '!bg-primary text-white'}`}
-                        onClick={() => handleClickActiveTab(index, item)}
-                      >{item}
-                      </span>)
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleClickActiveTab(index, item);
+                        }}
+                      >
+                        {item}
+                      </span>
+                    )
                   })
                 }
               </div>
@@ -336,14 +364,20 @@ const ProductItem = (props) => {
                 <div className="flex flex-col gap-2 w-full max-w-[200px]">
                   <Button 
                     className="btn-org btn-sm gap-2" 
-                    onClick={() => addToCart(props?.item, context?.userData?._id, quantity)}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      addToCart(props?.item, context?.userData?._id, quantity);
+                    }}
                   >
                     <MdOutlineShoppingCart className="text-[18px]" /> Add to Cart
                   </Button>
                   
                   <Button 
                     className="btn-dark btn-sm gap-2" 
-                    onClick={handleBuyNowWithVariant}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleBuyNowWithVariant();
+                    }}
                   >
                     <BsLightningCharge className="text-[18px]" /> Buy Now
                   </Button>
@@ -361,16 +395,29 @@ const ProductItem = (props) => {
 
         <div className="actions absolute top-[-20px] right-[5px] z-50 flex items-center gap-2 flex-col w-[50px] transition-all duration-300 group-hover:top-[15px] opacity-0 group-hover:opacity-100">
 
-          <Button className="!w-[35px] !h-[35px] !min-w-[35px] !rounded-full !bg-white  text-black hover:!bg-primary hover:text-white group" onClick={() => context.handleOpenProductDetailsModal(true, props?.item)}>
+          <Button 
+            className="!w-[35px] !h-[35px] !min-w-[35px] !rounded-full !bg-white  text-black hover:!bg-primary hover:text-white group" 
+            onClick={(e) => {
+              e.stopPropagation();
+              context.handleOpenProductDetailsModal(true, props?.item);
+            }}
+          >
             <MdZoomOutMap className="text-[18px] !text-black group-hover:text-white hover:!text-white" />
           </Button>
 
-          <Button className="!w-[35px] !h-[35px] !min-w-[35px] !rounded-full !bg-white  text-black hover:!bg-primary hover:text-white group">
+          <Button 
+            className="!w-[35px] !h-[35px] !min-w-[35px] !rounded-full !bg-white  text-black hover:!bg-primary hover:text-white group"
+            onClick={(e) => e.stopPropagation()}
+          >
             <IoGitCompareOutline className="text-[18px] !text-black group-hover:text-white hover:!text-white" />
           </Button>
 
-          <Button className={`!w-[35px] !h-[35px] !min-w-[35px] !rounded-full !bg-white  text-black hover:!bg-primary hover:text-white group`}
-            onClick={() => handleAddToMyList(props?.item)}
+          <Button 
+            className={`!w-[35px] !h-[35px] !min-w-[35px] !rounded-full !bg-white  text-black hover:!bg-primary hover:text-white group`}
+            onClick={(e) => {
+              e.stopPropagation();
+              handleAddToMyList(props?.item);
+            }}
           >
             {
               isAddedInMyList === true ? <IoMdHeart className="text-[18px] !text-primary group-hover:text-white hover:!text-white" /> :
@@ -412,13 +459,25 @@ const ProductItem = (props) => {
             isAdded === false ?
 
               <div className="flex flex-col gap-2">
-                <Button className="btn-org addToCartBtn btn-border flex w-full btn-sm gap-2 " size="small"
-                  onClick={() => addToCart(props?.item, context?.userData?._id, quantity)}>
+                <Button 
+                  className="btn-org addToCartBtn btn-border flex w-full btn-sm gap-2 " 
+                  size="small"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    addToCart(props?.item, context?.userData?._id, quantity);
+                  }}
+                >
                   <MdOutlineShoppingCart className="text-[18px]" /> Add to Cart
                 </Button>
                 
-                <Button className="btn-dark buyNowBtn btn-border flex w-full btn-sm gap-2" size="small"
-                  onClick={() => buyNow(props?.item, context?.userData?._id)}>
+                <Button 
+                  className="btn-dark buyNowBtn btn-border flex w-full btn-sm gap-2" 
+                  size="small"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    buyNow(props?.item, context?.userData?._id);
+                  }}
+                >
                   <BsLightningCharge className="text-[18px]" /> Buy Now
                 </Button>
               </div>
@@ -436,11 +495,25 @@ const ProductItem = (props) => {
 
 
                     <div className="flex items-center justify-between overflow-hidden rounded-full border border-[rgba(0,0,0,0.1)]">
-                      <Button className="!min-w-[35px] !w-[35px] !h-[30px] !bg-[#f1f1f1]  !rounded-none" onClick={minusQty}><FaMinus className="text-[rgba(0,0,0,0.7)]" /></Button>
+                      <Button 
+                        className="!min-w-[35px] !w-[35px] !h-[30px] !bg-[#f1f1f1]  !rounded-none" 
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          minusQty();
+                        }}
+                      >
+                        <FaMinus className="text-[rgba(0,0,0,0.7)]" />
+                      </Button>
                       <span>{quantity}</span>
-                      <Button className="!min-w-[35px] !w-[35px] !h-[30px] !bg-gray-800 !rounded-none"
-                        onClick={addQty}>
-                        <FaPlus className="text-white" /></Button>
+                      <Button 
+                        className="!min-w-[35px] !w-[35px] !h-[30px] !bg-gray-800 !rounded-none"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          addQty();
+                        }}
+                      >
+                        <FaPlus className="text-white" />
+                      </Button>
                     </div>
 
                 }

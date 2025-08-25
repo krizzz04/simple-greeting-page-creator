@@ -10,8 +10,9 @@ import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import Pagination from "@mui/material/Pagination";
 import ProductLoadingGrid from "../../components/ProductLoading/productLoadingGrid";
-import { postData } from "../../utils/api";
+import { postData, fetchDataFromApi } from "../../utils/api";
 import { MyContext } from "../../App";
+import { useSearchParams } from "react-router-dom";
 
 const ProductListing = () => {
   const [itemView, setItemView] = useState("grid");
@@ -24,12 +25,37 @@ const ProductListing = () => {
   const [totalPages, setTotalPages] = useState(1);
 
   const [selectedSortVal, setSelectedSortVal] = useState("Name, A to Z");
+  const [categoryName, setCategoryName] = useState("");
 
   const context = useContext(MyContext);
+  const [searchParams] = useSearchParams();
 
   useEffect(() => {
     window.scrollTo(0, 0);
-  }, [])
+    
+    // Check for category parameter in URL
+    const categoryId = searchParams.get('category');
+    const categoryNameParam = searchParams.get('name');
+    
+    if (categoryId) {
+      setCategoryName(categoryNameParam || "Category Products");
+      setIsLoading(true);
+      
+      // Fetch products by category
+      fetchDataFromApi(`/api/product/getAllProductsByCatId/${categoryId}`).then((res) => {
+        if (res?.error === false) {
+          setProductsData(res);
+        } else {
+          setProductsData({ products: [] });
+        }
+        setIsLoading(false);
+      }).catch((error) => {
+        console.error("Error fetching category products:", error);
+        setProductsData({ products: [] });
+        setIsLoading(false);
+      });
+    }
+  }, [searchParams])
 
 
   const open = Boolean(anchorEl);
@@ -58,6 +84,20 @@ const ProductListing = () => {
     <section className=" pb-0">
 
       <div className="bg-white p-2">
+        {/* Breadcrumbs and Category Title */}
+        {categoryName && (
+          <div className="container mb-4">
+            <Breadcrumbs aria-label="breadcrumb" className="mb-2">
+              <a href="/" className="text-blue-600 hover:text-blue-800">
+                Home
+              </a>
+              <span className="text-gray-500">{categoryName}</span>
+            </Breadcrumbs>
+            <h1 className="text-2xl font-bold text-gray-900 mb-2">{categoryName}</h1>
+            <p className="text-gray-600">Browse our collection of {categoryName.toLowerCase()} products</p>
+          </div>
+        )}
+        
         <div className="container flex gap-3">
           <div className={`sidebarWrapper fixed -bottom-[100%] left-0 w-fulllg:h-full lg:static lg:w-[20%] bg-white z-[102] lg:z-[100] p-3 lg:p-0  transition-all lg:opacity-100 opacity-0 ${context?.openFilter === true ? 'open' : ''}`}>
             <Sidebar

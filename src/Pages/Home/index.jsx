@@ -208,307 +208,27 @@ const Home = () => {
           overflow: hidden;
         }
 
-        /* Products Grid */
-        .mobile-products-section {
-          margin: 0 16px 20px 16px;
+        /* Category Cards */
+        .category-card {
+          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        .mobile-products-grid {
-          display: grid;
-          grid-template-columns: repeat(2, 1fr);
-          gap: 12px;
-          padding: 0;
+        .category-card:hover {
+          transform: translateY(-8px);
+          box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
         }
 
-        .mobile-product-card {
-          background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
-          border-radius: 20px;
-          overflow: hidden;
-          box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-          transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-          position: relative;
-          cursor: pointer;
-          border: 1px solid rgba(255, 255, 255, 0.8);
-          backdrop-filter: blur(10px);
+        .category-card .category-image {
+          transition: all 0.3s ease;
         }
 
-        .mobile-product-card:hover {
-          transform: translateY(-8px) scale(1.02);
-          box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
-          border-color: rgba(59, 130, 246, 0.3);
-        }
-
-        .mobile-product-card::before {
-          content: '';
-          position: absolute;
-          top: 0;
-          left: 0;
-          right: 0;
-          height: 2px;
-          background: linear-gradient(90deg, #3b82f6, #10b981, #f59e0b, #8b5cf6);
-          transform: scaleX(0);
-          transition: transform 0.4s ease;
-          z-index: 3;
-        }
-
-        .mobile-product-card:hover::before {
-          transform: scaleX(1);
-        }
-
-        .mobile-product-image {
-          aspect-ratio: 1;
-          background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
-          position: relative;
-          overflow: hidden;
-        }
-
-        .mobile-product-image::after {
-          content: '';
-          position: absolute;
-          top: 0;
-          left: 0;
-          right: 0;
-          bottom: 0;
-          background: linear-gradient(45deg, transparent 30%, rgba(255, 255, 255, 0.1) 50%, transparent 70%);
-          transform: translateX(-100%);
-          transition: transform 0.6s ease;
-        }
-
-        .mobile-product-card:hover .mobile-product-image::after {
-          transform: translateX(100%);
-        }
-
-        .mobile-product-image img {
-          width: 100%;
-          height: 100%;
-          object-fit: cover;
-          transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .mobile-product-card:hover .mobile-product-image img {
-          transform: scale(1.1) rotate(2deg);
-        }
-
-        .mobile-product-badge {
-          position: absolute;
-          top: 12px;
-          left: 12px;
-          background: linear-gradient(135deg, #ef4444, #dc2626);
-          color: white;
-          font-size: 11px;
-          font-weight: 700;
-          padding: 6px 10px;
-          border-radius: 12px;
-          z-index: 2;
-          box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
-          transform: scale(0.9);
-          transition: transform 0.3s ease;
-        }
-
-        .mobile-product-card:hover .mobile-product-badge {
+        .category-card:hover .category-image {
           transform: scale(1.1);
         }
 
-        .mobile-product-content {
-          padding: 16px;
-          position: relative;
-        }
-
-        .mobile-product-title {
-          font-size: 14px;
-          font-weight: 700;
-          color: #1f2937;
-          line-height: 1.4;
-          margin-bottom: 10px;
-          display: -webkit-box;
-          -webkit-line-clamp: 2;
-          -webkit-box-orient: vertical;
-          overflow: hidden;
-          transition: color 0.3s ease;
-        }
-
-        .mobile-product-card:hover .mobile-product-title {
-          color: #3b82f6;
-        }
-
-        .mobile-product-price {
-          display: flex;
-          align-items: center;
-          gap: 8px;
-          margin-bottom: 16px;
-        }
-
-        .mobile-product-price .current {
-          font-size: 18px;
-          font-weight: 800;
-          background: linear-gradient(135deg, #2563eb, #1d4ed8);
-          -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
-          background-clip: text;
-        }
-
-        .mobile-product-price .old {
-          font-size: 13px;
-          color: #9ca3af;
-          text-decoration: line-through;
-          font-weight: 500;
-        }
-
-        .mobile-product-actions {
-          display: flex;
-          gap: 8px;
-          opacity: 0.95;
-          transition: opacity 0.3s ease;
-          margin-top: 8px;
-          width: 100%;
-        }
-
-        .mobile-product-card:hover .mobile-product-actions {
-          opacity: 1;
-        }
-
-        .mobile-product-actions > * {
-          flex: 1;
-          min-width: 0;
-        }
-
-        .mobile-btn {
-          flex: 1;
-          padding: 12px 16px;
-          border: 2px solid transparent;
-          border-radius: 25px;
-          font-size: 12px;
-          font-weight: 600;
-          cursor: pointer;
-          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-          text-transform: uppercase;
-          letter-spacing: 0.8px;
-          position: relative;
-          overflow: hidden;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          min-height: 44px;
-          font-family: inherit;
-          outline: none;
-          user-select: none;
-          -webkit-user-select: none;
-          -moz-user-select: none;
-          -ms-user-select: none;
-          backdrop-filter: blur(10px);
-          box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-        }
-
-        .mobile-btn::before {
-          content: '';
-          position: absolute;
-          top: 0;
-          left: -100%;
-          width: 100%;
-          height: 100%;
-          background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
-          transition: left 0.6s ease;
-          pointer-events: none;
-        }
-
-        .mobile-btn:hover::before {
-          left: 100%;
-        }
-
-        .mobile-btn-primary {
-          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
-          color: white !important;
-          border-color: rgba(255, 255, 255, 0.2) !important;
-          box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4) !important;
-        }
-
-        .mobile-btn-primary:hover {
-          background: linear-gradient(135deg, #5a67d8 0%, #6b46c1 100%) !important;
-          color: white !important;
-          transform: translateY(-3px);
-          box-shadow: 0 10px 25px rgba(102, 126, 234, 0.5) !important;
-        }
-
-        .mobile-btn-secondary {
-          background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%) !important;
-          color: white !important;
-          border-color: rgba(255, 255, 255, 0.2) !important;
-          box-shadow: 0 6px 20px rgba(240, 147, 251, 0.4) !important;
-        }
-
-        .mobile-btn-secondary:hover {
-          background: linear-gradient(135deg, #e91e63 0%, #f44336 100%) !important;
-          color: white !important;
-          transform: translateY(-3px);
-          box-shadow: 0 10px 25px rgba(240, 147, 251, 0.5) !important;
-        }
-
-        .mobile-btn:hover {
-          transform: translateY(-3px);
-          box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
-        }
-
-        .mobile-btn:active {
-          transform: translateY(-1px);
-          transition: transform 0.1s ease;
-        }
-
-        .mobile-btn:focus {
-          outline: none;
-          box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.3);
-        }
-
-        /* Ensure buttons are visible and properly styled */
-        .mobile-product-actions .mobile-btn {
-          flex: 1;
-          padding: 12px 16px;
-          border: none;
-          border-radius: 12px;
-          font-size: 12px;
-          font-weight: 700;
-          cursor: pointer;
-          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-          text-transform: uppercase;
-          letter-spacing: 0.5px;
-          position: relative;
-          overflow: hidden;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          min-height: 44px;
-          font-family: inherit;
-          outline: none;
-          user-select: none;
-          -webkit-user-select: none;
-          -moz-user-select: none;
-          -ms-user-select: none;
-          background: transparent;
-        }
-
-        /* Force button visibility and styling */
-        .mobile-product-actions button.mobile-btn {
-          display: flex !important;
-          visibility: visible !important;
-          opacity: 1 !important;
-          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
-          color: white !important;
-          border: 2px solid rgba(255, 255, 255, 0.2) !important;
-          border-radius: 25px !important;
-          padding: 12px 16px !important;
-          font-size: 12px !important;
-          font-weight: 600 !important;
-          cursor: pointer !important;
-          text-transform: uppercase !important;
-          letter-spacing: 0.8px !important;
-          min-height: 44px !important;
-          align-items: center !important;
-          justify-content: center !important;
-          box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4) !important;
-        }
-
-        .mobile-product-actions button.mobile-btn.mobile-btn-secondary {
-          background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%) !important;
-          box-shadow: 0 6px 20px rgba(240, 147, 251, 0.4) !important;
+        /* Products Grid */
+        .mobile-products-section {
+          margin: 0 16px 20px 16px;
         }
 
         /* Section Headers */
@@ -558,46 +278,6 @@ const Home = () => {
           .mobile-banner {
             margin: 0 0 30px 0;
           }
-          
-          .mobile-products-grid {
-            grid-template-columns: repeat(4, 1fr);
-            gap: 20px;
-          }
-
-          .mobile-btn {
-            padding: 14px 18px;
-            font-size: 13px;
-            min-height: 48px;
-          }
-
-          .mobile-product-actions {
-            gap: 10px;
-          }
-        }
-
-        @media (min-width: 1024px) {
-          .mobile-products-grid {
-            grid-template-columns: repeat(5, 1fr);
-          }
-
-          .mobile-btn {
-            padding: 16px 20px;
-            font-size: 14px;
-            min-height: 52px;
-          }
-        }
-
-        /* Mobile specific improvements */
-        @media (max-width: 767px) {
-          .mobile-btn {
-            padding: 10px 12px;
-            font-size: 11px;
-            min-height: 40px;
-          }
-
-          .mobile-product-actions {
-            gap: 6px;
-          }
         }
       `}</style>
 
@@ -632,97 +312,15 @@ const Home = () => {
           <motion.div variants={fadeInUp}>
             {productsData?.length === 0 && <ProductLoading />}
             {productsData?.length !== 0 && (
-              <div className="mobile-products-grid">
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
                 {productsData?.slice(0, 8).map((item, index) => (
                   <motion.div 
                     key={index}
-                    className="mobile-product-card"
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: index * 0.1 }}
-                    whileHover={{ 
-                      scale: 1.02,
-                      transition: { duration: 0.2 }
-                    }}
-                    whileTap={{ 
-                      scale: 0.98,
-                      transition: { duration: 0.1 }
-                    }}
-                    onClick={() => navigate(`/product/${item._id}`)}
                   >
-                    {item?.discount > 0 && (
-                      <motion.div 
-                        className="mobile-product-badge"
-                        initial={{ scale: 0.8, opacity: 0 }}
-                        animate={{ scale: 1, opacity: 1 }}
-                        transition={{ delay: 0.2 }}
-                      >
-                        -{item.discount}%
-                      </motion.div>
-                    )}
-                    <div className="mobile-product-image">
-                      <motion.img 
-                        src={item?.images?.[0] || "/homeBannerPlaceholder.jpg"} 
-                        alt={item?.name || "Product"}
-                        loading="lazy"
-                        whileHover={{ 
-                          scale: 1.1,
-                          rotate: 2,
-                          transition: { duration: 0.3 }
-                        }}
-                      />
-                    </div>
-                    <div className="mobile-product-content">
-                      <motion.h3 
-                        className="mobile-product-title"
-                        whileHover={{ color: "#3b82f6" }}
-                      >
-                        {item?.name || "Product Name"}
-                      </motion.h3>
-                      <div className="mobile-product-price">
-                        <span className="current">₹{item?.price || 0}</span>
-                        {item?.oldPrice && item?.oldPrice > item?.price && (
-                          <span className="old">₹{item.oldPrice}</span>
-                        )}
-                      </div>
-                      <div className="mobile-product-actions" onClick={(e) => e.stopPropagation()}>
-                        <motion.button 
-                          className="mobile-btn mobile-btn-primary"
-                          whileHover={{ scale: 1.05 }}
-                          whileTap={{ scale: 0.95 }}
-                          onClick={() => {
-                            if (context?.isLogin && context?.userData) {
-                              const cartData = {
-                                productId: item._id,
-                                userId: context.userData._id,
-                                productTitle: item.name,
-                                image: item.images?.[0],
-                                price: item.price,
-                                oldPrice: item.oldPrice,
-                                discount: item.discount,
-                                rating: item.rating || 0,
-                                countInStock: item.stock || item.countInStock || 10,
-                                subTotal: item.price * 1
-                              };
-                              context.addToCart(cartData, context.userData._id, 1);
-                              context.alertBox("success", "Product added to cart!");
-                            } else {
-                              context.alertBox("error", "Please login to add products to cart");
-                            }
-                          }}
-                        >
-                          Add
-                        </motion.button>
-                        <motion.button 
-                          className="mobile-btn mobile-btn-secondary"
-                          whileHover={{ scale: 1.05 }}
-                          whileTap={{ scale: 0.95 }}
-                          onClick={() => handleBuyNow(item)}
-                        >
-                          Buy
-                        </motion.button>
-                      </div>
-                    </div>
+                    <ProductItem item={item} />
                   </motion.div>
                 ))}
               </div>
@@ -744,9 +342,72 @@ const Home = () => {
                 <h2 className="mobile-section-title">Shop by Category</h2>
                 <p className="mobile-section-subtitle">Discover our wide range of products</p>
               </div>
+              <a href="#" className="mobile-view-all">View All Categories</a>
             </motion.div>
             <motion.div variants={fadeInUp}>
-              <HomeCatSlider data={context?.catData} />
+              {context?.catData?.length === 0 ? (
+                <div className="text-center py-8">
+                  <div className="text-gray-400 text-6xl mb-4">📦</div>
+                  <h3 className="text-lg font-semibold text-gray-600 mb-2">No Categories Available</h3>
+                  <p className="text-gray-500">Categories will appear here once they are added to the system.</p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+                  {context?.catData?.slice(0, 12).map((cat, index) => (
+                  <motion.div 
+                    key={index}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: index * 0.1 }}
+                    whileHover={{ 
+                      scale: 1.05,
+                      transition: { duration: 0.2 }
+                    }}
+                    whileTap={{ 
+                      scale: 0.95,
+                      transition: { duration: 0.1 }
+                    }}
+                  >
+                    <div 
+                      className="category-card group relative overflow-hidden rounded-2xl bg-gradient-to-br from-white via-white to-gray-50 shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:scale-105 hover:-translate-y-1 border border-gray-100 cursor-pointer"
+                      onClick={() => {
+                        // Navigate to category page with products
+                        navigate(`/products?category=${cat._id}&name=${cat.name}`);
+                      }}
+                    >
+                      {/* Animated background gradient */}
+                      <div className="absolute inset-0 bg-gradient-to-br from-blue-50/40 via-purple-50/40 to-pink-50/40 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                      
+                      <div className="relative py-4 lg:py-6 px-3 text-center flex items-center justify-center flex-col z-10">
+                        {/* Image container with better visibility */}
+                        <div className="category-image relative mb-3 w-16 h-16 lg:w-20 lg:h-20 transform group-hover:scale-110 transition-transform duration-300">
+                          {/* Background circle for image */}
+                          <div className="absolute inset-0 bg-gradient-to-br from-blue-100 to-purple-100 rounded-full group-hover:from-blue-200 group-hover:to-purple-200 transition-all duration-300"></div>
+                          
+                          {/* Image with proper sizing and object-fit */}
+                          <img
+                            src={cat?.images?.[0] || "/homeBannerPlaceholder.jpg"}
+                            className="relative w-full h-full object-cover rounded-full p-2 transition-all duration-300 group-hover:brightness-110 group-hover:p-1"
+                            alt={cat?.name || "Category"}
+                          />
+                          
+                          {/* Subtle glow effect */}
+                          <div className="absolute inset-0 bg-gradient-to-br from-blue-400/20 to-purple-400/20 rounded-full blur-md opacity-0 group-hover:opacity-100 transition-opacity duration-500 -z-10"></div>
+                        </div>
+                        
+                        {/* Category name with better readability */}
+                        <h3 className="text-[11px] lg:text-[13px] font-[600] text-gray-700 group-hover:text-gray-900 transition-colors duration-300 leading-tight">
+                          {cat?.name}
+                        </h3>
+                        
+                        {/* Enhanced accent line */}
+                        <div className="mt-2 w-0 h-0.5 bg-gradient-to-r from-blue-400 to-purple-400 group-hover:w-6 transition-all duration-500 rounded-full"></div>
+                                              </div>
+                      </div>
+                    </motion.div>
+                  ))}
+                </div>
+              )}
             </motion.div>
           </motion.section>
         )}
@@ -770,97 +431,15 @@ const Home = () => {
           <motion.div variants={fadeInUp}>
             {popularProductsData?.length === 0 && <ProductLoading />}
             {popularProductsData?.length !== 0 && (
-              <div className="mobile-products-grid">
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
                 {popularProductsData?.slice(0, 6).map((item, index) => (
                   <motion.div 
                     key={index}
-                    className="mobile-product-card"
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: index * 0.1 }}
-                    whileHover={{ 
-                      scale: 1.02,
-                      transition: { duration: 0.2 }
-                    }}
-                    whileTap={{ 
-                      scale: 0.98,
-                      transition: { duration: 0.1 }
-                    }}
-                    onClick={() => navigate(`/product/${item._id}`)}
                   >
-                    {item?.discount > 0 && (
-                      <motion.div 
-                        className="mobile-product-badge"
-                        initial={{ scale: 0.8, opacity: 0 }}
-                        animate={{ scale: 1, opacity: 1 }}
-                        transition={{ delay: 0.2 }}
-                      >
-                        -{item.discount}%
-                      </motion.div>
-                    )}
-                    <div className="mobile-product-image">
-                      <motion.img 
-                        src={item?.images?.[0] || "/homeBannerPlaceholder.jpg"} 
-                        alt={item?.name || "Product"}
-                        loading="lazy"
-                        whileHover={{ 
-                          scale: 1.1,
-                          rotate: 2,
-                          transition: { duration: 0.3 }
-                        }}
-                      />
-                    </div>
-                    <div className="mobile-product-content">
-                      <motion.h3 
-                        className="mobile-product-title"
-                        whileHover={{ color: "#3b82f6" }}
-                      >
-                        {item?.name || "Product Name"}
-                      </motion.h3>
-                      <div className="mobile-product-price">
-                        <span className="current">₹{item?.price || 0}</span>
-                        {item?.oldPrice && item?.oldPrice > item?.price && (
-                          <span className="old">₹{item.oldPrice}</span>
-                        )}
-                      </div>
-                      <div className="mobile-product-actions" onClick={(e) => e.stopPropagation()}>
-                        <motion.button 
-                          className="mobile-btn mobile-btn-primary"
-                          whileHover={{ scale: 1.05 }}
-                          whileTap={{ scale: 0.95 }}
-                          onClick={() => {
-                            if (context?.isLogin && context?.userData) {
-                              const cartData = {
-                                productId: item._id,
-                                userId: context.userData._id,
-                                productTitle: item.name,
-                                image: item.images?.[0],
-                                price: item.price,
-                                oldPrice: item.oldPrice,
-                                discount: item.discount,
-                                rating: item.rating || 0,
-                                countInStock: item.stock || item.countInStock || 10,
-                                subTotal: item.price * 1
-                              };
-                              context.addToCart(cartData, context.userData._id, 1);
-                              context.alertBox("success", "Product added to cart!");
-                            } else {
-                              context.alertBox("error", "Please login to add products to cart");
-                            }
-                          }}
-                        >
-                          Add
-                        </motion.button>
-                        <motion.button 
-                          className="mobile-btn mobile-btn-secondary"
-                          whileHover={{ scale: 1.05 }}
-                          whileTap={{ scale: 0.95 }}
-                          onClick={() => handleBuyNow(item)}
-                        >
-                          Buy
-                        </motion.button>
-                      </div>
-                    </div>
+                    <ProductItem item={item} />
                   </motion.div>
                 ))}
               </div>
@@ -906,97 +485,15 @@ const Home = () => {
                 <motion.div variants={fadeInUp}>
                   {productRow?.data?.length === 0 && <ProductLoading />}
                   {productRow?.data?.length !== 0 && (
-                    <div className="mobile-products-grid">
+                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
                       {productRow?.data?.slice(0, 6).map((item, idx) => (
                         <motion.div 
                           key={idx}
-                          className="mobile-product-card"
                           initial={{ opacity: 0, y: 20 }}
                           animate={{ opacity: 1, y: 0 }}
                           transition={{ delay: idx * 0.1 }}
-                          whileHover={{ 
-                            scale: 1.02,
-                            transition: { duration: 0.2 }
-                          }}
-                          whileTap={{ 
-                            scale: 0.98,
-                            transition: { duration: 0.1 }
-                          }}
-                          onClick={() => navigate(`/product/${item._id}`)}
                         >
-                          {item?.discount > 0 && (
-                            <motion.div 
-                              className="mobile-product-badge"
-                              initial={{ scale: 0.8, opacity: 0 }}
-                              animate={{ scale: 1, opacity: 1 }}
-                              transition={{ delay: 0.2 }}
-                            >
-                              -{item.discount}%
-                            </motion.div>
-                          )}
-                          <div className="mobile-product-image">
-                            <motion.img 
-                              src={item?.images?.[0] || "/homeBannerPlaceholder.jpg"} 
-                              alt={item?.name || "Product"}
-                              loading="lazy"
-                              whileHover={{ 
-                                scale: 1.1,
-                                rotate: 2,
-                                transition: { duration: 0.3 }
-                              }}
-                            />
-                          </div>
-                          <div className="mobile-product-content">
-                            <motion.h3 
-                              className="mobile-product-title"
-                              whileHover={{ color: "#3b82f6" }}
-                            >
-                              {item?.name || "Product Name"}
-                            </motion.h3>
-                            <div className="mobile-product-price">
-                              <span className="current">₹{item?.price || 0}</span>
-                              {item?.oldPrice && item?.oldPrice > item?.price && (
-                                <span className="old">₹{item.oldPrice}</span>
-                              )}
-                            </div>
-                            <div className="mobile-product-actions" onClick={(e) => e.stopPropagation()}>
-                              <motion.button 
-                                className="mobile-btn mobile-btn-primary"
-                                whileHover={{ scale: 1.05 }}
-                                whileTap={{ scale: 0.95 }}
-                                onClick={() => {
-                                  if (context?.isLogin && context?.userData) {
-                                    const cartData = {
-                                      productId: item._id,
-                                      userId: context.userData._id,
-                                      productTitle: item.name,
-                                      image: item.images?.[0],
-                                      price: item.price,
-                                      oldPrice: item.oldPrice,
-                                      discount: item.discount,
-                                      rating: item.rating || 0,
-                                      countInStock: item.stock || item.countInStock || 10,
-                                      subTotal: item.price * 1
-                                    };
-                                    context.addToCart(cartData, context.userData._id, 1);
-                                    context.alertBox("success", "Product added to cart!");
-                                  } else {
-                                    context.alertBox("error", "Please login to add products to cart");
-                                  }
-                                }}
-                              >
-                                Add
-                              </motion.button>
-                              <motion.button 
-                                className="mobile-btn mobile-btn-secondary"
-                                whileHover={{ scale: 1.05 }}
-                                whileTap={{ scale: 0.95 }}
-                                onClick={() => handleBuyNow(item)}
-                              >
-                                Buy
-                              </motion.button>
-                            </div>
-                          </div>
+                          <ProductItem item={item} />
                         </motion.div>
                       ))}
                     </div>
