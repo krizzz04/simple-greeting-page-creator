@@ -29,14 +29,11 @@ export const Sidebar = (props) => {
     limit: 25
   })
 
-
-
   const [price, setPrice] = useState([0, 60000]);
 
   const context = useContext(MyContext);
 
   const location = useLocation();
-
 
   const handleCheckboxChange = (field, value) => {
 
@@ -62,7 +59,6 @@ export const Sidebar = (props) => {
     }
 
   }
-
 
   useEffect(() => {
 
@@ -109,17 +105,10 @@ export const Sidebar = (props) => {
       filtesData();
     }, 200);
 
-
-
-
   }, [location]);
-
-
 
   const filtesData = () => {
     props.setIsLoading(true);
-
-    //console.log(context?.searchData)
 
     if (context?.searchData?.products?.length > 0) {
       props.setProductsData(context?.searchData);
@@ -134,17 +123,12 @@ export const Sidebar = (props) => {
         window.scrollTo(0, 0);
       })
     }
-
-
   }
-
-
 
   useEffect(() => {
     filters.page = props.page;
     filtesData();
   }, [filters, props.page])
-
 
   useEffect(() => {
     setFilters((prev) => ({
@@ -154,10 +138,31 @@ export const Sidebar = (props) => {
     }))
   }, [price]);
 
-
   return (
     <aside className="sidebar py-3  lg:py-5 static lg:sticky top-[130px] z-[50] pr-0 lg:pr-5">
       <div className=" max-h-[60vh]  lg:overflow-visible overflow-auto  w-full">
+        {/* Profile Section */}
+        {context?.isLogin && context?.userData && (
+          <div className="box mb-4">
+            <h3 className="w-full mb-3 text-[16px] font-[600] flex items-center pr-5">
+              Profile
+            </h3>
+            <div className="flex items-center gap-3">
+              <div className="w-[50px] h-[50px] rounded-full overflow-hidden bg-gray-200">
+                <img
+                  src={context?.userData?.avatar || "/user.jpg"}
+                  alt="Profile"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              <div className="flex-1">
+                <h4 className="text-[14px] font-[600]">{context?.userData?.name}</h4>
+                <p className="text-[12px] text-gray-600">{context?.userData?.email}</p>
+              </div>
+            </div>
+          </div>
+        )}
+
         <div className="box">
           <h3 className="w-full mb-3 text-[16px] font-[600] flex items-center pr-5">
             Shop by Category
@@ -170,8 +175,6 @@ export const Sidebar = (props) => {
           </h3>
           <Collapse isOpened={isOpenCategoryFilter}>
             <div className="scroll px-4 relative -left-[13px]">
-
-
               {
                 context?.catData?.length !== 0 && context?.catData?.map((item, index) => {
                   return (
@@ -187,7 +190,6 @@ export const Sidebar = (props) => {
                   )
                 })
               }
-
             </div>
           </Collapse>
         </div>
@@ -232,10 +234,7 @@ export const Sidebar = (props) => {
               size="small"
               readOnly
             />
-
           </div>
-
-
 
           <div className="flex items-center pl-2 lg:pl-1">
             <FormControlLabel
@@ -250,9 +249,7 @@ export const Sidebar = (props) => {
               size="small"
               readOnly
             />
-
           </div>
-
 
           <div className="flex items-center pl-2 lg:pl-1">
             <FormControlLabel
@@ -267,9 +264,7 @@ export const Sidebar = (props) => {
               size="small"
               readOnly
             />
-
           </div>
-
 
           <div className="flex items-center pl-2 lg:pl-1">
             <FormControlLabel
@@ -284,11 +279,7 @@ export const Sidebar = (props) => {
               size="small"
               readOnly
             />
-
           </div>
-
-
-
 
           <div className="flex items-center pl-2 lg:pl-1">
             <FormControlLabel
@@ -303,17 +294,11 @@ export const Sidebar = (props) => {
               size="small"
               readOnly
             />
-
           </div>
-
         </div>
-
-
       </div>
       <br />
       <Button className="btn-org w-full !flex lg:!hidden" onClick={() => context?.setOpenFilter(false)}><MdOutlineFilterAlt size={20} /> Filers</Button>
-
-
     </aside>
   );
 };

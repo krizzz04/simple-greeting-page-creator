@@ -40,6 +40,33 @@ const CategoryPanel = (props) => {
         <div className="absolute bottom-0 left-0 w-16 h-16 bg-white/10 rounded-full translate-y-8 -translate-x-8"></div>
       </div>
 
+      {/* Profile Section */}
+      {context?.isLogin && context?.userData && (
+        <div className="bg-gradient-to-r from-gray-50 to-white border-b border-gray-100 p-5">
+          <div className="mb-4 pb-3 border-b border-gray-200">
+            <p className="text-[11px] text-gray-500 font-medium uppercase tracking-wide">Welcome back!</p>
+          </div>
+          <div className="flex items-center gap-4">
+            <div className="w-[60px] h-[60px] rounded-full overflow-hidden bg-gradient-to-br from-primary to-orange-500 p-0.5 shadow-lg">
+              <div className="w-full h-full rounded-full overflow-hidden bg-white">
+                <img
+                  src={context?.userData?.avatar || "/user.jpg"}
+                  alt="Profile"
+                  className="w-full h-full object-cover"
+                />
+              </div>
+            </div>
+            <div className="flex-1 min-w-0">
+              <h4 className="text-[15px] font-[700] text-gray-800 mb-1 truncate">{context?.userData?.name}</h4>
+              <p className="text-[13px] text-gray-600 mb-1 truncate">{context?.userData?.email}</p>
+              {context?.userData?.mobile && (
+                <p className="text-[13px] text-primary font-medium">{context?.userData?.mobile}</p>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Navigation Menu */}
       <div className="p-4 space-y-2">
         <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
