@@ -21,6 +21,8 @@ const AddAddress = () => {
     const [addressType, setAddressType] = useState("");
 
     const [formFields, setFormsFields] = useState({
+        name: '',
+        email: '',
         address_line1: '',
         city: '',
         state: '',
@@ -84,6 +86,24 @@ const AddAddress = () => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
+        
+        if (formFields.name === "") {
+            context.alertBox("error", "Please enter your name");
+            return false
+        }
+
+        if (formFields.email === "") {
+            context.alertBox("error", "Please enter your email");
+            return false
+        }
+
+        // Basic email validation
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(formFields.email)) {
+            context.alertBox("error", "Please enter a valid email address");
+            return false
+        }
+
         if (formFields.address_line1 === "") {
             context.alertBox("error", "Please enter Address Line 1");
             return false
@@ -147,6 +167,8 @@ const AddAddress = () => {
                     context.getUserDetails();
 
                     setFormsFields({
+                        name: '',
+                        email: '',
                         address_line1: '',
                         city: '',
                         state: '',
@@ -185,6 +207,8 @@ const AddAddress = () => {
                     context?.getUserDetails(res.data);
 
                     setFormsFields({
+                        name: '',
+                        email: '',
                         address_line1: '',
                         city: '',
                         state: '',
@@ -212,6 +236,8 @@ const AddAddress = () => {
         fetchDataFromApi(`/api/address/${id}`).then((res) => {
 
             setFormsFields({
+                name: res?.address?.name || '',
+                email: res?.address?.email || '',
                 address_line1: res?.address?.address_line1,
                 city: res?.address?.city,
                 state: res?.address?.state,
@@ -233,6 +259,33 @@ const AddAddress = () => {
 
     return (
         <form className="p-8 py-3 pb-8 px-4" onSubmit={handleSubmit}>
+            <div className="col w-[100%] mb-4">
+                <TextField
+                    className="w-full"
+                    label="Full Name"
+                    variant="outlined"
+                    size="small"
+                    name="name"
+                    onChange={onChangeInput} 
+                    value={formFields.name}
+                    required
+                />
+            </div>
+
+            <div className="col w-[100%] mb-4">
+                <TextField
+                    className="w-full"
+                    label="Email Address"
+                    variant="outlined"
+                    size="small"
+                    name="email" 
+                    onChange={onChangeInput} 
+                    value={formFields.email}
+                    type="email"
+                    required
+                />
+            </div>
+
             <div className="col w-[100%] mb-4">
                 <TextField
                     className="w-full"

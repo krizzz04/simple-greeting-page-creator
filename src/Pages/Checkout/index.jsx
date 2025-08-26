@@ -293,9 +293,12 @@ const Checkout = () => {
     const orderIdString = shortOrderId ? ` #${shortOrderId}` : '';
     const totalAmt = orderDetails.totalAmt || orderDetails.totalAmount || 0;
     
-    const message = `Hello ${user.name}, your order${orderIdString} has been placed successfully! Total: ₹${totalAmt}. Payment: ${orderDetails.payment_status}.`;
+    // Use address name if available, otherwise fall back to user name
+    const customerName = deliveryAddress?.name || user?.name || 'Customer';
+    
+    const message = `Hello ${customerName}, your order${orderIdString} has been placed successfully! Total: ₹${totalAmt}. Payment: ${orderDetails.payment_status}.`;
 
-    console.log("📱 Preparing to send SMS:", { user: user.name, phone: mobileNumber, orderId: shortOrderId });
+    console.log("📱 Preparing to send SMS:", { customer: customerName, phone: mobileNumber, orderId: shortOrderId });
     
     const result = await callWasenderAPI(mobileNumber, message, "SMS");
     return result !== false;
@@ -316,10 +319,13 @@ const Checkout = () => {
     const orderDate = new Date().toLocaleDateString('en-IN');
     const deliveryAddr = deliveryAddress?.address_line1 || 'Your registered address';
     
+    // Use address name if available, otherwise fall back to user name
+    const customerName = deliveryAddress?.name || user?.name || 'Customer';
+    
     // 🎨 Enhanced WhatsApp Order Template
     const message = `🎉 *ORDER CONFIRMED* 🎉
 
-Hello *${user.name}*! 
+Hello *${customerName}*! 
 
 Your order has been successfully placed! 🛒
 
@@ -353,9 +359,12 @@ Thank you for choosing us! 💚
         return false;
     }
 
+    // Use address name if available, otherwise fall back to user name
+    const customerName = deliveryAddress?.name || user?.name || 'Customer';
+
     const message = `✅ *ORDER PROCESSING* ✅
 
-Hi *${user.name}*! 
+Hi *${customerName}*! 
 
 Your order is now being processed by our team! 🚀
 
@@ -374,7 +383,7 @@ Reply to this message or visit our website
 *Thank you for your business!* 🙏
 Advanced UI Techniques`;
 
-    console.log("✅ Sending WhatsApp confirmation:", { user: user.name, phone: mobileNumber });
+    console.log("✅ Sending WhatsApp confirmation:", { customer: customerName, phone: mobileNumber });
 
     const result = await callWasenderAPI(mobileNumber, message, "WhatsApp Confirmation");
     return result !== false;
