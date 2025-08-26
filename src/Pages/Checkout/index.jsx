@@ -293,8 +293,10 @@ const Checkout = () => {
     const orderIdString = shortOrderId ? ` #${shortOrderId}` : '';
     const totalAmt = orderDetails.totalAmt || orderDetails.totalAmount || 0;
     
-    // Use address name if available, otherwise fall back to user name
-    const customerName = deliveryAddress?.name || user?.name || 'Customer';
+    // Prioritize address name/email over user account data (especially for phone login users)
+    const customerName = deliveryAddress?.name || 
+                        (user?.name && !user.name.includes('user_') && !user.name.includes('User_') ? user.name : null) || 
+                        'Customer';
     
     const message = `Hello ${customerName}, your order${orderIdString} has been placed successfully! Total: ₹${totalAmt}. Payment: ${orderDetails.payment_status}.`;
 
@@ -319,8 +321,10 @@ const Checkout = () => {
     const orderDate = new Date().toLocaleDateString('en-IN');
     const deliveryAddr = deliveryAddress?.address_line1 || 'Your registered address';
     
-    // Use address name if available, otherwise fall back to user name
-    const customerName = deliveryAddress?.name || user?.name || 'Customer';
+    // Prioritize address name/email over user account data (especially for phone login users)
+    const customerName = deliveryAddress?.name || 
+                        (user?.name && !user.name.includes('user_') && !user.name.includes('User_') ? user.name : null) || 
+                        'Customer';
     
     // 🎨 Enhanced WhatsApp Order Template
     const message = `🎉 *ORDER CONFIRMED* 🎉
@@ -359,8 +363,10 @@ Thank you for choosing us! 💚
         return false;
     }
 
-    // Use address name if available, otherwise fall back to user name
-    const customerName = deliveryAddress?.name || user?.name || 'Customer';
+    // Prioritize address name/email over user account data (especially for phone login users)
+    const customerName = deliveryAddress?.name || 
+                        (user?.name && !user.name.includes('user_') && !user.name.includes('User_') ? user.name : null) || 
+                        'Customer';
 
     const message = `✅ *ORDER PROCESSING* ✅
 

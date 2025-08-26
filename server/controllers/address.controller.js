@@ -4,8 +4,22 @@ import UserModel from "../models/user.model.js";
 export const addAddressController = async (request, response) => {
 
     try {
-        const { address_line1, city, state, pincode, country, mobile, userId, landmark, addressType } = request.body;
+        const { name, email, address_line1, city, state, pincode, country, mobile, userId, landmark, addressType } = request.body;
 
+        // Debug logging
+        console.log('📝 Server - Received Address Data:', {
+            name,
+            email,
+            address_line1,
+            city,
+            state,
+            pincode,
+            country,
+            mobile,
+            userId,
+            landmark,
+            addressType
+        });
 
         // if (!address_line1 || city || state || pincode || country || mobile || userId) {
         //     return response.status(500).json({
@@ -17,10 +31,14 @@ export const addAddressController = async (request, response) => {
 
 
         const address = new AddressModel({
-            address_line1, city, state, pincode, country, mobile, userId, landmark, addressType
+            name, email, address_line1, city, state, pincode, country, mobile, userId, landmark, addressType
         })
 
+        console.log('📝 Server - Address Model Object:', address);
+
         const savedAddress = await address.save();
+
+        console.log('📝 Server - Saved Address:', savedAddress);
 
         const updateCartUser = await UserModel.updateOne({ _id: userId }, {
             $push: {
@@ -40,6 +58,7 @@ export const addAddressController = async (request, response) => {
 
 
     } catch (error) {
+        console.error('📝 Server - Address Save Error:', error);
         return response.status(500).json({
             message: error.message || error,
             error: true,
@@ -169,12 +188,14 @@ export async function editAddress(request, response) {
 
         const id  = request.params.id;
 
-        const { address_line1, city, state, pincode, country, mobile, userId, landmark, addressType } = request.body;
+        const { name, email, address_line1, city, state, pincode, country, mobile, userId, landmark, addressType } = request.body;
 
 
         const address = await AddressModel.findByIdAndUpdate(
             id,
             {
+                name: name,
+                email: email,
                 address_line1: address_line1,
                 city: city,
                 state: state,

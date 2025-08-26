@@ -20,7 +20,7 @@ const AddAddress = () => {
     const [phone, setPhone] = useState('');
     const [addressType, setAddressType] = useState("");
 
-    const [formFields, setFormsFields] = useState({
+    const [formFields, setFormFields] = useState({
         name: '',
         email: '',
         address_line1: '',
@@ -42,7 +42,7 @@ const AddAddress = () => {
         if (context?.userData?._id !== undefined) {
 
 
-            setFormsFields((prevState) => ({
+            setFormFields((prevState) => ({
                 ...prevState,
                 userId: context?.userData?._id
             }))
@@ -54,7 +54,7 @@ const AddAddress = () => {
 
     const onChangeInput = (e) => {
         const { name, value } = e.target;
-        setFormsFields(() => {
+        setFormFields(() => {
             return {
                 ...formFields,
                 [name]: value
@@ -67,7 +67,7 @@ const AddAddress = () => {
 
     const handleChangeAddressType = (event) => {
         setAddressType(event.target.value)
-        setFormsFields(() => ({
+        setFormFields(() => ({
             ...formFields,
             addressType: event.target.value
         }))
@@ -153,8 +153,12 @@ const AddAddress = () => {
 
         if (context?.addressMode === "add") {
             setIsLoading(true);
+            
+            // Debug logging
+            console.log('📝 Adding Address - Form Data:', formFields);
+            
             postData(`/api/address/add`, formFields, { withCredentials: true }).then((res) => {
-                console.log(res)
+                console.log('📝 Add Address Response:', res)
                 if (res?.error !== true) {
 
                     context.alertBox("success", res?.message);
@@ -166,7 +170,7 @@ const AddAddress = () => {
 
                     context.getUserDetails();
 
-                    setFormsFields({
+                    setFormFields({
                         name: '',
                         email: '',
                         address_line1: '',
@@ -197,6 +201,10 @@ const AddAddress = () => {
 
         if (context?.addressMode  === "edit") {
             setIsLoading(true);
+            
+            // Debug logging
+            console.log('📝 Editing Address - Form Data:', formFields);
+            
             editData(`/api/address/${context?.addressId}`, formFields, { withCredentials: true }).then((res) => {
 
                 fetchDataFromApi(`/api/address/get?userId=${context?.userData?._id}`).then((res) => {
@@ -206,7 +214,7 @@ const AddAddress = () => {
                     }, 500)
                     context?.getUserDetails(res.data);
 
-                    setFormsFields({
+                    setFormFields({
                         name: '',
                         email: '',
                         address_line1: '',
@@ -235,7 +243,7 @@ const AddAddress = () => {
 
         fetchDataFromApi(`/api/address/${id}`).then((res) => {
 
-            setFormsFields({
+            setFormFields({
                 name: res?.address?.name || '',
                 email: res?.address?.email || '',
                 address_line1: res?.address?.address_line1,
