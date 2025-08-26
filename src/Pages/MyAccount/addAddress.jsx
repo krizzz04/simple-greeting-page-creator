@@ -353,7 +353,7 @@ const AddAddress = () => {
                     value={phone}
                     onChange={(phone) => {
                         setPhone(phone);
-                        setFormsFields((prevState) => ({
+                        setFormFields((prevState) => ({
                             ...prevState,
                             mobile: phone
                         }))

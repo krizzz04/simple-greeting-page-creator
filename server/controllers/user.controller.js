@@ -430,9 +430,41 @@ export async function updateUserDetails(request, response) {
         const userId = request.userId //auth middleware
         const { name, email, mobile, password } = request.body;
 
+        console.log('🔧 Update User Details - Request Data:', {
+            userId,
+            name,
+            email,
+            mobile
+        });
+
         const userExist = await UserModel.findById(userId);
-        if (!userExist)
-            return response.status(400).send('The user cannot be Updated!');
+        if (!userExist) {
+            console.log('❌ User not found:', userId);
+            return response.status(400).json({
+                message: 'The user cannot be Updated!',
+                error: true,
+                success: false
+            });
+        }
+
+        console.log('🔧 Current User Data:', {
+            currentName: userExist.name,
+            currentEmail: userExist.email,
+            currentMobile: userExist.mobile
+        });
+
+        // Check if email is being changed and if it already exists
+        if (email && email !== userExist.email) {
+            const existingUserWithEmail = await UserModel.findOne({ email: email, _id: { $ne: userId } });
+            if (existingUserWithEmail) {
+                console.log('❌ Email already exists:', email);
+                return response.status(400).json({
+                    message: 'Email already exists with another account',
+                    error: true,
+                    success: false
+                });
+            }
+        }
 
         // Format phone number if provided
         let formattedMobile = mobile;
@@ -441,15 +473,25 @@ export async function updateUserDetails(request, response) {
             formattedMobile = `+91${mobile.replace(/^0+/, '')}`;
         }
 
+        // Build update object with only provided fields
+        const updateData = {};
+        if (name !== undefined) updateData.name = name;
+        if (email !== undefined) updateData.email = email;
+        if (mobile !== undefined) updateData.mobile = formattedMobile;
+
+        console.log('🔧 Updating User with:', updateData);
+
         const updateUser = await UserModel.findByIdAndUpdate(
             userId,
-            {
-                name: name,
-                mobile: formattedMobile,
-                email: email,
-            },
-            { new: true }
+            updateData,
+            { new: true, runValidators: false }
         )
+
+        console.log('✅ User Updated Successfully:', {
+            name: updateUser?.name,
+            email: updateUser?.email,
+            mobile: updateUser?.mobile
+        });
 
         return response.json({
             message: "User Updated successfully",
@@ -465,6 +507,7 @@ export async function updateUserDetails(request, response) {
         })
 
     } catch (error) {
+        console.error('❌ Update User Details Error:', error);
         return response.status(500).json({
             message: error.message || error,
             error: true,

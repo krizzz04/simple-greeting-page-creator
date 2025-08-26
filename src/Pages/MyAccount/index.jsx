@@ -18,7 +18,7 @@ const MyAccount = () => {
   const [isChangePasswordFormShow, setisChangePasswordFormShow] = useState(false);
   const [phone, setPhone] = useState('');
 
-  const [formFields, setFormsFields] = useState({
+  const [formFields, setFormFields] = useState({
     name: '',
     email: '',
     mobile: ''
@@ -50,7 +50,7 @@ const MyAccount = () => {
       console.log('User data received:', context?.userData);
       setUserId(context?.userData?._id);
       setTimeout(() => {
-        setFormsFields({
+        setFormFields({
           name: context?.userData?.name || '',
           email: context?.userData?.email || '',
           mobile: context?.userData?.mobile || ''
@@ -73,7 +73,7 @@ const MyAccount = () => {
 
   const onChangeInput = (e) => {
     const { name, value } = e.target;
-    setFormsFields(prev => {
+    setFormFields(prev => {
       return {
         ...prev,
         [name]: value
@@ -244,7 +244,7 @@ const MyAccount = () => {
                     disabled={isLoading === true ? true : false}
                     onChange={(phone) => {
                       setPhone(phone);
-                      setFormsFields(prev => ({
+                      setFormFields(prev => ({
                         ...prev,
                         mobile: phone
                       }));
