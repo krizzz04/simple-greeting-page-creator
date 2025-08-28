@@ -22,6 +22,7 @@ const Checkout = () => {
   const [isLoading, setIsloading] = useState(false);
   const [messagingInProgress, setMessagingInProgress] = useState(false);
   const [orderInProgress, setOrderInProgress] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState("online"); // "online" or "cod"
   const context = useContext(MyContext);
 
   const history = useNavigate();
@@ -76,14 +77,19 @@ const Checkout = () => {
   }, [context?.userData, context?.isLogin])
 
   useEffect(() => {
-    setTotalAmount(
-      context.cartData?.length !== 0 ?
-        context.cartData?.map(item => parseInt(item.price) * item.quantity)
-          .reduce((total, value) => total + value, 0) : 0)
-  }, [context.cartData])
+    const subtotal = context.cartData?.length !== 0 ?
+      context.cartData?.map(item => parseInt(item.price) * item.quantity)
+        .reduce((total, value) => total + value, 0) : 0;
+    
+    // Add ₹200 COD charge if payment method is COD
+    const codCharge = paymentMethod === "cod" ? 200 : 0;
+    const finalTotal = subtotal + codCharge;
+    
+    setTotalAmount(finalTotal);
+  }, [context.cartData, paymentMethod])
 
   useEffect(() => {
-    if (!VITE_APP_PAYPAL_CLIENT_ID) return;
+    if (!VITE_APP_PAYPAL_CLIENT_ID || paymentMethod !== "online") return;
     
     // Clean up existing PayPal script
     const existingScript = document.querySelector('script[src*="paypal.com/sdk/js"]');
@@ -156,7 +162,7 @@ const Checkout = () => {
         script.parentNode.removeChild(script);
       }
     };
-  }, [context?.cartData, context?.userData, selectedAddress, totalAmount]);
+  }, [context?.cartData, context?.userData, selectedAddress, totalAmount, paymentMethod]);
 
   // Helper function to add delay between API calls
   const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
@@ -554,6 +560,12 @@ Advanced UI Techniques`;
       return;
     }
 
+    // Only allow online payment checkout when online payment is selected
+    if (paymentMethod !== "online") {
+      context?.alertBox("error", "Please select online payment method for this checkout option.");
+      return;
+    }
+
     if (userData?.address_details?.length !== 0) {
       setOrderInProgress(true);
       
@@ -815,31 +827,71 @@ Advanced UI Techniques`;
                 }
               </div>
 
-              <div className="flex items-center justify-between py-3 border-t border-[rgba(0,0,0,0.1)] font-[600] text-[16px]">
-                <span>Total Amount:</span>
-                <span>₹{totalAmount}</span>
+              {/* Payment Method Selection */}
+              <div className="mb-4">
+                <h3 className="text-[16px] font-[600] mb-3">Payment Method</h3>
+                <div className="space-y-2">
+                  <label className="flex items-center gap-3 cursor-pointer">
+                    <Radio
+                      checked={paymentMethod === "online"}
+                      onChange={() => setPaymentMethod("online")}
+                      name="payment-method"
+                      color="primary"
+                    />
+                    <span className="text-[14px]">Online Payment (Razorpay/PayPal)</span>
+                  </label>
+                  <label className="flex items-center gap-3 cursor-pointer">
+                    <Radio
+                      checked={paymentMethod === "cod"}
+                      onChange={() => setPaymentMethod("cod")}
+                      name="payment-method"
+                      color="primary"
+                    />
+                    <span className="text-[14px]">Cash on Delivery (+₹200)</span>
+                  </label>
+                </div>
+              </div>
+
+              {/* Order Summary */}
+              <div className="space-y-2 mb-4">
+                <div className="flex items-center justify-between text-[14px]">
+                  <span>Subtotal:</span>
+                  <span>₹{context.cartData?.length !== 0 ? 
+                    context.cartData?.map(item => parseInt(item.price) * item.quantity)
+                      .reduce((total, value) => total + value, 0) : 0}</span>
+                </div>
+                {paymentMethod === "cod" && (
+                  <div className="flex items-center justify-between text-[14px] text-orange-600 font-medium">
+                    <span>COD Charge:</span>
+                    <span>+₹200</span>
+                  </div>
+                )}
+                <div className="flex items-center justify-between py-3 border-t border-[rgba(0,0,0,0.1)] font-[600] text-[16px]">
+                  <span>Total Amount:</span>
+                  <span>₹{totalAmount}</span>
+                </div>
               </div>
 
               <div className="flex items-center flex-col gap-3 mb-2">
                 <Button 
                   type="submit" 
                   className="btn-org btn-lg w-full flex gap-2 items-center" 
-                  disabled={!userData?.address_details || userData.address_details.length === 0 || isLoading || messagingInProgress || orderInProgress}
+                  disabled={!userData?.address_details || userData.address_details.length === 0 || isLoading || messagingInProgress || orderInProgress || paymentMethod !== "online"}
                 >
                   <BsFillBagCheckFill className="text-[20px]" /> 
-                  {(messagingInProgress || orderInProgress) ? "Processing..." : "Checkout"}
+                  {(messagingInProgress || orderInProgress) ? "Processing..." : "Pay with Razorpay"}
                 </Button>
 
                 <div 
                   id="paypal-button-container" 
-                  className={(!userData?.address_details || userData.address_details.length === 0 || isLoading || messagingInProgress || orderInProgress) ? 'pointer-events-none opacity-50' : ''}
+                  className={(!userData?.address_details || userData.address_details.length === 0 || isLoading || messagingInProgress || orderInProgress || paymentMethod !== "online") ? 'pointer-events-none opacity-50' : ''}
                 ></div>
 
                 <Button 
                   type="button" 
                   className="btn-dark btn-lg w-full flex gap-2 items-center" 
                   onClick={cashOnDelivery} 
-                  disabled={isLoading || messagingInProgress || orderInProgress || !userData?.address_details || userData.address_details.length === 0}
+                  disabled={isLoading || messagingInProgress || orderInProgress || !userData?.address_details || userData.address_details.length === 0 || paymentMethod !== "cod"}
                 >
                   {
                     (isLoading || messagingInProgress || orderInProgress) ? <CircularProgress size={24} color="inherit" /> :
@@ -857,6 +909,7 @@ Advanced UI Techniques`;
                   <div className="font-semibold mb-2">Debug Info:</div>
                   <div>WaSender API Key: {WASENDER_API_KEY ? "✅ Present" : "❌ Missing"}</div>
                   <div>Selected Address: {selectedAddress || "None"}</div>
+                  <div>Payment Method: {paymentMethod}</div>
                   <div>Total Amount: ₹{totalAmount || 0}</div>
                   <Button 
                     variant="outlined" 
