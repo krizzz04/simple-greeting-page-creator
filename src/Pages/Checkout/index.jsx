@@ -4,6 +4,7 @@ import { BsFillBagCheckFill } from "react-icons/bs";
 import { MyContext } from '../../App';
 import { FaPlus } from "react-icons/fa6";
 import { FaGooglePay } from "react-icons/fa";
+import { SiPaytm, SiPhonepe } from "react-icons/si";
 import Radio from '@mui/material/Radio';
 import { deleteData, fetchDataFromApi, postData, API_BASE_URL } from "../../utils/api";
 import axios from 'axios';
@@ -829,47 +830,106 @@ Advanced UI Techniques`;
               </div>
 
               {/* Payment Method Selection */}
-              <div className="mb-4">
-                <h3 className="text-[16px] font-[600] mb-3">Payment Method</h3>
-                <div className="space-y-2">
-                  <label className="flex items-center gap-3 cursor-pointer">
+              <div className="mb-6">
+                <h3 className="text-[18px] font-[700] mb-4 text-gray-800">Choose Payment Method</h3>
+                
+                {/* Online Payment Option with Offer */}
+                <div className={`relative mb-4 p-4 rounded-xl border-2 transition-all duration-300 cursor-pointer ${
+                  paymentMethod === "online" 
+                    ? "border-green-500 bg-green-50 shadow-lg" 
+                    : "border-gray-200 bg-white hover:border-green-300 hover:bg-green-25"
+                }`} onClick={() => setPaymentMethod("online")}>
+                  {/* Offer Badge */}
+                  <div className="absolute -top-3 -right-3 bg-gradient-to-r from-green-500 to-emerald-600 text-white px-3 py-1 rounded-full text-[12px] font-bold shadow-lg animate-pulse">
+                    🎉 INSTANT ₹200 OFF
+                  </div>
+                  
+                  <div className="flex items-center gap-3">
                     <Radio
                       checked={paymentMethod === "online"}
                       onChange={() => setPaymentMethod("online")}
                       name="payment-method"
-                      color="primary"
+                      color="success"
+                      className="!text-green-600"
                     />
-                    <span className="text-[14px]">Online Payment (Razorpay/PayPal) - ₹200 OFF</span>
-                  </label>
-                  <label className="flex items-center gap-3 cursor-pointer">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-2">
+                        <span className="text-[16px] font-[600] text-gray-800">Digital Payment</span>
+                        <span className="bg-green-100 text-green-700 px-2 py-1 rounded-md text-[12px] font-bold">
+                          RECOMMENDED
+                        </span>
+                      </div>
+                      <p className="text-[13px] text-gray-600 mb-3">Pay securely with your favorite apps</p>
+                      
+                      {/* Payment Icons */}
+                      <div className="flex items-center gap-4">
+                        <div className="bg-white p-3 rounded-lg shadow-sm">
+                          <img src="https://developers.google.com/static/pay/api/images/brand-guidelines/google-pay-mark.png" alt="Google Pay" className="w-8 h-8 object-contain" />
+                        </div>
+                        <div className="bg-white p-3 rounded-lg shadow-sm">
+                          <SiPhonepe className="text-[32px] text-purple-600" />
+                        </div>
+                        <div className="bg-white p-3 rounded-lg shadow-sm">
+                          <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/24/Paytm_Logo_%28standalone%29.svg/2560px-Paytm_Logo_%28standalone%29.svg.png" alt="Paytm" className="w-8 h-8 object-contain" />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Cash on Delivery Option */}
+                <div className={`relative p-4 rounded-xl border-2 transition-all duration-300 cursor-pointer ${
+                  paymentMethod === "cod" 
+                    ? "border-orange-500 bg-orange-50 shadow-lg" 
+                    : "border-gray-200 bg-white hover:border-orange-300 hover:bg-orange-25"
+                }`} onClick={() => setPaymentMethod("cod")}>
+                  <div className="flex items-center gap-3">
                     <Radio
                       checked={paymentMethod === "cod"}
                       onChange={() => setPaymentMethod("cod")}
                       name="payment-method"
-                      color="primary"
+                      color="warning"
+                      className="!text-orange-600"
                     />
-                    <span className="text-[14px]">Cash on Delivery</span>
-                  </label>
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-2">
+                        <span className="text-[16px] font-[600] text-gray-800">Cash on Delivery</span>
+                        <span className="bg-orange-100 text-orange-700 px-2 py-1 rounded-md text-[12px] font-bold">
+                          PAY LATER
+                        </span>
+                      </div>
+                      <p className="text-[13px] text-gray-600">Pay when you receive your order</p>
+                    </div>
+                  </div>
                 </div>
               </div>
 
               {/* Order Summary */}
-              <div className="space-y-2 mb-4">
-                <div className="flex items-center justify-between text-[14px]">
-                  <span>Subtotal:</span>
-                  <span>₹{context.cartData?.length !== 0 ? 
-                    context.cartData?.map(item => parseInt(item.price) * item.quantity)
-                      .reduce((total, value) => total + value, 0) : 0}</span>
-                </div>
-                {paymentMethod === "online" && (
-                  <div className="flex items-center justify-between text-[14px] text-green-600 font-medium">
-                    <span>Online Payment Discount:</span>
-                    <span>-₹200</span>
+              <div className="bg-gradient-to-br from-gray-50 to-white p-4 rounded-xl border border-gray-200 mb-4">
+                <h4 className="text-[16px] font-[700] mb-3 text-gray-800">Order Summary</h4>
+                
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between text-[14px]">
+                    <span className="text-gray-600">Subtotal:</span>
+                    <span className="font-medium">₹{context.cartData?.length !== 0 ? 
+                      context.cartData?.map(item => parseInt(item.price) * item.quantity)
+                        .reduce((total, value) => total + value, 0) : 0}</span>
                   </div>
-                )}
-                <div className="flex items-center justify-between py-3 border-t border-[rgba(0,0,0,0.1)] font-[600] text-[16px]">
-                  <span>Total Amount:</span>
-                  <span>₹{totalAmount}</span>
+                  
+                  {paymentMethod === "online" && (
+                    <div className="flex items-center justify-between p-2 bg-green-50 rounded-lg border border-green-200">
+                      <div className="flex items-center gap-2">
+                        <span className="text-green-600">🎉</span>
+                        <span className="text-[14px] text-green-700 font-medium">Digital Payment Discount</span>
+                      </div>
+                      <span className="text-[14px] text-green-700 font-bold">-₹200</span>
+                    </div>
+                  )}
+                  
+                  <div className="flex items-center justify-between py-3 border-t border-gray-200 font-[700] text-[18px]">
+                    <span className="text-gray-800">Total Amount:</span>
+                    <span className="text-green-600">₹{totalAmount}</span>
+                  </div>
                 </div>
               </div>
 
@@ -879,7 +939,7 @@ Advanced UI Techniques`;
                   className="btn-org btn-lg w-full flex gap-2 items-center" 
                   disabled={!userData?.address_details || userData.address_details.length === 0 || isLoading || messagingInProgress || orderInProgress || paymentMethod !== "online"}
                 >
-                  <FaGooglePay className="text-[20px]" /> 
+                  <FaGooglePay className="text-[28px] text-white" /> 
                   {(messagingInProgress || orderInProgress) ? "Processing..." : "Pay now (₹200 OFF)"}
                 </Button>
 
