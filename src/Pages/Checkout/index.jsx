@@ -3,6 +3,7 @@ import { Button } from "@mui/material";
 import { BsFillBagCheckFill } from "react-icons/bs";
 import { MyContext } from '../../App';
 import { FaPlus } from "react-icons/fa6";
+import { FaGooglePay } from "react-icons/fa";
 import Radio from '@mui/material/Radio';
 import { deleteData, fetchDataFromApi, postData, API_BASE_URL } from "../../utils/api";
 import axios from 'axios';
@@ -81,9 +82,9 @@ const Checkout = () => {
       context.cartData?.map(item => parseInt(item.price) * item.quantity)
         .reduce((total, value) => total + value, 0) : 0;
     
-    // Add ₹200 COD charge if payment method is COD
-    const codCharge = paymentMethod === "cod" ? 200 : 0;
-    const finalTotal = subtotal + codCharge;
+    // Apply ₹200 discount for online payment
+    const onlineDiscount = paymentMethod === "online" ? 200 : 0;
+    const finalTotal = subtotal - onlineDiscount;
     
     setTotalAmount(finalTotal);
   }, [context.cartData, paymentMethod])
@@ -838,7 +839,7 @@ Advanced UI Techniques`;
                       name="payment-method"
                       color="primary"
                     />
-                    <span className="text-[14px]">Online Payment (Razorpay/PayPal)</span>
+                    <span className="text-[14px]">Online Payment (Razorpay/PayPal) - ₹200 OFF</span>
                   </label>
                   <label className="flex items-center gap-3 cursor-pointer">
                     <Radio
@@ -847,7 +848,7 @@ Advanced UI Techniques`;
                       name="payment-method"
                       color="primary"
                     />
-                    <span className="text-[14px]">Cash on Delivery (+₹200)</span>
+                    <span className="text-[14px]">Cash on Delivery</span>
                   </label>
                 </div>
               </div>
@@ -860,10 +861,10 @@ Advanced UI Techniques`;
                     context.cartData?.map(item => parseInt(item.price) * item.quantity)
                       .reduce((total, value) => total + value, 0) : 0}</span>
                 </div>
-                {paymentMethod === "cod" && (
-                  <div className="flex items-center justify-between text-[14px] text-orange-600 font-medium">
-                    <span>COD Charge:</span>
-                    <span>+₹200</span>
+                {paymentMethod === "online" && (
+                  <div className="flex items-center justify-between text-[14px] text-green-600 font-medium">
+                    <span>Online Payment Discount:</span>
+                    <span>-₹200</span>
                   </div>
                 )}
                 <div className="flex items-center justify-between py-3 border-t border-[rgba(0,0,0,0.1)] font-[600] text-[16px]">
@@ -878,8 +879,8 @@ Advanced UI Techniques`;
                   className="btn-org btn-lg w-full flex gap-2 items-center" 
                   disabled={!userData?.address_details || userData.address_details.length === 0 || isLoading || messagingInProgress || orderInProgress || paymentMethod !== "online"}
                 >
-                  <BsFillBagCheckFill className="text-[20px]" /> 
-                  {(messagingInProgress || orderInProgress) ? "Processing..." : "Pay with Razorpay"}
+                  <FaGooglePay className="text-[20px]" /> 
+                  {(messagingInProgress || orderInProgress) ? "Processing..." : "Pay now (₹200 OFF)"}
                 </Button>
 
                 <div 
