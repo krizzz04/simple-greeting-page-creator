@@ -934,34 +934,42 @@ Advanced UI Techniques`;
               </div>
 
               <div className="flex items-center flex-col gap-3 mb-2">
-                <Button 
-                  type="submit" 
-                  className="btn-org btn-lg w-full flex gap-2 items-center" 
-                  disabled={!userData?.address_details || userData.address_details.length === 0 || isLoading || messagingInProgress || orderInProgress || paymentMethod !== "online"}
-                >
-                  <FaGooglePay className="text-[28px] text-white" /> 
-                  {(messagingInProgress || orderInProgress) ? "Processing..." : "Pay now (₹200 OFF)"}
-                </Button>
+                {/* Digital Payment Button - Only show when online payment is selected */}
+                {paymentMethod === "online" && (
+                  <>
+                    <Button 
+                      type="submit" 
+                      className="btn-org btn-lg w-full flex gap-2 items-center" 
+                      disabled={!userData?.address_details || userData.address_details.length === 0 || isLoading || messagingInProgress || orderInProgress}
+                    >
+                      <FaGooglePay className="text-[28px] text-white" /> 
+                      {(messagingInProgress || orderInProgress) ? "Processing..." : "Pay now (₹200 OFF)"}
+                    </Button>
 
-                <div 
-                  id="paypal-button-container" 
-                  className={(!userData?.address_details || userData.address_details.length === 0 || isLoading || messagingInProgress || orderInProgress || paymentMethod !== "online") ? 'pointer-events-none opacity-50' : ''}
-                ></div>
+                    <div 
+                      id="paypal-button-container" 
+                      className={(!userData?.address_details || userData.address_details.length === 0 || isLoading || messagingInProgress || orderInProgress) ? 'pointer-events-none opacity-50' : ''}
+                    ></div>
+                  </>
+                )}
 
-                <Button 
-                  type="button" 
-                  className="btn-dark btn-lg w-full flex gap-2 items-center" 
-                  onClick={cashOnDelivery} 
-                  disabled={isLoading || messagingInProgress || orderInProgress || !userData?.address_details || userData.address_details.length === 0 || paymentMethod !== "cod"}
-                >
-                  {
-                    (isLoading || messagingInProgress || orderInProgress) ? <CircularProgress size={24} color="inherit" /> :
-                      <>
-                        <BsFillBagCheckFill className="text-[20px]" />
-                        Cash on Delivery
-                      </>
-                  }
-                </Button>
+                {/* Cash on Delivery Button - Only show when COD is selected */}
+                {paymentMethod === "cod" && (
+                  <Button 
+                    type="button" 
+                    className="btn-dark btn-lg w-full flex gap-2 items-center" 
+                    onClick={cashOnDelivery} 
+                    disabled={isLoading || messagingInProgress || orderInProgress || !userData?.address_details || userData.address_details.length === 0}
+                  >
+                    {
+                      (isLoading || messagingInProgress || orderInProgress) ? <CircularProgress size={24} color="inherit" /> :
+                        <>
+                          <BsFillBagCheckFill className="text-[20px]" />
+                          Cash on Delivery
+                        </>
+                    }
+                  </Button>
+                )}
               </div>
 
               {/* Debug section - remove in production */}

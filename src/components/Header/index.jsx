@@ -128,7 +128,7 @@ const Header = () => {
               <Button className="!w-[35px] !min-w-[35px] !h-[35px] !rounded-full !text-gray-800" onClick={() => setIsOpenCatPanel(true)}><HiOutlineMenu size={22} /></Button>
             }
 
-            <div className="col1 w-[40%] lg:w-[25%]">
+            <div className="col1 w-[40%] lg:w-[25%] flex justify-center lg:justify-start">
               <Link to={"/"}>
                 <img src={localStorage.getItem('logo') || "/logo.jpg"} className="max-w-[60px] lg:max-w-[90px]" alt="Logo" />
               </Link>
