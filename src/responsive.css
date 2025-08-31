@@ -32,7 +32,7 @@
     .footerBoxWrap{padding-left:20px !important ;}
     .footerBoxWrap .col{width: 180px !important;}
 
-    .sidebarWrapper.open{bottom: 0px !important; opacity: 1 !important;}
+    .sidebarWrapper.open{bottom: 80px !important; opacity: 1 !important; max-height: calc(100vh - 80px) !important; overflow-y: auto !important;}
     
 }
 
