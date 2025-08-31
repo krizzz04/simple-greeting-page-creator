@@ -330,30 +330,42 @@ const Footer = () => {
                   <span className="w-2 h-2 bg-blue-500 rounded-full mr-2"></span>
                   Shipping and Delivery
                 </h3>
-                <ul className="space-y-2 text-sm">
-                  <li className="flex items-start">
-                    <span className="text-blue-600 mr-2">•</span>
-                    Orders are usually shipped within <strong>0–7 days</strong> or as per the delivery date confirmed at the time of order.
+                <ul className="space-y-3 text-sm">
+                  <li className="flex items-start gap-3">
+                    <span className="text-blue-600 font-bold text-lg leading-none mt-0.5">•</span>
+                    <span className="flex-1 leading-relaxed">
+                      Orders are usually shipped within <strong>0–7 days</strong> or as per the delivery date confirmed at the time of order.
+                    </span>
                   </li>
-                  <li className="flex items-start">
-                    <span className="text-blue-600 mr-2">•</span>
-                    Domestic orders are typically delivered within <strong>1–15 working days</strong>.
+                  <li className="flex items-start gap-3">
+                    <span className="text-blue-600 font-bold text-lg leading-none mt-0.5">•</span>
+                    <span className="flex-1 leading-relaxed">
+                      Domestic orders are typically delivered within <strong>1–15 working days</strong>.
+                    </span>
                   </li>
-                  <li className="flex items-start">
-                    <span className="text-blue-600 mr-2">•</span>
-                    We are not responsible for delays caused by courier companies or postal services, but we ensure timely handover of shipments.
+                  <li className="flex items-start gap-3">
+                    <span className="text-blue-600 font-bold text-lg leading-none mt-0.5">•</span>
+                    <span className="flex-1 leading-relaxed">
+                      We are not responsible for delays caused by courier companies or postal services, but we ensure timely handover of shipments.
+                    </span>
                   </li>
-                  <li className="flex items-start">
-                    <span className="text-blue-600 mr-2">•</span>
-                    Orders are delivered to the address provided at checkout. Please double-check your details as we are not liable for incorrect addresses.
+                  <li className="flex items-start gap-3">
+                    <span className="text-blue-600 font-bold text-lg leading-none mt-0.5">•</span>
+                    <span className="flex-1 leading-relaxed">
+                      Orders are delivered to the address provided at checkout. Please double-check your details as we are not liable for incorrect addresses.
+                    </span>
                   </li>
-                  <li className="flex items-start">
-                    <span className="text-blue-600 mr-2">•</span>
-                    All orders are shipped via registered domestic courier services or speed post.
+                  <li className="flex items-start gap-3">
+                    <span className="text-blue-600 font-bold text-lg leading-none mt-0.5">•</span>
+                    <span className="flex-1 leading-relaxed">
+                      All orders are shipped via registered domestic courier services or speed post.
+                    </span>
                   </li>
-                  <li className="flex items-start">
-                    <span className="text-blue-600 mr-2">•</span>
-                    <strong>Free shipping is available on all orders.</strong>
+                  <li className="flex items-start gap-3">
+                    <span className="text-blue-600 font-bold text-lg leading-none mt-0.5">•</span>
+                    <span className="flex-1 leading-relaxed">
+                      <strong>Free shipping is available on all orders.</strong>
+                    </span>
                   </li>
                 </ul>
               </div>
@@ -364,22 +376,30 @@ const Footer = () => {
                   <span className="w-2 h-2 bg-green-500 rounded-full mr-2"></span>
                   Returns and Replacements
                 </h3>
-                <ul className="space-y-2 text-sm">
-                  <li className="flex items-start">
-                    <span className="text-green-600 mr-2">•</span>
-                    Our products are not customized but go through strict quality checks.
+                <ul className="space-y-3 text-sm">
+                  <li className="flex items-start gap-3">
+                    <span className="text-green-600 font-bold text-lg leading-none mt-0.5">•</span>
+                    <span className="flex-1 leading-relaxed">
+                      Our products are not customized but go through strict quality checks.
+                    </span>
                   </li>
-                  <li className="flex items-start">
-                    <span className="text-green-600 mr-2">•</span>
-                    If you receive a damaged or incorrect item, contact us within <strong>3 days</strong> of delivery.
+                  <li className="flex items-start gap-3">
+                    <span className="text-green-600 font-bold text-lg leading-none mt-0.5">•</span>
+                    <span className="flex-1 leading-relaxed">
+                      If you receive a damaged or incorrect item, contact us within <strong>3 days</strong> of delivery.
+                    </span>
                   </li>
-                  <li className="flex items-start">
-                    <span className="text-green-600 mr-2">•</span>
-                    We follow a <strong>no-refund policy</strong>. However, after verification, we will replace the damaged or incorrect item.
+                  <li className="flex items-start gap-3">
+                    <span className="text-green-600 font-bold text-lg leading-none mt-0.5">•</span>
+                    <span className="flex-1 leading-relaxed">
+                      We follow a <strong>no-refund policy</strong>. However, after verification, we will replace the damaged or incorrect item.
+                    </span>
                   </li>
-                  <li className="flex items-start">
-                    <span className="text-green-600 mr-2">•</span>
-                    Shipping charges for sending the replacement are to be paid by the customer, but the replacement product will be provided at no additional cost.
+                  <li className="flex items-start gap-3">
+                    <span className="text-green-600 font-bold text-lg leading-none mt-0.5">•</span>
+                    <span className="flex-1 leading-relaxed">
+                      Shipping charges for sending the replacement are to be paid by the customer, but the replacement product will be provided at no additional cost.
+                    </span>
                   </li>
                 </ul>
               </div>

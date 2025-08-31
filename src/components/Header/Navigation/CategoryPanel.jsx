@@ -157,7 +157,7 @@ const CategoryPanel = (props) => {
         {/* Footer */}
         <div className="mt-8 pt-4 border-t border-gray-200">
           <p className="text-xs text-gray-500 text-center">
-            Discover our handcrafted tiger-head décor inspired by Mangalore's iconic Pilivesha
+            Discover our handcrafted tiger-head decor inspired by Mangalore's iconic Pilivesha
           </p>
         </div>
       </div>
