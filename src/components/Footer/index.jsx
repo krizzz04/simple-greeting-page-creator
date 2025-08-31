@@ -273,25 +273,25 @@ const Footer = () => {
                 </h4>
                 <ul className="space-y-3 text-sm">
                   <li className="flex items-start gap-3">
-                    <span className="text-purple-600 font-bold text-lg leading-none mt-0.5">•</span>
+                    <span className="text-purple-600 font-bold text-xl leading-none mt-0.5 flex-shrink-0">•</span>
                     <span className="flex-1 leading-relaxed">
                       <strong>Sandcrafted</strong> and uniquely molded for authenticity
                     </span>
                   </li>
                   <li className="flex items-start gap-3">
-                    <span className="text-purple-600 font-bold text-lg leading-none mt-0.5">•</span>
+                    <span className="text-purple-600 font-bold text-xl leading-none mt-0.5 flex-shrink-0">•</span>
                     <span className="flex-1 leading-relaxed">
                       <strong>Premium teak wood</strong> or <strong>acrylic-glass base</strong> for durability
                     </span>
                   </li>
                   <li className="flex items-start gap-3">
-                    <span className="text-purple-600 font-bold text-lg leading-none mt-0.5">•</span>
+                    <span className="text-purple-600 font-bold text-xl leading-none mt-0.5 flex-shrink-0">•</span>
                     <span className="flex-1 leading-relaxed">
                       <strong>Limited-edition</strong> pieces with cultural significance
                     </span>
                   </li>
                   <li className="flex items-start gap-3">
-                    <span className="text-purple-600 font-bold text-lg leading-none mt-0.5">•</span>
+                    <span className="text-purple-600 font-bold text-xl leading-none mt-0.5 flex-shrink-0">•</span>
                     <span className="flex-1 leading-relaxed">
                       <strong>Handcrafted</strong> with attention to detail and tradition
                     </span>
