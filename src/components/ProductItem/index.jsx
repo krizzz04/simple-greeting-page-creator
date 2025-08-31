@@ -328,7 +328,7 @@ const ProductItem = (props) => {
       onClick={() => navigate(`/product/${props?.item?._id}`)}
     >
       <div className="group imgWrapper w-[100%]  overflow-hidden  rounded-md rounded-bl-none rounded-br-none relative">
-        <div className="img h-[200px] overflow-hidden">
+        <div className="img h-[280px] overflow-hidden">
           <img
             src={props?.item?.images?.[0] || "/homeBannerPlaceholder.jpg"}
             className="w-full"
