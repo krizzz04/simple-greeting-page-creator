@@ -231,18 +231,24 @@ const Footer = () => {
                 </p>
                 <div className="bg-white p-4 rounded-lg">
                   <h5 className="text-sm font-semibold text-gray-900 mb-2">Optimal Placement for Positive Energy:</h5>
-                  <ul className="space-y-1 text-sm">
-                    <li className="flex items-start">
-                      <span className="text-blue-600 mr-2">•</span>
-                      <strong>North or East direction</strong> → Brings positive energy, courage, and progress
+                  <ul className="space-y-2 text-sm">
+                    <li className="flex items-start gap-3">
+                      <span className="text-blue-600 font-bold text-lg leading-none mt-0.5">•</span>
+                      <span className="flex-1 leading-relaxed">
+                        <strong>North or East direction</strong> → Brings positive energy, courage, and progress
+                      </span>
                     </li>
-                    <li className="flex items-start">
-                      <span className="text-blue-600 mr-2">•</span>
-                      <strong>Behind your office chair</strong> → Symbolizes authority and protection
+                    <li className="flex items-start gap-3">
+                      <span className="text-blue-600 font-bold text-lg leading-none mt-0.5">•</span>
+                      <span className="flex-1 leading-relaxed">
+                        <strong>Behind your office chair</strong> → Symbolizes authority and protection
+                      </span>
                     </li>
-                    <li className="flex items-start">
-                      <span className="text-blue-600 mr-2">•</span>
-                      <strong>In your living room</strong> → Creates an impressive focal point
+                    <li className="flex items-start gap-3">
+                      <span className="text-blue-600 font-bold text-lg leading-none mt-0.5">•</span>
+                      <span className="flex-1 leading-relaxed">
+                        <strong>In your living room</strong> → Creates an impressive focal point
+                      </span>
                     </li>
                   </ul>
                 </div>
@@ -265,22 +271,30 @@ const Footer = () => {
                   <span className="w-2 h-2 bg-purple-500 rounded-full mr-2"></span>
                   Artisan Craftsmanship
                 </h4>
-                <ul className="space-y-2 text-sm">
-                  <li className="flex items-start">
-                    <span className="text-purple-600 mr-2">•</span>
-                    <strong>Sandcrafted</strong> and uniquely molded for authenticity
+                <ul className="space-y-3 text-sm">
+                  <li className="flex items-start gap-3">
+                    <span className="text-purple-600 font-bold text-lg leading-none mt-0.5">•</span>
+                    <span className="flex-1 leading-relaxed">
+                      <strong>Sandcrafted</strong> and uniquely molded for authenticity
+                    </span>
                   </li>
-                  <li className="flex items-start">
-                    <span className="text-purple-600 mr-2">•</span>
-                    <strong>Premium teak wood</strong> or <strong>acrylic-glass base</strong> for durability
+                  <li className="flex items-start gap-3">
+                    <span className="text-purple-600 font-bold text-lg leading-none mt-0.5">•</span>
+                    <span className="flex-1 leading-relaxed">
+                      <strong>Premium teak wood</strong> or <strong>acrylic-glass base</strong> for durability
+                    </span>
                   </li>
-                  <li className="flex items-start">
-                    <span className="text-purple-600 mr-2">•</span>
-                    <strong>Limited-edition</strong> pieces with cultural significance
+                  <li className="flex items-start gap-3">
+                    <span className="text-purple-600 font-bold text-lg leading-none mt-0.5">•</span>
+                    <span className="flex-1 leading-relaxed">
+                      <strong>Limited-edition</strong> pieces with cultural significance
+                    </span>
                   </li>
-                  <li className="flex items-start">
-                    <span className="text-purple-600 mr-2">•</span>
-                    <strong>Handcrafted</strong> with attention to detail and tradition
+                  <li className="flex items-start gap-3">
+                    <span className="text-purple-600 font-bold text-lg leading-none mt-0.5">•</span>
+                    <span className="flex-1 leading-relaxed">
+                      <strong>Handcrafted</strong> with attention to detail and tradition
+                    </span>
                   </li>
                 </ul>
               </div>
