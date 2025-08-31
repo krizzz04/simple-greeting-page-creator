@@ -5,6 +5,7 @@ import { MyContext } from '../../App';
 import { FaPlus } from "react-icons/fa6";
 import { FaGooglePay } from "react-icons/fa";
 import { SiPaytm, SiPhonepe } from "react-icons/si";
+import { MdDelete } from "react-icons/md";
 import Radio from '@mui/material/Radio';
 import { deleteData, fetchDataFromApi, postData, API_BASE_URL } from "../../utils/api";
 import axios from 'axios';
@@ -28,6 +29,32 @@ const Checkout = () => {
   const context = useContext(MyContext);
 
   const history = useNavigate();
+
+  // Function to remove item from cart
+  const removeFromCart = async (itemId) => {
+    try {
+      console.log("🗑️ Attempting to remove cart item:", itemId);
+      
+      if (!itemId) {
+        context?.alertBox("error", "Invalid item ID");
+        return;
+      }
+
+      const response = await deleteData(`/api/cart/delete-cart-item/${itemId}`);
+      console.log("🗑️ Remove response:", response);
+      
+      if (response?.error === false || response?.success === true) {
+        context?.alertBox("success", "Item removed from cart");
+        context?.getCartItems(); // Refresh cart data
+      } else {
+        console.error("🗑️ Remove failed:", response);
+        context?.alertBox("error", response?.message || "Failed to remove item from cart");
+      }
+    } catch (error) {
+      console.error("🗑️ Error removing item from cart:", error);
+      context?.alertBox("error", "Failed to remove item from cart");
+    }
+  };
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -806,8 +833,8 @@ Advanced UI Techniques`;
                 {
                   context?.cartData?.length !== 0 && context?.cartData?.map((item, index) => {
                     return (
-                      <div className="flex items-center justify-between py-2" key={index}>
-                        <div className="part1 flex items-center gap-3">
+                      <div className="flex items-center justify-between py-2 border-b border-gray-100 last:border-b-0" key={index}>
+                        <div className="part1 flex items-center gap-3 flex-1">
                           <div className="img w-[50px] h-[50px] object-cover overflow-hidden rounded-md group cursor-pointer">
                             <img
                               src={item?.image}
@@ -816,13 +843,27 @@ Advanced UI Techniques`;
                             />
                           </div>
 
-                          <div className="info">
+                          <div className="info flex-1">
                             <h4 className="text-[14px]" title={item?.productTitle}>{item?.productTitle?.substr(0, 20) + '...'} </h4>
-                            <span className="text-[13px]">Qty : {item?.quantity}</span>
+                            <span className="text-[13px] text-gray-600">Qty : {item?.quantity}</span>
                           </div>
                         </div>
 
-                        <span className="text-[14px] font-[500]">{`₹${(item?.quantity * item?.price)}`}</span>
+                        <div className="flex items-center gap-3">
+                          <span className="text-[14px] font-[500] text-green-600">{`₹${(item?.quantity * item?.price)}`}</span>
+                          
+                          <Button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              console.log("🗑️ Cart item structure:", item);
+                              removeFromCart(item._id);
+                            }}
+                            className="!min-w-[30px] !w-[30px] !h-[30px] !rounded-full !bg-red-50 hover:!bg-red-100 !text-red-500 hover:!text-red-600 transition-all duration-200"
+                            title="Remove from cart"
+                          >
+                            <MdDelete className="text-[16px]" />
+                          </Button>
+                        </div>
                       </div>
                     )
                   })

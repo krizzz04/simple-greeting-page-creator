@@ -94,13 +94,18 @@ export const editData = async (url, updatedData ) => {
 
 
 export const deleteData = async (url ) => {
-    const params={
-        headers: {
-            'Authorization': `Bearer ${localStorage.getItem('accessToken')}`, // Include your API key in the Authorization header
-            'Content-Type': 'application/json', // Adjust the content type as needed
-          },
-    
-    } 
-    const { res } = await axios.delete(API_BASE_URL +url,params)
-    return res;
+    try {
+        const params={
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('accessToken')}`, // Include your API key in the Authorization header
+                'Content-Type': 'application/json', // Adjust the content type as needed
+              },
+        
+        } 
+        const { data } = await axios.delete(API_BASE_URL + url, params)
+        return data;
+    } catch (error) {
+        console.error('Delete error:', error);
+        return { error: true, message: 'Network error occurred' };
+    }
 }
