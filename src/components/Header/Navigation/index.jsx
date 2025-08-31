@@ -130,7 +130,7 @@ const Navigation = (props) => {
           <div className="col_3 w-[20%] hidden lg:block">
             <p className="text-[14px] font-[500] flex items-center gap-3 mb-0 mt-0">
               <GoRocket className="text-[18px]" />
-              Free International Delivery
+              No Compromise on Quality
             </p>
           </div>
         </div>
