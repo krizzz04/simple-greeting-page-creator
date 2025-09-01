@@ -112,6 +112,15 @@ export const createOrderController = async (request, response) => {
                 });
 
                 console.log('✅ Order successfully sent to Delhivery:', delhiveryResult.waybill);
+            } else if (delhiveryResult.fallback) {
+                // Handle fallback case - still save waybill but mark as pending
+                await OrderModel.findByIdAndUpdate(order._id, {
+                    delhiveryWaybill: delhiveryResult.waybill,
+                    delhiveryTrackingUrl: null,
+                    shippingStatus: 'Pending - Delhivery API Unavailable'
+                });
+
+                console.log('⚠️ Delhivery API unavailable, using fallback waybill:', delhiveryResult.waybill);
             } else {
                 console.error('❌ Failed to send order to Delhivery:', delhiveryResult.error);
             }
@@ -362,6 +371,15 @@ export const captureOrderPaypalController = async (request, response) => {
                 });
 
                 console.log('✅ PayPal order successfully sent to Delhivery:', delhiveryResult.waybill);
+            } else if (delhiveryResult.fallback) {
+                // Handle fallback case - still save waybill but mark as pending
+                await OrderModel.findByIdAndUpdate(order._id, {
+                    delhiveryWaybill: delhiveryResult.waybill,
+                    delhiveryTrackingUrl: null,
+                    shippingStatus: 'Pending - Delhivery API Unavailable'
+                });
+
+                console.log('⚠️ Delhivery API unavailable for PayPal order, using fallback waybill:', delhiveryResult.waybill);
             } else {
                 console.error('❌ Failed to send PayPal order to Delhivery:', delhiveryResult.error);
             }

@@ -3,6 +3,11 @@ import axios from 'axios';
 const DELHIVERY_API_KEY = 'eb20a6d1c7451bf344645cbe25fb176a0328547f';
 const DELHIVERY_BASE_URL = 'https://track.delhivery.com/api/v1';
 
+// Validate API key
+if (!DELHIVERY_API_KEY) {
+    console.error('❌ DELHIVERY_API_KEY is not configured');
+}
+
 class DelhiveryService {
     constructor() {
         this.apiKey = DELHIVERY_API_KEY;
@@ -12,6 +17,11 @@ class DelhiveryService {
     // Create a new order in Delhivery
     async createOrder(orderData) {
         try {
+            // Validate required data
+            if (!orderData.orderId || !orderData.customerName || !orderData.deliveryAddress) {
+                throw new Error('Missing required order data');
+            }
+
             const payload = {
                 waybill: this.generateWaybill(),
                 order: orderData.orderId,
@@ -63,9 +73,14 @@ class DelhiveryService {
 
         } catch (error) {
             console.error('❌ Delhivery Order Creation Failed:', error.response?.data || error.message);
+            
+            // Return a fallback response to prevent order creation failure
             return {
                 success: false,
-                error: error.response?.data || error.message
+                error: error.response?.data || error.message,
+                waybill: this.generateWaybill(), // Still generate waybill for fallback
+                trackingUrl: null,
+                fallback: true
             };
         }
     }

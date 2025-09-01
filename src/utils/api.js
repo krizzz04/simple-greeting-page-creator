@@ -34,7 +34,7 @@ export const postData = async (url, formData) => {
 
 
 
-export const fetchDataFromApi = async (url) => {
+export const getData = async (url) => {
     try {
         const params={
             headers: {
@@ -51,6 +51,9 @@ export const fetchDataFromApi = async (url) => {
         return { error: true, message: 'Network error occurred' };
     }
 }
+
+// Alias for backward compatibility
+export const fetchDataFromApi = getData;
 
 
 export const uploadImage = async (url, updatedData ) => {
