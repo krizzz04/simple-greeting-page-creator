@@ -1,7 +1,7 @@
 import axios from 'axios';
 
-const DELHIVERY_API_KEY = 'eb20a6d1c7451bf344645cbe25fb176a0328547f';
-const DELHIVERY_BASE_URL = 'https://track.delhivery.com/api/v1';
+const DELHIVERY_API_KEY = '98af64ba1beb5f81c51de8089ddf4630ac248ff3';
+const DELHIVERY_BASE_URL = 'https://api.delhivery.com/v3';
 
 // Validate API key
 if (!DELHIVERY_API_KEY) {
@@ -10,12 +10,15 @@ if (!DELHIVERY_API_KEY) {
 
 class DelhiveryService {
     constructor() {
+        console.log('🚚 DelhiveryService constructor called');
         this.apiKey = DELHIVERY_API_KEY;
         this.baseURL = DELHIVERY_BASE_URL;
+        console.log('🚚 DelhiveryService initialized with API key:', this.apiKey ? 'Present' : 'Missing');
     }
 
     // Create a new order in Delhivery
     async createOrder(orderData) {
+        console.log('🚚 DelhiveryService.createOrder called with:', orderData);
         try {
             // Validate required data
             if (!orderData.orderId || !orderData.customerName || !orderData.deliveryAddress) {
@@ -25,7 +28,7 @@ class DelhiveryService {
             const payload = {
                 waybill: this.generateWaybill(),
                 order: orderData.orderId,
-                shipment_details: {
+                consignee: {
                     name: orderData.customerName,
                     phone: orderData.customerPhone,
                     email: orderData.customerEmail,
@@ -53,7 +56,7 @@ class DelhiveryService {
             console.log('🚚 Delhivery Order Payload:', payload);
 
             const response = await axios.post(
-                `${this.baseURL}/order/create`,
+                `${this.baseURL}/shipments/create`,
                 payload,
                 {
                     headers: {
@@ -89,7 +92,7 @@ class DelhiveryService {
     async trackOrder(waybill) {
         try {
             const response = await axios.get(
-                `${this.baseURL}/track/${waybill}`,
+                `${this.baseURL}/shipments/track/${waybill}`,
                 {
                     headers: {
                         'Authorization': `Token ${this.apiKey}`
@@ -172,7 +175,7 @@ class DelhiveryService {
     async cancelOrder(waybill) {
         try {
             const response = await axios.post(
-                `${this.baseURL}/order/cancel`,
+                `${this.baseURL}/shipments/cancel`,
                 { waybill },
                 {
                     headers: {
@@ -197,4 +200,6 @@ class DelhiveryService {
     }
 }
 
-export default new DelhiveryService();
+const delhiveryServiceInstance = new DelhiveryService();
+console.log('🚚 DelhiveryService instance created:', delhiveryServiceInstance);
+export default delhiveryServiceInstance;

@@ -12,7 +12,7 @@ This integration automatically sends orders to Delhivery when they are placed in
 ### Environment Variables
 Add these to your `.env` file:
 ```env
-DELHIVERY_API_KEY=eb20a6d1c7451bf344645cbe25fb176a0328547f
+DELHIVERY_API_KEY=98af64ba1beb5f81c51de8089ddf4630ac248ff3
 DELHIVERY_BASE_URL=https://track.delhivery.com/api/v1
 ```
 

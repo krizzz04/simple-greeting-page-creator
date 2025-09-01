@@ -6,6 +6,7 @@ import OrderConfirmationEmail from "../utils/orderEmailTemplate.js";
 import sendEmailFun from "../config/sendEmail.js";
 import AddressModel from "../models/address.model.js";
 import delhiveryService from "../config/delhiveryService.js";
+console.log('🚚 DelhiveryService imported in order controller:', typeof delhiveryService);
 
 export const createOrderController = async (request, response) => {
     try {
@@ -87,6 +88,7 @@ export const createOrderController = async (request, response) => {
         }
 
         // 🚚 Integrate with Delhivery for shipping
+        console.log('🚚 Starting Delhivery integration...');
         try {
             const delhiveryOrderData = {
                 orderId: order._id.toString(),
@@ -100,6 +102,7 @@ export const createOrderController = async (request, response) => {
             };
 
             console.log('🚚 Sending order to Delhivery:', delhiveryOrderData);
+            console.log('🚚 Delhivery service object:', typeof delhiveryService, delhiveryService);
 
             const delhiveryResult = await delhiveryService.createOrder(delhiveryOrderData);
             
@@ -126,6 +129,7 @@ export const createOrderController = async (request, response) => {
             }
         } catch (delhiveryError) {
             console.error('❌ Delhivery integration error:', delhiveryError);
+            console.error('❌ Delhivery error stack:', delhiveryError.stack);
             // Don't fail the order creation if Delhivery fails
         }
 

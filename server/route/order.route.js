@@ -23,6 +23,7 @@ orderRouter.get('/track/:waybill', async (req, res) => {
         // Import delhiveryService here to avoid circular dependency
         const delhiveryService = (await import('../config/delhiveryService.js')).default;
         
+        console.log('🚚 Tracking waybill:', waybill);
         const trackingResult = await delhiveryService.trackOrder(waybill);
         
         if (trackingResult.success) {
