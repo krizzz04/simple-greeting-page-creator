@@ -5,6 +5,7 @@ import paypal from "@paypal/checkout-server-sdk";
 import OrderConfirmationEmail from "../utils/orderEmailTemplate.js";
 import sendEmailFun from "../config/sendEmail.js";
 import AddressModel from "../models/address.model.js";
+import delhiveryService from "../config/delhiveryService.js";
 
 export const createOrderController = async (request, response) => {
     try {
@@ -85,6 +86,39 @@ export const createOrderController = async (request, response) => {
             })
         }
 
+        // 🚚 Integrate with Delhivery for shipping
+        try {
+            const delhiveryOrderData = {
+                orderId: order._id.toString(),
+                customerName: customerName,
+                customerPhone: deliveryAddress?.mobile || user?.mobile,
+                customerEmail: customerEmail,
+                deliveryAddress: deliveryAddress,
+                paymentMethod: request.body.payment_status === 'paid' ? 'online' : 'cod',
+                totalAmount: request.body.totalAmt,
+                products: request.body.products
+            };
+
+            console.log('🚚 Sending order to Delhivery:', delhiveryOrderData);
+
+            const delhiveryResult = await delhiveryService.createOrder(delhiveryOrderData);
+            
+            if (delhiveryResult.success) {
+                // Update order with Delhivery tracking info
+                await OrderModel.findByIdAndUpdate(order._id, {
+                    delhiveryWaybill: delhiveryResult.waybill,
+                    delhiveryTrackingUrl: delhiveryResult.trackingUrl,
+                    shippingStatus: 'Order Created in Delhivery'
+                });
+
+                console.log('✅ Order successfully sent to Delhivery:', delhiveryResult.waybill);
+            } else {
+                console.error('❌ Failed to send order to Delhivery:', delhiveryResult.error);
+            }
+        } catch (delhiveryError) {
+            console.error('❌ Delhivery integration error:', delhiveryError);
+            // Don't fail the order creation if Delhivery fails
+        }
 
         return response.status(200).json({
             error: false,
@@ -302,6 +336,39 @@ export const captureOrderPaypalController = async (request, response) => {
             })
         }
 
+        // 🚚 Integrate with Delhivery for shipping
+        try {
+            const delhiveryOrderData = {
+                orderId: order._id.toString(),
+                customerName: customerName,
+                customerPhone: deliveryAddress?.mobile || user?.mobile,
+                customerEmail: customerEmail,
+                deliveryAddress: deliveryAddress,
+                paymentMethod: 'online', // PayPal orders are always online
+                totalAmount: request.body.totalAmount,
+                products: request.body.products
+            };
+
+            console.log('🚚 Sending PayPal order to Delhivery:', delhiveryOrderData);
+
+            const delhiveryResult = await delhiveryService.createOrder(delhiveryOrderData);
+            
+            if (delhiveryResult.success) {
+                // Update order with Delhivery tracking info
+                await OrderModel.findByIdAndUpdate(order._id, {
+                    delhiveryWaybill: delhiveryResult.waybill,
+                    delhiveryTrackingUrl: delhiveryResult.trackingUrl,
+                    shippingStatus: 'Order Created in Delhivery'
+                });
+
+                console.log('✅ PayPal order successfully sent to Delhivery:', delhiveryResult.waybill);
+            } else {
+                console.error('❌ Failed to send PayPal order to Delhivery:', delhiveryResult.error);
+            }
+        } catch (delhiveryError) {
+            console.error('❌ Delhivery integration error for PayPal:', delhiveryResult.error);
+            // Don't fail the order creation if Delhivery fails
+        }
 
         for (let i = 0; i < request.body.products.length; i++) {
 

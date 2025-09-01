@@ -9,8 +9,9 @@ import { MdDelete } from "react-icons/md";
 import Radio from '@mui/material/Radio';
 import { deleteData, fetchDataFromApi, postData, API_BASE_URL } from "../../utils/api";
 import axios from 'axios';
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import CircularProgress from '@mui/material/CircularProgress';
+import DelhiveryTracking from '../../components/DelhiveryTracking';
 
 const VITE_APP_RAZORPAY_KEY_ID = import.meta.env.VITE_APP_RAZORPAY_KEY_ID;
 const VITE_APP_PAYPAL_CLIENT_ID = import.meta.env.VITE_APP_PAYPAL_CLIENT_ID;
@@ -26,6 +27,8 @@ const Checkout = () => {
   const [messagingInProgress, setMessagingInProgress] = useState(false);
   const [orderInProgress, setOrderInProgress] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState("online"); // "online" or "cod"
+  const [orderPlaced, setOrderPlaced] = useState(false);
+  const [orderData, setOrderData] = useState(null);
   const context = useContext(MyContext);
 
   const history = useNavigate();
@@ -551,7 +554,16 @@ Advanced UI Techniques`;
             // Send all notifications
             await sendAllNotifications(user, info, deliveryAddressObject, fullOrderId);
             
-            history("/order/success");
+                          // 🚚 Store order data for tracking display
+              const orderWithTracking = {
+                ...newOrder,
+                delivery_address: deliveryAddressObject
+              };
+              localStorage.setItem(`order_${fullOrderId}`, JSON.stringify(orderWithTracking));
+              
+              // 🚚 Show tracking information on checkout page
+              setOrderData(orderWithTracking);
+              setOrderPlaced(true);
             deleteData(`/api/cart/emptyCart/${context?.userData?._id}`).then(() => {
                 context?.getCartItems();
             })
@@ -636,10 +648,20 @@ Advanced UI Techniques`;
               // Send all notifications
               await sendAllNotifications(user, payLoad, deliveryAddressObject, fullOrderId);
               
+              // 🚚 Store order data for tracking display
+              const orderWithTracking = {
+                ...newOrder,
+                delivery_address: deliveryAddressObject
+              };
+              localStorage.setItem(`order_${fullOrderId}`, JSON.stringify(orderWithTracking));
+              
+              // 🚚 Show tracking information on checkout page
+              setOrderData(orderWithTracking);
+              setOrderPlaced(true);
+              
               deleteData(`/api/cart/emptyCart/${user?._id}`).then(() => {
                 context?.getCartItems();
               })
-              history("/order/success");
             } else {
               context.alertBox("error", res?.message);
               history("/order/failed");
@@ -705,10 +727,20 @@ Advanced UI Techniques`;
             // Send all notifications
             await sendAllNotifications(user, payLoad, deliveryAddressObject, fullOrderId);
 
+            // 🚚 Store order data for tracking display
+            const orderWithTracking = {
+                ...newOrder,
+                delivery_address: deliveryAddressObject
+            };
+            localStorage.setItem(`order_${fullOrderId}`, JSON.stringify(orderWithTracking));
+
+            // 🚚 Show tracking information on checkout page
+            setOrderData(orderWithTracking);
+            setOrderPlaced(true);
+
             deleteData(`/api/cart/emptyCart/${user?._id}`).then(() => {
                 context?.getCartItems();
             });
-            history("/order/success");
         } else {
             context.alertBox("error", res?.message);
             history("/order/failed");
@@ -744,6 +776,70 @@ Advanced UI Techniques`;
   // Expose test function to window for debugging
   if (typeof window !== 'undefined') {
     window.testWasenderAPI = testWasenderAPI;
+  }
+
+  // 🚚 Show tracking information if order was just placed
+  if (orderPlaced && orderData) {
+    return (
+      <section className="py-6 lg:py-8 w-full bg-gray-50 min-h-screen">
+        <div className="container mx-auto px-4">
+          <div className="max-w-4xl mx-auto">
+            <div className="bg-white rounded-lg shadow-sm border border-gray-100 p-8 text-center">
+              <div className="mb-6">
+                <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <span className="text-green-600 text-3xl">✅</span>
+                </div>
+                <h1 className="text-2xl font-bold text-gray-900 mb-2">Order Placed Successfully!</h1>
+                <p className="text-gray-600">Your order has been confirmed and is being processed.</p>
+              </div>
+
+              {/* 🚚 Delhivery Tracking Section */}
+              {orderData?.delhiveryWaybill && (
+                <div className="bg-blue-50 p-6 rounded-lg border border-blue-200 mb-6">
+                  <h2 className="font-semibold text-blue-900 mb-4 text-lg">🚚 Track Your Package</h2>
+                  <DelhiveryTracking 
+                    waybill={orderData.delhiveryWaybill} 
+                    orderId={orderData._id} 
+                  />
+                </div>
+              )}
+
+              {/* 🚚 No Tracking Yet - Show Processing Status */}
+              {!orderData?.delhiveryWaybill && (
+                <div className="bg-gray-50 p-6 rounded-lg border border-gray-200 mb-6">
+                  <h2 className="font-semibold text-gray-900 mb-4 text-lg">📦 Order Status</h2>
+                  <div className="text-center">
+                    <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                      <span className="text-gray-500 text-2xl">⏳</span>
+                    </div>
+                    <p className="font-medium text-gray-900 mb-2">Order Processing</p>
+                    <p className="text-sm text-gray-600">Your order is being prepared for shipping. You'll receive tracking information via email once the package is shipped.</p>
+                  </div>
+                </div>
+              )}
+
+              <div className="flex gap-3 justify-center">
+                <Button 
+                  onClick={() => {
+                    setOrderPlaced(false);
+                    setOrderData(null);
+                  }}
+                  className="btn-org btn-border"
+                >
+                  Place Another Order
+                </Button>
+                <Link to="/orders">
+                  <Button className="btn-org btn-border">View All Orders</Button>
+                </Link>
+                <Link to="/">
+                  <Button className="btn-org btn-border">Back to Home</Button>
+                </Link>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    );
   }
 
   return (

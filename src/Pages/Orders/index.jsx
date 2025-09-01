@@ -7,6 +7,7 @@ import Badge from "../../components/Badge";
 import { FaAngleUp } from "react-icons/fa6";
 import { fetchDataFromApi } from "../../utils/api";
 import Pagination from "@mui/material/Pagination";
+import DelhiveryTracking from "../../components/DelhiveryTracking";
 
 const Orders = () => {
   const [isOpenOrderdProduct, setIsOpenOrderdProduct] = useState(null);
@@ -75,6 +76,13 @@ const Orders = () => {
                             <div>
                               <h3 className="font-semibold text-gray-900 text-sm">Order #{order?._id?.slice(-8)}</h3>
                               <p className="text-xs text-gray-500">{order?.createdAt?.split("T")[0]}</p>
+                              {/* 🚚 Quick Tracking Info */}
+                              {order?.delhiveryWaybill && (
+                                <div className="flex items-center gap-1 mt-1">
+                                  <span className="text-blue-600 text-xs">🚚</span>
+                                  <span className="text-blue-600 text-xs font-medium">Track: {order.delhiveryWaybill}</span>
+                                </div>
+                              )}
                             </div>
                           </div>
                           <div className="flex items-center gap-3">
@@ -149,6 +157,45 @@ const Orders = () => {
                                   </div>
                                 </div>
                               ))}
+                            </div>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* 🚚 Delhivery Tracking Section */}
+                      {isOpenOrderdProduct === index && order?.delhiveryWaybill && (
+                        <div className="border-t border-gray-200 bg-blue-50">
+                          <div className="p-3">
+                            <h4 className="font-semibold text-gray-900 mb-3 text-sm flex items-center gap-2">
+                              <span className="text-blue-600">🚚</span>
+                              Shipment Tracking
+                            </h4>
+                            <DelhiveryTracking 
+                              waybill={order.delhiveryWaybill} 
+                              orderId={order._id} 
+                            />
+                          </div>
+                        </div>
+                      )}
+
+                      {/* 🚚 Delhivery Tracking Section - No Waybill Yet */}
+                      {isOpenOrderdProduct === index && !order?.delhiveryWaybill && (
+                        <div className="border-t border-gray-200 bg-gray-50">
+                          <div className="p-3">
+                            <h4 className="font-semibold text-gray-900 mb-3 text-sm flex items-center gap-2">
+                              <span className="text-gray-500">📦</span>
+                              Shipment Status
+                            </h4>
+                            <div className="bg-white p-4 rounded-lg border border-gray-200">
+                              <div className="flex items-center gap-3">
+                                <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center">
+                                  <span className="text-gray-500 text-lg">⏳</span>
+                                </div>
+                                <div>
+                                  <p className="font-medium text-gray-900 text-sm">Order Processing</p>
+                                  <p className="text-xs text-gray-600">Your order is being prepared for shipping. Tracking information will appear here once the package is shipped.</p>
+                                </div>
+                              </div>
                             </div>
                           </div>
                         </div>

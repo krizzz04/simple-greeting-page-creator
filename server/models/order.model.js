@@ -46,6 +46,25 @@ const orderSchema = new mongoose.Schema({
     totalAmt: {
         type: Number,
         default: 0
+    },
+    // 🚚 Delhivery Integration Fields
+    delhiveryWaybill: {
+        type: String,
+        default: ""
+    },
+    delhiveryTrackingUrl: {
+        type: String,
+        default: ""
+    },
+    shippingStatus: {
+        type: String,
+        default: "Pending"
+    },
+    shippingDate: {
+        type: Date
+    },
+    estimatedDelivery: {
+        type: Date
     }
 }, {
     timestamps: true
