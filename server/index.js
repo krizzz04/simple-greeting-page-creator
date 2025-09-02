@@ -20,8 +20,23 @@ import orderRouter from './route/order.route.js';
 import logoRouter from './route/logo.route.js';
 
 const app = express();
-app.use(cors());
-app.options('*', cors())
+
+// CORS configuration for production domains
+const corsOptions = {
+    origin: [
+        'https://www.roarofsouth.in',
+        'https://roarofsouth.in',
+        'http://localhost:5173',
+        'http://localhost:3000',
+        'http://localhost:8000'
+    ],
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
+};
+
+app.use(cors(corsOptions));
+app.options('*', cors(corsOptions));
 
 
 app.use(express.json())
