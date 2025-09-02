@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Configuration Debug</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; max-width: 800px; margin: 0 auto; }
+        .container { background: #f5f5f5; padding: 20px; border-radius: 8px; margin: 10px 0; }
+        .success { background: #d4edda; color: #155724; }
+        .error { background: #f8d7da; color: #721c24; }
+        .info { background: #d1ecf1; color: #0c5460; }
+        button { padding: 10px 20px; margin: 5px; cursor: pointer; background: #007bff; color: white; border: none; border-radius: 4px; }
+        button:hover { background: #0056b3; }
+        pre { background: #f8f9fa; padding: 10px; border-radius: 4px; overflow-x: auto; white-space: pre-wrap; }
+        .highlight { background: yellow; padding: 2px 4px; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <h1>🔧 API Configuration Debug</h1>
+    
+    <div class="container info">
+        <h3>🎯 Purpose</h3>
+        <p>This page will help debug what API URL your React app is actually using.</p>
+    </div>
+
+    <div class="container">
+        <h3>📍 Current Configuration</h3>
+        <div id="config-info">Loading...</div>
+    </div>
+
+    <div class="container">
+        <h3>🧪 API Tests</h3>
+        <button onclick="testLocalAPI()">Test localhost:8000</button>
+        <button onclick="testCloudAPI()">Test Render.com</button>
+        <button onclick="testCurrentAPI()">Test Current API_BASE_URL</button>
+        <button onclick="clearResults()">Clear Results</button>
+    </div>
+
+    <div id="results"></div>
+
+    <script type="module">
+        // Try to import the API configuration
+        let API_BASE_URL = 'Not loaded';
+        
+        try {
+            // This won't work in a static HTML file, but we'll show the environment variables
+            const envViteApiUrl = import.meta?.env?.VITE_API_URL;
+            console.log('VITE_API_URL from import.meta.env:', envViteApiUrl);
+        } catch (e) {
+            console.log('Cannot access import.meta.env in static HTML');
+        }
+        
+        // Show configuration
+        document.getElementById('config-info').innerHTML = `
+            <p><strong>Expected API URL:</strong> <span class="highlight">http://localhost:8000</span></p>
+            <p><strong>Cloud URL (should NOT be used):</strong> <span style="background: #f8d7da; padding: 2px 4px;">https://tara-g1nf.onrender.com</span></p>
+            <p><strong>Browser Location:</strong> ${window.location.href}</p>
+            <p><strong>User Agent:</strong> ${navigator.userAgent}</p>
+        `;
+        
+        function log(message, type = 'info') {
+            const results = document.getElementById('results');
+            const container = document.createElement('div');
+            container.className = `container ${type}`;
+            container.innerHTML = `
+                <h4>${type.toUpperCase()}: ${new Date().toLocaleTimeString()}</h4>
+                <pre>${message}</pre>
+            `;
+            results.appendChild(container);
+            results.scrollTop = results.scrollHeight;
+        }
+        
+        function clearResults() {
+            document.getElementById('results').innerHTML = '';
+        }
+        
+        async function testAPI(url, name) {
+            log(`Testing ${name} (${url})...`, 'info');
+            try {
+                const response = await fetch(url, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    log(`✅ ${name} is working!\nResponse: ${JSON.stringify(data, null, 2)}`, 'success');
+                } else {
+                    log(`❌ ${name} failed with status: ${response.status}\n${response.statusText}`, 'error');
+                }
+            } catch (error) {
+                log(`❌ ${name} failed with error: ${error.message}`, 'error');
+            }
+        }
+        
+        async function testLocalAPI() {
+            await testAPI('http://localhost:8000/', 'Local API');
+        }
+        
+        async function testCloudAPI() {
+            await testAPI('https://tara-g1nf.onrender.com/', 'Cloud API');
+        }
+        
+        async function testCurrentAPI() {
+            // This would normally use the imported API_BASE_URL
+            log('Cannot test current API_BASE_URL from static HTML. Use React app instead.', 'info');
+        }
+        
+        // Auto-run tests
+        window.onload = function() {
+            setTimeout(testLocalAPI, 1000);
+        };
+        
+        // Make functions global
+        window.testLocalAPI = testLocalAPI;
+        window.testCloudAPI = testCloudAPI;
+        window.testCurrentAPI = testCurrentAPI;
+        window.clearResults = clearResults;
+    </script>
+</body>
+</html>

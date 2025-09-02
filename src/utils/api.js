@@ -1,7 +1,31 @@
 import axios from "axios";
 
-// Use env-provided API URL with a localhost fallback for development
-export const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
+// Debug environment variables
+console.log('🔍 Environment Debug:');
+console.log('- import.meta.env.VITE_API_URL:', import.meta.env.VITE_API_URL);
+console.log('- import.meta.env.MODE:', import.meta.env.MODE);
+console.log('- import.meta.env.DEV:', import.meta.env.DEV);
+
+// Force localhost for development with explicit fallback
+const envApiUrl = import.meta.env.VITE_API_URL;
+let API_BASE_URL;
+
+if (envApiUrl && envApiUrl.includes('localhost')) {
+    API_BASE_URL = envApiUrl;
+    console.log('✅ Using environment localhost URL:', API_BASE_URL);
+} else if (envApiUrl && !envApiUrl.includes('localhost')) {
+    console.warn('⚠️ Environment points to external server:', envApiUrl);
+    console.warn('🔧 Forcing localhost for local development');
+    API_BASE_URL = "http://localhost:8000";
+} else {
+    console.log('🔧 No VITE_API_URL found, using localhost fallback');
+    API_BASE_URL = "http://localhost:8000";
+}
+
+console.log('🎯 Final API_BASE_URL:', API_BASE_URL);
+
+// Export the URL
+export { API_BASE_URL };
 
 export const postData = async (url, formData) => {
     try {

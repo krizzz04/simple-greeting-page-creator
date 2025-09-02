@@ -21,7 +21,7 @@ const DelhiveryTracking = ({ waybill, orderId }) => {
         setError(null);
         
         try {
-            const response = await getData(`/order/track/${waybill}`);
+            const response = await getData(`/delhivery/track/${waybill}`);
             
             if (response.success) {
                 setTrackingData(response.data);
