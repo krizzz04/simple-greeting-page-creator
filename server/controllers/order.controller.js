@@ -142,6 +142,12 @@ export const createOrderController = async (request, response) => {
         
         // 7. IMPROVED Delhivery integration
         console.log('🚚 === DELHIVERY INTEGRATION START ===');
+        console.log('🔧 Delhivery Service Check:', {
+            serviceExists: !!delhiveryService,
+            createOrderExists: !!delhiveryService.createOrder,
+            mode: process.env.DELHIVERY_MODE,
+            apiKeyExists: !!process.env.DELHIVERY_API_KEY
+        });
         let delhiveryResult = null;
         
         try {
