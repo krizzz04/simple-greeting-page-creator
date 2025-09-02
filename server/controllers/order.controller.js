@@ -163,8 +163,8 @@ export const createOrderController = async (request, response) => {
                 customerPhone: customerPhone.toString(),
                 customerEmail: customerEmail,
                 deliveryAddress: {
-                    addressLine: deliveryAddress.address || deliveryAddress.addressLine || '',
-                    area: deliveryAddress.area || '',
+                    addressLine: deliveryAddress.address_line1 || deliveryAddress.address || '',
+                    area: deliveryAddress.landmark || deliveryAddress.area || '',
                     city: deliveryAddress.city || '',
                     state: deliveryAddress.state || '',
                     pincode: deliveryAddress.pincode.toString()
@@ -181,6 +181,14 @@ export const createOrderController = async (request, response) => {
             };
             
             console.log('🚚 Delhivery order data prepared:', JSON.stringify(delhiveryOrderData, null, 2));
+            console.log('🏠 Original address data:', {
+                address_line1: deliveryAddress.address_line1,
+                landmark: deliveryAddress.landmark,
+                city: deliveryAddress.city,
+                state: deliveryAddress.state,
+                pincode: deliveryAddress.pincode,
+                mobile: deliveryAddress.mobile
+            });
             
             // Call Delhivery service
             delhiveryResult = await delhiveryService.createOrder(delhiveryOrderData);

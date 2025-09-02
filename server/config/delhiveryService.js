@@ -6,7 +6,7 @@ const TEST_MODE = process.env.DELHIVERY_TEST_MODE === 'true'; // Add test mode s
 
 const BASE_URL =
   DELHIVERY_MODE === "production"
-    ? "https://track.delhivery.com"
+    ? "https://api.delhivery.com/v3"
     : "https://staging-express.delhivery.com";
 
 // Axios instance for Delhivery
@@ -305,15 +305,12 @@ const delhiveryService = {
         }]
       };
       
-      // Create payload in Delhivery's required format
-      const payload = `format=json&data=${JSON.stringify(shipmentData)}`;
-      
-      console.log('🚚 Final payload being sent to Delhivery:', payload);
+      console.log('🚚 Final shipment data being sent to Delhivery:', JSON.stringify(shipmentData, null, 2));
       
       // Make the API call with proper headers
-      const response = await axios.post(`${BASE_URL}/api/cmu/create.json`, payload, {
+      const response = await axios.post(`${BASE_URL}/shipments/create`, shipmentData, {
         headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
+          "Content-Type": "application/json",
           Authorization: `Token ${DELHIVERY_API_KEY}`,
           "Accept": "application/json"
         },
