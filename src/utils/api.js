@@ -1,28 +1,9 @@
 import axios from "axios";
 
-// Debug environment variables
-console.log('🔍 Environment Debug:');
-console.log('- import.meta.env.VITE_API_URL:', import.meta.env.VITE_API_URL);
-console.log('- import.meta.env.MODE:', import.meta.env.MODE);
-console.log('- import.meta.env.DEV:', import.meta.env.DEV);
+// Production API URL configuration
+const API_BASE_URL = "https://tara-g1nf.onrender.com";
 
-// Force localhost for development with explicit fallback
-const envApiUrl = import.meta.env.VITE_API_URL;
-let API_BASE_URL;
-
-if (envApiUrl && envApiUrl.includes('localhost')) {
-    API_BASE_URL = envApiUrl;
-    console.log('✅ Using environment localhost URL:', API_BASE_URL);
-} else if (envApiUrl && !envApiUrl.includes('localhost')) {
-    console.warn('⚠️ Environment points to external server:', envApiUrl);
-    console.warn('🔧 Forcing localhost for local development');
-    API_BASE_URL = "http://localhost:8000";
-} else {
-    console.log('🔧 No VITE_API_URL found, using localhost fallback');
-    API_BASE_URL = "http://localhost:8000";
-}
-
-console.log('🎯 Final API_BASE_URL:', API_BASE_URL);
+console.log('🚀 Using Production API:', API_BASE_URL);
 
 // Export the URL
 export { API_BASE_URL };
