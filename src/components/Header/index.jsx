@@ -297,8 +297,8 @@ const Header = () => {
                 {!context?.isLogin && context?.windowWidth < 992 && (
                   <li>
                     <Link to="/login">
-                      <Button className="btn-org btn-sm !min-w-0 !text-xs !px-3 !py-1">
-                        <FaRegUser className="!text-sm !mr-1" />
+                      <Button className="!bg-gradient-to-r !from-[#ff5252] !to-[#f97316] !text-white !font-medium !text-xs !px-2 !py-1 !min-w-0 !rounded-md hover:!from-[#f97316] hover:!to-[#ff5252] transition-all duration-300">
+                        <FaRegUser className="!text-xs !mr-1" />
                         Login
                       </Button>
                     </Link>
