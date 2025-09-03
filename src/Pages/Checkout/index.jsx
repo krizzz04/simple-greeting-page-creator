@@ -33,6 +33,7 @@ const Checkout = () => {
   const [showProcessingPopup, setShowProcessingPopup] = useState(false);
   const [currentOrderDetails, setCurrentOrderDetails] = useState(null);
   const [popupStepUpdater, setPopupStepUpdater] = useState(null);
+  const [showCodConfirmation, setShowCodConfirmation] = useState(false);
   const context = useContext(MyContext);
   const history = useNavigate();
   const location = useLocation();
@@ -799,16 +800,35 @@ Advanced UI Techniques`;
       return;
     }
 
+    if (!userData?.address_details || userData.address_details.length === 0) {
+        context.alertBox("error", "Please add a delivery address first.");
+        return;
+    }
+
+    if (!selectedAddress) {
+        context.alertBox("error", "Please select a delivery address.");
+        return;
+    }
+
+    // Show custom confirmation popup
+    setShowCodConfirmation(true);
+    return; // Wait for user confirmation
+  }
+
+  // Handle popup completion
+  const handleProcessingComplete = () => {
+    setShowProcessingPopup(false);
+    setCurrentOrderDetails(null);
+    setPopupStepUpdater(null);
+  };
+
+  // Handle COD confirmation
+  const handleCodConfirm = async () => {
+    setShowCodConfirmation(false);
+    
     const user = context?.userData;
     setIsloading(true);
     setOrderInProgress(true);
-
-    if (!userData?.address_details || userData.address_details.length === 0) {
-        context.alertBox("error", "Please add a delivery address first.");
-        setIsloading(false);
-        setOrderInProgress(false);
-        return;
-    }
 
     const deliveryAddressObject = userData.address_details.find(addr => addr._id === selectedAddress);
 
@@ -861,13 +881,10 @@ Advanced UI Techniques`;
         setIsloading(false);
         setOrderInProgress(false);
     });
-  }
+  };
 
-  // Handle popup completion
-  const handleProcessingComplete = () => {
-    setShowProcessingPopup(false);
-    setCurrentOrderDetails(null);
-    setPopupStepUpdater(null);
+  const handleCodCancel = () => {
+    setShowCodConfirmation(false);
   };
 
   // Handle popup step updates
@@ -1092,199 +1109,244 @@ Advanced UI Techniques`;
       )}
       
       <form onSubmit={checkout}>
-        <div className="w-full lg:w-[70%] m-auto flex flex-col md:flex-row gap-5">
-          <div className="leftCol w-full md:w-[60%]">
-            <div className="card bg-white shadow-md p-5 rounded-md w-full">
-              <div className="flex items-center justify-between">
-                <h2>Select Delivery Address</h2>
-                {
-                  userData?.address_details?.length !== 0 &&
-                  <Button variant="outlined"
-                    onClick={() => {
-                      context?.setOpenAddressPanel(true);
-                      context?.setAddressMode("add");
-                    }} className="btn">
-                    <FaPlus />
-                    ADD {context?.windowWidth < 767 ? '' : 'NEW ADDRESS'}
-                  </Button>
-                }
-              </div>
-
-              <br />
-
-              <div className="flex flex-col gap-4">
-                {
-                  userData?.address_details?.length !== 0 ? userData?.address_details?.map((address, index) => {
-                    return (
-                      <label className={`flex gap-3 p-4 border border-[rgba(0,0,0,0.1)] rounded-md relative ${isChecked === index && 'bg-[#fff2f2]'}`} key={index}>
-                        <div>
-                          <Radio size="small" onChange={(e) => handleChange(e, index)}
-                            checked={isChecked === index} value={address?._id} />
-                        </div>
-                        <div className="info">
-                          <span className="inline-block text-[13px] font-[500] p-1 bg-[#f1f1f1] rounded-md">{address?.addressType}</span>
-                          <h3>{userData?.name}</h3>
-                          <p className="mt-0 mb-0">
-                            {address?.address_line1 + " " + address?.city + " " + address?.country + " " + address?.state + " " + address?.landmark + ' ' + '+ ' + address?.mobile}
-                          </p>
-                          <p className="mb-0 font-[500]">{userData?.mobile ? '+' + userData.mobile : (address?.mobile ? '+' + address.mobile : '')}</p>
-                        </div>
-
-                        <Button variant="text" className="!absolute top-[15px] right-[15px]" size="small"
-                          onClick={() => editAddress(address?._id)}
-                        >EDIT</Button>
-                      </label>
-                    )
-                  })
-                  :
-                  <>
-                    <div className="flex items-center mt-5 justify-between flex-col p-5">
-                      <img src="/map.png" width="100" />
-                      <h2 className="text-center">No Addresses found in your account!</h2>
-                      <p className="mt-0">Add a delivery address.</p>
-                      <Button className="btn-org"
-                        onClick={() => {
-                          context?.setOpenAddressPanel(true);
-                          context?.setAddressMode("add");
-                        }}>ADD ADDRESS</Button>
-                    </div>
-                  </>
-                }
-              </div>
+        <div className="w-full max-w-4xl m-auto">
+          <div className="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
+            {/* Header */}
+            <div className="bg-gradient-to-r from-primary to-orange-500 p-6 text-white">
+              <h1 className="text-2xl font-bold text-center">Checkout</h1>
+              <p className="text-center text-white/90 mt-2">Complete your order</p>
             </div>
-          </div>
 
-          <div className="rightCol w-full md:w-[40%]">
-            <div className="card shadow-md bg-white p-5 rounded-md">
-              <h2 className="mb-4">Your Order</h2>
+            <div className="p-6">
+              {/* Address Selection */}
+              <div className="bg-white p-4 rounded-lg border border-gray-200 mb-4">
+                <div className="flex items-center justify-between mb-3">
+                  <h3 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
+                    <svg className="w-4 h-4 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                    Delivery Address
+                  </h3>
+                  {userData?.address_details?.length !== 0 && (
+                    <Button 
+                      variant="outlined"
+                      onClick={() => {
+                        context?.setOpenAddressPanel(true);
+                        context?.setAddressMode("add");
+                      }} 
+                      className="btn-org btn-xs !border-primary !text-primary hover:!bg-primary hover:!text-white transition-all duration-300"
+                    >
+                      <FaPlus className="mr-1" />
+                      Add New
+                    </Button>
+                  )}
+                </div>
 
-              <div className="flex items-center justify-between py-3 border-t border-b border-[rgba(0,0,0,0.1)]">
-                <span className="text-[14px] font-[600]">Product</span>
-                <span className="text-[14px] font-">Subtotal</span>
+                {/* Address Dropdown */}
+                {userData?.address_details?.length !== 0 ? (
+                  <div className="space-y-3">
+                    <div className="relative">
+                      <select 
+                        value={selectedAddress} 
+                        onChange={(e) => setSelectedAddress(e.target.value)}
+                        className="w-full p-3 pr-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary bg-white text-gray-700 appearance-none cursor-pointer transition-all duration-300"
+                      >
+                        <option value="">Choose delivery address</option>
+                        {userData?.address_details?.map((address, index) => (
+                          <option key={address._id} value={address._id}>
+                            {address?.addressType} - {address?.address_line1?.substring(0, 25)}...
+                          </option>
+                        ))}
+                      </select>
+                      <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                        <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                        </svg>
+                      </div>
+                    </div>
+                    
+                    {/* Selected Address Details */}
+                    {selectedAddress && (
+                      <div className="bg-gray-50 p-3 rounded-lg border border-gray-200">
+                        {(() => {
+                          const selectedAddr = userData?.address_details?.find(addr => addr._id === selectedAddress);
+                          return selectedAddr ? (
+                            <div className="flex items-start justify-between">
+                              <div className="flex-1">
+                                <p className="font-medium text-gray-800 text-sm">{userData?.name}</p>
+                                <p className="text-xs text-gray-600">
+                                  {selectedAddr?.address_line1}, {selectedAddr?.city}
+                                </p>
+                                <p className="text-xs text-gray-600">+{selectedAddr?.mobile}</p>
+                              </div>
+                              <Button 
+                                variant="text" 
+                                size="small"
+                                onClick={() => editAddress(selectedAddr._id)}
+                                className="!text-primary hover:!bg-primary/10 !min-w-0 !p-1"
+                              >
+                                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                </svg>
+                              </Button>
+                            </div>
+                          ) : null;
+                        })()}
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <div className="text-center py-6">
+                    <h4 className="text-base font-medium text-gray-700 mb-2">No Addresses Found</h4>
+                    <p className="text-sm text-gray-500 mb-3">Add a delivery address to continue</p>
+                    <Button 
+                      className="btn-org btn-sm"
+                      onClick={() => {
+                        context?.setOpenAddressPanel(true);
+                        context?.setAddressMode("add");
+                      }}
+                    >
+                      <FaPlus className="mr-1" />
+                      Add Address
+                    </Button>
+                  </div>
+                )}
               </div>
 
-              <div className="mb-5 scroll max-h-[250px] overflow-y-scroll overflow-x-hidden pr-2">
-                {
-                  context?.cartData?.length !== 0 && context?.cartData?.map((item, index) => {
-                    return (
-                      <div className="flex items-center justify-between py-2 border-b border-gray-100 last:border-b-0" key={index}>
-                        <div className="part1 flex items-center gap-3 flex-1">
-                          <div className="img w-[50px] h-[50px] object-cover overflow-hidden rounded-md group cursor-pointer">
+              {/* Order Summary */}
+              <div className="mb-6">
+                <h2 className="text-xl font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                  <svg className="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
+                  Order Summary
+                </h2>
+
+                <div className="bg-gray-50 rounded-lg p-4">
+                  <div className="space-y-3 max-h-48 overflow-y-auto">
+                    {context?.cartData?.length !== 0 && context?.cartData?.map((item, index) => (
+                      <div className="flex items-center justify-between py-2 border-b border-gray-200 last:border-b-0" key={index}>
+                        <div className="flex items-center gap-3 flex-1">
+                          <div className="w-12 h-12 object-cover overflow-hidden rounded-md">
                             <img
                               src={item?.image}
                               alt={item?.productTitle}
-                              className="w-full transition-all group-hover:scale-105"
+                              className="w-full h-full object-cover"
                             />
                           </div>
-
-                          <div className="info flex-1">
-                            <h4 className="text-[14px]" title={item?.productTitle}>{item?.productTitle?.substr(0, 20) + '...'} </h4>
-                            <span className="text-[13px] text-gray-600">Qty : {item?.quantity}</span>
+                          <div className="flex-1">
+                            <h4 className="text-sm font-medium text-gray-800" title={item?.productTitle}>
+                              {item?.productTitle?.substr(0, 25) + (item?.productTitle?.length > 25 ? '...' : '')}
+                            </h4>
+                            <span className="text-xs text-gray-500">Qty: {item?.quantity}</span>
                           </div>
                         </div>
-
-                        <div className="flex items-center gap-3">
-                          <span className="text-[14px] font-[500] text-green-600">{`₹${(item?.quantity * item?.price)}`}</span>
-                          
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm font-medium text-green-600">₹{item?.quantity * item?.price}</span>
                           <Button
                             onClick={(e) => {
                               e.stopPropagation();
-                              console.log("🗑️ Cart item structure:", item);
                               removeFromCart(item._id);
                             }}
-                            className="!min-w-[30px] !w-[30px] !h-[30px] !rounded-full !bg-red-50 hover:!bg-red-100 !text-red-500 hover:!text-red-600 transition-all duration-200"
-                            title="Remove from cart"
+                            className="!min-w-[24px] !w-[24px] !h-[24px] !rounded-full !bg-red-50 hover:!bg-red-100 !text-red-500"
+                            size="small"
                           >
-                            <MdDelete className="text-[16px]" />
+                            <MdDelete className="text-xs" />
                           </Button>
                         </div>
                       </div>
-                    )
-                  })
-                }
+                    ))}
+                  </div>
+                </div>
               </div>
 
               {/* Payment Method Selection */}
               <div className="mb-6">
-                <h3 className="text-[18px] font-[700] mb-4 text-gray-800">Choose Payment Method</h3>
+                <h2 className="text-xl font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                  <svg className="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+                  </svg>
+                  Payment Method
+                </h2>
                 
-                {/* Online Payment Option with Offer */}
-                <div className={`relative mb-4 p-4 rounded-xl border-2 transition-all duration-300 cursor-pointer ${
-                  paymentMethod === "online" 
-                    ? "border-green-500 bg-green-50 shadow-lg" 
-                    : "border-gray-200 bg-white hover:border-green-300 hover:bg-green-25"
-                }`} onClick={() => setPaymentMethod("online")}>
-                  {/* Offer Badge */}
-                  <div className="absolute -top-3 -right-3 bg-gradient-to-r from-green-500 to-emerald-600 text-white px-3 py-1 rounded-full text-[12px] font-bold shadow-lg animate-pulse">
-                    🎉 INSTANT ₹200 OFF
-                  </div>
-                  
-                  <div className="flex items-center gap-3">
-                    <Radio
-                      checked={paymentMethod === "online"}
-                      onChange={() => setPaymentMethod("online")}
-                      name="payment-method"
-                      color="success"
-                      className="!text-green-600"
-                    />
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-2">
-                        <span className="text-[16px] font-[600] text-gray-800">Digital Payment</span>
-                        <span className="bg-green-100 text-green-700 px-2 py-1 rounded-md text-[12px] font-bold">
-                          RECOMMENDED
-                        </span>
-                      </div>
-                      <p className="text-[13px] text-gray-600 mb-3">Pay securely with your favorite apps</p>
-                      
-                      {/* Payment Icons */}
-                      <div className="flex items-center gap-4">
-                        <div className="bg-white p-3 rounded-lg shadow-sm">
-                          <img src="https://developers.google.com/static/pay/api/images/brand-guidelines/google-pay-mark.png" alt="Google Pay" className="w-8 h-8 object-contain" />
+                <div className="grid md:grid-cols-2 gap-4">
+                  {/* Online Payment Option */}
+                  <div className={`relative p-4 rounded-xl border-2 transition-all duration-300 cursor-pointer ${
+                    paymentMethod === "online" 
+                      ? "border-green-500 bg-green-50 shadow-lg" 
+                      : "border-gray-200 bg-white hover:border-green-300 hover:bg-green-25"
+                  }`} onClick={() => setPaymentMethod("online")}>
+                    <div className="absolute -top-3 -right-3 bg-gradient-to-r from-green-500 to-emerald-600 text-white px-3 py-1 rounded-full text-xs font-bold shadow-lg">
+                      🎉 ₹200 OFF
+                    </div>
+                    
+                    <div className="flex items-center gap-3">
+                      <Radio
+                        checked={paymentMethod === "online"}
+                        onChange={() => setPaymentMethod("online")}
+                        name="payment-method"
+                        color="success"
+                        className="!text-green-600"
+                      />
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-2">
+                          <span className="text-base font-semibold text-gray-800">Digital Payment</span>
+                          <span className="bg-green-100 text-green-700 px-2 py-1 rounded-md text-xs font-bold">
+                            RECOMMENDED
+                          </span>
                         </div>
-                        <div className="bg-white p-3 rounded-lg shadow-sm">
-                          <SiPhonepe className="text-[32px] text-purple-600" />
-                        </div>
-                        <div className="bg-white p-3 rounded-lg shadow-sm">
-                          <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/24/Paytm_Logo_%28standalone%29.svg/2560px-Paytm_Logo_%28standalone%29.svg.png" alt="Paytm" className="w-8 h-8 object-contain" />
+                        <p className="text-sm text-gray-600 mb-3">Pay securely with your favorite apps</p>
+                        
+                        <div className="flex items-center gap-3">
+                          <div className="bg-white p-2 rounded-lg shadow-sm">
+                            <img src="https://developers.google.com/static/pay/api/images/brand-guidelines/google-pay-mark.png" alt="Google Pay" className="w-6 h-6 object-contain" />
+                          </div>
+                          <div className="bg-white p-2 rounded-lg shadow-sm">
+                            <SiPhonepe className="text-2xl text-purple-600" />
+                          </div>
+                          <div className="bg-white p-2 rounded-lg shadow-sm">
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/24/Paytm_Logo_%28standalone%29.svg/2560px-Paytm_Logo_%28standalone%29.svg.png" alt="Paytm" className="w-6 h-6 object-contain" />
+                          </div>
                         </div>
                       </div>
                     </div>
                   </div>
-                </div>
 
-                {/* Cash on Delivery Option */}
-                <div className={`relative p-4 rounded-xl border-2 transition-all duration-300 cursor-pointer ${
-                  paymentMethod === "cod" 
-                    ? "border-orange-500 bg-orange-50 shadow-lg" 
-                    : "border-gray-200 bg-white hover:border-orange-300 hover:bg-orange-25"
-                }`} onClick={() => setPaymentMethod("cod")}>
-                  <div className="flex items-center gap-3">
-                    <Radio
-                      checked={paymentMethod === "cod"}
-                      onChange={() => setPaymentMethod("cod")}
-                      name="payment-method"
-                      color="warning"
-                      className="!text-orange-600"
-                    />
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-2">
-                        <span className="text-[16px] font-[600] text-gray-800">Cash on Delivery</span>
-                        <span className="bg-orange-100 text-orange-700 px-2 py-1 rounded-md text-[12px] font-bold">
-                          PAY LATER
-                        </span>
+                  {/* Cash on Delivery Option */}
+                  <div className={`relative p-4 rounded-xl border-2 transition-all duration-300 cursor-pointer ${
+                    paymentMethod === "cod" 
+                      ? "border-orange-500 bg-orange-50 shadow-lg" 
+                      : "border-gray-200 bg-white hover:border-orange-300 hover:bg-orange-25"
+                  }`} onClick={() => setPaymentMethod("cod")}>
+                    <div className="flex items-center gap-3">
+                      <Radio
+                        checked={paymentMethod === "cod"}
+                        onChange={() => setPaymentMethod("cod")}
+                        name="payment-method"
+                        color="warning"
+                        className="!text-orange-600"
+                      />
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-2">
+                          <span className="text-base font-semibold text-gray-800">Cash on Delivery</span>
+                          <span className="bg-orange-100 text-orange-700 px-2 py-1 rounded-md text-xs font-bold">
+                            PAY LATER
+                          </span>
+                        </div>
+                        <p className="text-sm text-gray-600">Pay when you receive your order</p>
                       </div>
-                      <p className="text-[13px] text-gray-600">Pay when you receive your order</p>
                     </div>
                   </div>
                 </div>
               </div>
 
-              {/* Order Summary */}
-              <div className="bg-gradient-to-br from-gray-50 to-white p-4 rounded-xl border border-gray-200 mb-4">
-                <h4 className="text-[16px] font-[700] mb-3 text-gray-800">Order Summary</h4>
+              {/* Order Total */}
+              <div className="bg-gradient-to-br from-gray-50 to-white p-6 rounded-xl border border-gray-200 mb-6">
+                <h3 className="text-lg font-semibold text-gray-800 mb-4">Order Summary</h3>
                 
                 <div className="space-y-3">
-                  <div className="flex items-center justify-between text-[14px]">
+                  <div className="flex items-center justify-between text-sm">
                     <span className="text-gray-600">Subtotal:</span>
                     <span className="font-medium">₹{context.cartData?.length !== 0 ? 
                       context.cartData?.map(item => parseInt(item.price) * item.quantity)
@@ -1292,32 +1354,32 @@ Advanced UI Techniques`;
                   </div>
                   
                   {paymentMethod === "online" && (
-                    <div className="flex items-center justify-between p-2 bg-green-50 rounded-lg border border-green-200">
+                    <div className="flex items-center justify-between p-3 bg-green-50 rounded-lg border border-green-200">
                       <div className="flex items-center gap-2">
                         <span className="text-green-600">🎉</span>
-                        <span className="text-[14px] text-green-700 font-medium">Digital Payment Discount</span>
+                        <span className="text-sm text-green-700 font-medium">Digital Payment Discount</span>
                       </div>
-                      <span className="text-[14px] text-green-700 font-bold">-₹200</span>
+                      <span className="text-sm text-green-700 font-bold">-₹200</span>
                     </div>
                   )}
                   
-                  <div className="flex items-center justify-between py-3 border-t border-gray-200 font-[700] text-[18px]">
+                  <div className="flex items-center justify-between py-3 border-t border-gray-200 font-bold text-lg">
                     <span className="text-gray-800">Total Amount:</span>
                     <span className="text-green-600">₹{totalAmount}</span>
                   </div>
                 </div>
               </div>
 
-              <div className="flex items-center flex-col gap-3 mb-2">
-                {/* Digital Payment Button - Only show when online payment is selected */}
+              {/* Payment Buttons */}
+              <div className="flex flex-col gap-3">
                 {paymentMethod === "online" && (
                   <>
                     <Button 
                       type="submit" 
-                      className="btn-org btn-lg w-full flex gap-2 items-center" 
+                      className="btn-org btn-lg w-full flex gap-2 items-center justify-center" 
                       disabled={!userData?.address_details || userData.address_details.length === 0 || isLoading || messagingInProgress || orderInProgress}
                     >
-                      <FaGooglePay className="text-[28px] text-white" /> 
+                      <FaGooglePay className="text-2xl text-white" /> 
                       {(messagingInProgress || orderInProgress) ? "Processing..." : "Pay now (₹200 OFF)"}
                     </Button>
 
@@ -1328,18 +1390,17 @@ Advanced UI Techniques`;
                   </>
                 )}
 
-                {/* Cash on Delivery Button - Only show when COD is selected */}
                 {paymentMethod === "cod" && (
                   <Button 
                     type="button" 
-                    className="btn-dark btn-lg w-full flex gap-2 items-center" 
+                    className="btn-dark btn-lg w-full flex gap-2 items-center justify-center" 
                     onClick={cashOnDelivery} 
                     disabled={isLoading || messagingInProgress || orderInProgress || !userData?.address_details || userData.address_details.length === 0}
                   >
                     {
                       (isLoading || messagingInProgress || orderInProgress) ? <CircularProgress size={24} color="inherit" /> :
                         <>
-                          <BsFillBagCheckFill className="text-[20px]" />
+                          <BsFillBagCheckFill className="text-lg" />
                           Cash on Delivery
                         </>
                     }
@@ -1347,24 +1408,7 @@ Advanced UI Techniques`;
                 )}
               </div>
 
-              {/* Debug section - remove in production */}
-              {process.env.NODE_ENV === 'development' && (
-                <div className="mt-4 p-3 bg-gray-100 rounded-md text-sm">
-                  <div className="font-semibold mb-2">Debug Info:</div>
-                  <div>WaSender API Key: {WASENDER_API_KEY ? "✅ Present" : "❌ Missing"}</div>
-                  <div>Selected Address: {selectedAddress || "None"}</div>
-                  <div>Payment Method: {paymentMethod}</div>
-                  <div>Total Amount: ₹{totalAmount || 0}</div>
-                  <Button 
-                    variant="outlined" 
-                    size="small" 
-                    onClick={() => testWasenderAPI()}
-                    className="mt-2"
-                  >
-                    Test WaSender API
-                  </Button>
-                </div>
-              )}
+
             </div>
           </div>
         </div>
@@ -1377,6 +1421,70 @@ Advanced UI Techniques`;
         orderDetails={currentOrderDetails}
         onStepUpdate={handleStepUpdate}
       />
+
+      {/* COD Confirmation Popup */}
+      {showCodConfirmation && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full transform transition-all duration-300 scale-100">
+            {/* Header */}
+            <div className="bg-gradient-to-r from-primary to-orange-500 p-6 rounded-t-2xl text-white relative overflow-hidden">
+              <div className="absolute inset-0 bg-black bg-opacity-20"></div>
+              <div className="relative z-10 text-center">
+                <div className="w-16 h-16 bg-white bg-opacity-20 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </div>
+                <h2 className="text-2xl font-bold mb-2">Confirm Order</h2>
+                <p className="text-white/90">Cash on Delivery</p>
+              </div>
+            </div>
+
+            {/* Content */}
+            <div className="p-6">
+              <div className="text-center mb-6">
+                <div className="w-20 h-20 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <svg className="w-10 h-10 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
+                  </svg>
+                </div>
+                <h3 className="text-xl font-bold text-gray-800 mb-3">Cash on Delivery</h3>
+                <p className="text-gray-600 mb-4">
+                  You will pay <span className="font-bold text-primary">₹{totalAmount}</span> when you receive your order.
+                </p>
+                
+                <div className="bg-gradient-to-r from-orange-50 to-red-50 p-4 rounded-lg border border-orange-200 mb-4">
+                  <div className="flex items-center gap-2 mb-2">
+                    <svg className="w-5 h-5 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <span className="font-semibold text-orange-800">Important</span>
+                  </div>
+                  <p className="text-sm text-orange-700">
+                    Please ensure you have the exact amount ready when the delivery person arrives.
+                  </p>
+                </div>
+              </div>
+
+              {/* Buttons */}
+              <div className="flex gap-3">
+                <Button 
+                  onClick={handleCodCancel}
+                  className="flex-1 bg-gray-100 text-gray-700 hover:bg-gray-200 font-semibold py-3 rounded-xl transition-all duration-300"
+                >
+                  Cancel
+                </Button>
+                <Button 
+                  onClick={handleCodConfirm}
+                  className="flex-1 btn-org font-semibold py-3 rounded-xl transition-all duration-300 transform hover:scale-105"
+                >
+                  Confirm Order
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </section>
   );
 };
