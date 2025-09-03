@@ -826,59 +826,173 @@ Advanced UI Techniques`;
   // 🚚 Show tracking information if order was just placed
   if (orderPlaced && orderData) {
     return (
-      <section className="py-6 lg:py-8 w-full bg-gray-50 min-h-screen">
-        <div className="container mx-auto px-4">
-          <div className="max-w-4xl mx-auto">
-            <div className="bg-white rounded-lg shadow-sm border border-gray-100 p-8 text-center">
-              <div className="mb-6">
-                <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <span className="text-green-600 text-3xl">✅</span>
+      <section className="min-h-screen bg-gradient-to-br from-green-50 via-white to-blue-50">
+        {/* Background decoration */}
+        <div className="absolute inset-0 overflow-hidden">
+          <div className="absolute -top-40 -right-40 w-80 h-80 bg-green-200 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-pulse"></div>
+          <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-blue-200 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-pulse"></div>
+        </div>
+
+        <div className="relative z-10 py-8 lg:py-16 px-4">
+          <div className="container mx-auto max-w-4xl">
+            {/* Success Card */}
+            <div className="bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden">
+              {/* Header with gradient */}
+              <div className="bg-gradient-to-r from-green-500 to-blue-600 p-8 text-center text-white relative">
+                <div className="absolute top-0 left-0 w-full h-full bg-black opacity-10"></div>
+                <div className="relative z-10">
+                  <div className="w-24 h-24 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center mx-auto mb-6 border-4 border-white/30">
+                    <svg className="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                  </div>
+                  <h1 className="text-3xl lg:text-4xl font-bold mb-3">Order Confirmed!</h1>
+                  <p className="text-lg text-white/90 max-w-md mx-auto">
+                    Your order has been successfully placed and is being processed
+                  </p>
                 </div>
-                <h1 className="text-2xl font-bold text-gray-900 mb-2">Order Placed Successfully!</h1>
-                <p className="text-gray-600">Your order has been confirmed and is being processed.</p>
               </div>
 
-              {/* 🚚 Delhivery Tracking Section */}
-              {orderData?.delhiveryWaybill && (
-                <div className="bg-blue-50 p-6 rounded-lg border border-blue-200 mb-6">
-                  <h2 className="font-semibold text-blue-900 mb-4 text-lg">🚚 Track Your Package</h2>
-                  <DelhiveryTracking 
-                    waybill={orderData.delhiveryWaybill} 
-                    orderId={orderData._id} 
-                  />
-                </div>
-              )}
-
-              {/* 🚚 No Tracking Yet - Show Processing Status */}
-              {!orderData?.delhiveryWaybill && (
-                <div className="bg-gray-50 p-6 rounded-lg border border-gray-200 mb-6">
-                  <h2 className="font-semibold text-gray-900 mb-4 text-lg">📦 Order Status</h2>
-                  <div className="text-center">
-                    <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                      <span className="text-gray-500 text-2xl">⏳</span>
+              {/* Order Details */}
+              <div className="p-8">
+                <div className="grid md:grid-cols-2 gap-8 mb-8">
+                  {/* Order Summary */}
+                  <div className="bg-gradient-to-br from-gray-50 to-white p-6 rounded-xl border border-gray-100">
+                    <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                      <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                      </svg>
+                      Order Summary
+                    </h3>
+                    <div className="space-y-3">
+                      <div className="flex justify-between items-center py-2 border-b border-gray-100">
+                        <span className="text-gray-600">Order ID:</span>
+                        <span className="font-mono text-sm bg-gray-100 px-2 py-1 rounded">
+                          #{orderData._id?.slice(-8) || 'N/A'}
+                        </span>
+                      </div>
+                      <div className="flex justify-between items-center py-2 border-b border-gray-100">
+                        <span className="text-gray-600">Total Amount:</span>
+                        <span className="font-bold text-green-600 text-lg">
+                          ₹{orderData.totalAmt || orderData.totalAmount || 'N/A'}
+                        </span>
+                      </div>
+                      <div className="flex justify-between items-center py-2 border-b border-gray-100">
+                        <span className="text-gray-600">Items:</span>
+                        <span className="font-medium">
+                          {orderData.products?.length || 0} products
+                        </span>
+                      </div>
+                      <div className="flex justify-between items-center py-2">
+                        <span className="text-gray-600">Payment:</span>
+                        <span className="px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm font-medium">
+                          {orderData.payment_status || 'Completed'}
+                        </span>
+                      </div>
                     </div>
-                    <p className="font-medium text-gray-900 mb-2">Order Processing</p>
-                    <p className="text-sm text-gray-600">Your order is being prepared for shipping. You'll receive tracking information via email once the package is shipped.</p>
+                  </div>
+
+                  {/* Delivery Address */}
+                  <div className="bg-gradient-to-br from-blue-50 to-white p-6 rounded-xl border border-blue-100">
+                    <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                      <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                      </svg>
+                      Delivery Address
+                    </h3>
+                    <div className="space-y-2 text-sm">
+                      <p className="font-medium text-gray-800">
+                        {orderData.delivery_address?.name || 'Customer'}
+                      </p>
+                      <p className="text-gray-600">
+                        {orderData.delivery_address?.address_line1 || 'Address not available'}
+                      </p>
+                      {orderData.delivery_address?.city && (
+                        <p className="text-gray-600">
+                          {orderData.delivery_address.city}, {orderData.delivery_address.state}
+                        </p>
+                      )}
+                      <p className="text-gray-600">
+                        {orderData.delivery_address?.mobile || 'Phone not available'}
+                      </p>
+                    </div>
                   </div>
                 </div>
-              )}
 
-              <div className="flex gap-3 justify-center">
-                <Button 
-                  onClick={() => {
-                    setOrderPlaced(false);
-                    setOrderData(null);
-                  }}
-                  className="btn-org btn-border"
-                >
-                  Place Another Order
-                </Button>
-                <Link to="/orders">
-                  <Button className="btn-org btn-border">View All Orders</Button>
-                </Link>
-                <Link to="/">
-                  <Button className="btn-org btn-border">Back to Home</Button>
-                </Link>
+                {/* Tracking Section */}
+                {orderData?.delhiveryWaybill ? (
+                  <div className="bg-gradient-to-br from-purple-50 to-white p-6 rounded-xl border border-purple-200 mb-8">
+                    <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                      <svg className="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-1.447-.894L15 4m0 13V4m-6 3l6-3" />
+                      </svg>
+                      Track Your Package
+                    </h3>
+                    <DelhiveryTracking 
+                      waybill={orderData.delhiveryWaybill} 
+                      orderId={orderData._id} 
+                    />
+                  </div>
+                ) : (
+                  <div className="bg-gradient-to-br from-orange-50 to-white p-6 rounded-xl border border-orange-200 mb-8">
+                    <div className="text-center">
+                      <div className="w-20 h-20 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <svg className="w-10 h-10 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                      </div>
+                      <h3 className="text-xl font-semibold text-gray-800 mb-2">Order Processing</h3>
+                      <p className="text-gray-600 max-w-md mx-auto">
+                        Your order is being prepared for shipping. We'll send you tracking information via email and WhatsApp once the package is shipped.
+                      </p>
+                    </div>
+                  </div>
+                )}
+
+                {/* Action Buttons */}
+                <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                  <Button 
+                    onClick={() => {
+                      setOrderPlaced(false);
+                      setOrderData(null);
+                    }}
+                    className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white px-8 py-3 rounded-xl font-semibold transition-all duration-300 transform hover:scale-105 shadow-lg"
+                  >
+                    <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                    </svg>
+                    Place Another Order
+                  </Button>
+                  
+                  <Link to="/my-orders">
+                    <Button className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white px-8 py-3 rounded-xl font-semibold transition-all duration-300 transform hover:scale-105 shadow-lg">
+                      <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                      </svg>
+                      View All Orders
+                    </Button>
+                  </Link>
+                  
+                  <Link to="/">
+                    <Button className="bg-gradient-to-r from-gray-500 to-gray-600 hover:from-gray-600 hover:to-gray-700 text-white px-8 py-3 rounded-xl font-semibold transition-all duration-300 transform hover:scale-105 shadow-lg">
+                      <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                      </svg>
+                      Back to Home
+                    </Button>
+                  </Link>
+                </div>
+
+                {/* Success Message */}
+                <div className="mt-8 text-center">
+                  <div className="inline-flex items-center gap-2 bg-green-50 text-green-700 px-4 py-2 rounded-full text-sm">
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    Thank you for your purchase! We'll keep you updated on your order status.
+                  </div>
+                </div>
               </div>
             </div>
           </div>
