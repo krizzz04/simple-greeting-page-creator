@@ -322,7 +322,7 @@ const Checkout = () => {
     }
   };
 
-  // SMS Message Template
+  // SMS Message Template with Product Summary
   const sendSmsMessage = async (user, orderDetails, deliveryAddress, fullOrderId) => {
     const mobileNumber = deliveryAddress?.mobile || user?.mobile;
     
@@ -340,15 +340,30 @@ const Checkout = () => {
                         (user?.name && !user.name.includes('user_') && !user.name.includes('User_') ? user.name : null) || 
                         'Customer';
     
-    const message = `Hello ${customerName}, your order${orderIdString} has been placed successfully! Total: ₹${totalAmt}. Payment: ${orderDetails.payment_status}.`;
+    // Add product summary for SMS
+    const products = orderDetails.products || [];
+    let productSummary = '';
+    
+    if (products.length > 0) {
+        const itemCount = products.reduce((total, product) => total + (product.quantity || 1), 0);
+        const productNames = products.slice(0, 2).map(p => p.product_name || p.name || 'Product').join(', ');
+        productSummary = ` Items: ${itemCount} (${productNames}${products.length > 2 ? ' + more' : ''})`;
+    }
+    
+    const message = `Hello ${customerName}, your order${orderIdString} has been placed successfully!${productSummary} Total: ₹${totalAmt}. Payment: ${orderDetails.payment_status}.`;
 
-    console.log("📱 Preparing to send SMS:", { customer: customerName, phone: mobileNumber, orderId: shortOrderId });
+    console.log("📱 Preparing to send SMS:", { 
+        customer: customerName, 
+        phone: mobileNumber, 
+        orderId: shortOrderId,
+        productCount: products.length 
+    });
     
     const result = await callWasenderAPI(mobileNumber, message, "SMS");
     return result !== false;
   };
 
-  // Enhanced WhatsApp Order Message Template
+  // Enhanced WhatsApp Order Message Template with Product Details
   const sendWhatsAppMessage = async (user, orderDetails, deliveryAddress, fullOrderId) => {
     const mobileNumber = deliveryAddress?.mobile || user?.mobile;
     
@@ -368,7 +383,24 @@ const Checkout = () => {
                         (user?.name && !user.name.includes('user_') && !user.name.includes('User_') ? user.name : null) || 
                         'Customer';
     
-    // 🎨 Enhanced WhatsApp Order Template
+    // Generate product list
+    let productList = '';
+    const products = orderDetails.products || [];
+    
+    if (products.length > 0) {
+        productList = '\n🛍️ *Items Ordered:*\n';
+        products.forEach((product, index) => {
+            const productName = product.product_name || product.name || 'Product';
+            const quantity = product.quantity || 1;
+            const price = product.price || product.product_price || 0;
+            const totalPrice = quantity * price;
+            
+            productList += `• ${productName}\n`;
+            productList += `  Qty: ${quantity} × ₹${price} = ₹${totalPrice}\n`;
+        });
+    }
+    
+    // 🎨 Enhanced WhatsApp Order Template with Product Details
     const message = `🎉 *ORDER CONFIRMED* 🎉
 
 Hello *${customerName}*! 
@@ -378,9 +410,9 @@ Your order has been successfully placed! 🛒
 📋 *Order Details:*
 🔢 Order ID: #${shortOrderId}
 📅 Date: ${orderDate}
-💰 Amount: ₹${totalAmt}
+💰 Total Amount: ₹${totalAmt}
 💳 Payment: ${paymentMethod}
-📍 Delivery: ${deliveryAddr}
+📍 Delivery: ${deliveryAddr}${productList}
 
 📦 *What's Next?*
 • We'll prepare your order
@@ -388,9 +420,13 @@ Your order has been successfully placed! 🛒
 • Expected delivery: 3-5 business days
 
 Thank you for choosing us! 💚
-*Advanced UI Techniques*`;
+*Roar of South*`;
 
-    console.log("💬 Sending WhatsApp order message:", { user: user.name, phone: mobileNumber });
+    console.log("💬 Sending WhatsApp order message with products:", { 
+        user: user.name, 
+        phone: mobileNumber, 
+        productCount: products.length 
+    });
 
     const result = await callWasenderAPI(mobileNumber, message, "WhatsApp Order");
     return result !== false;
@@ -593,6 +629,7 @@ Advanced UI Techniques`;
                           // 🚚 Store order data for tracking display
               const orderWithTracking = {
                 ...newOrder,
+                products: context?.cartData, // Include the cart data
                 delivery_address: deliveryAddressObject
               };
               localStorage.setItem(`order_${fullOrderId}`, JSON.stringify(orderWithTracking));
@@ -689,6 +726,7 @@ Advanced UI Techniques`;
               // 🚚 Store order data for tracking display
               const orderWithTracking = {
                 ...newOrder,
+                products: context?.cartData, // Include the cart data
                 delivery_address: deliveryAddressObject
               };
               localStorage.setItem(`order_${fullOrderId}`, JSON.stringify(orderWithTracking));
@@ -770,6 +808,7 @@ Advanced UI Techniques`;
             // 🚚 Store order data for tracking display
             const orderWithTracking = {
                 ...newOrder,
+                products: context?.cartData, // Include the cart data
                 delivery_address: deliveryAddressObject
             };
             localStorage.setItem(`order_${fullOrderId}`, JSON.stringify(orderWithTracking));

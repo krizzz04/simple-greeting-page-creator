@@ -63,7 +63,7 @@ const VerificationEmail = (username, otp ) => {
               <p>If you didn’t create an account, you can safely ignore this email.</p>
           </div>
           <div class="footer">
-              <p>&copy; 2024 Ecommerce App. All rights reserved.</p>
+              <p>&copy; ${new Date().getFullYear()} Roar of South. All rights reserved.</p>
           </div>
       </div>
   </body>
