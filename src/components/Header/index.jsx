@@ -288,6 +288,17 @@ const Header = () => {
 
                 }
 
+                {/* Mobile Login Button - Only show when not logged in and on mobile */}
+                {!context?.isLogin && context?.windowWidth < 992 && (
+                  <li>
+                    <Link to="/login">
+                      <Button className="!text-gray-700 !font-medium !px-3 !py-1 !min-w-0 !text-sm">
+                        <FaRegUser className="!text-base !mr-1" />
+                        Login
+                      </Button>
+                    </Link>
+                  </li>
+                )}
 
                 <li>
                   <Tooltip title="Cart">

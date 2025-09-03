@@ -12,6 +12,7 @@ import axios from 'axios';
 import { useNavigate, Link } from "react-router-dom";
 import CircularProgress from '@mui/material/CircularProgress';
 import DelhiveryTracking from '../../components/DelhiveryTracking';
+import OrderProcessingPopup from '../../components/OrderProcessingPopup';
 
 const VITE_APP_RAZORPAY_KEY_ID = import.meta.env.VITE_APP_RAZORPAY_KEY_ID;
 const VITE_APP_PAYPAL_CLIENT_ID = import.meta.env.VITE_APP_PAYPAL_CLIENT_ID;
@@ -29,6 +30,9 @@ const Checkout = () => {
   const [paymentMethod, setPaymentMethod] = useState("online"); // "online" or "cod"
   const [orderPlaced, setOrderPlaced] = useState(false);
   const [orderData, setOrderData] = useState(null);
+  const [showProcessingPopup, setShowProcessingPopup] = useState(false);
+  const [currentOrderDetails, setCurrentOrderDetails] = useState(null);
+  const [popupStepUpdater, setPopupStepUpdater] = useState(null);
   const context = useContext(MyContext);
 
   const history = useNavigate();
@@ -455,23 +459,46 @@ Advanced UI Techniques`;
     }
 
     try {
+      // Update popup to show order processing
+      if (popupStepUpdater) {
+        popupStepUpdater('order', 'completed');
+      }
+
       // Send SMS
       console.log("1️⃣ Sending SMS...");
+      if (popupStepUpdater) {
+        popupStepUpdater('sms', 'processing');
+      }
       results.sms = await sendSmsMessage(user, orderDetails, deliveryAddress, fullOrderId);
+      if (popupStepUpdater) {
+        popupStepUpdater('sms', 'completed');
+      }
       
       // Wait longer between messages to avoid rate limiting
       await delay(8000); // 8 seconds
       
       // Send WhatsApp order message
       console.log("2️⃣ Sending WhatsApp order message...");
+      if (popupStepUpdater) {
+        popupStepUpdater('whatsapp', 'processing');
+      }
       results.whatsapp = await sendWhatsAppMessage(user, orderDetails, deliveryAddress, fullOrderId);
+      if (popupStepUpdater) {
+        popupStepUpdater('whatsapp', 'completed');
+      }
       
       // Wait longer before confirmation
       await delay(12000); // 12 seconds
       
       // Send WhatsApp confirmation
       console.log("3️⃣ Sending WhatsApp confirmation...");
+      if (popupStepUpdater) {
+        popupStepUpdater('confirmation', 'processing');
+      }
       results.confirmation = await sendWhatsAppConfirmationMessage(user, deliveryAddress);
+      if (popupStepUpdater) {
+        popupStepUpdater('confirmation', 'completed');
+      }
       
       console.log("📊 Notification results:", results);
       
@@ -543,7 +570,9 @@ Advanced UI Techniques`;
           );
 
         if (response.data.success) {
-            context.alertBox("success", "Order completed and saved to database!");
+            // Show processing popup
+            setCurrentOrderDetails(info);
+            setShowProcessingPopup(true);
             
             const newOrder = response.data.order || response.data;
             const fullOrderId = newOrder?._id;
@@ -551,7 +580,7 @@ Advanced UI Techniques`;
             // Get the delivery address object
             const deliveryAddressObject = userData.address_details.find(addr => addr._id === selectedAddress);
             
-            // Send all notifications
+            // Send all notifications (popup will show progress)
             await sendAllNotifications(user, info, deliveryAddressObject, fullOrderId);
             
                           // 🚚 Store order data for tracking display
@@ -637,7 +666,9 @@ Advanced UI Techniques`;
 
           postData(`/api/order/create`, payLoad).then(async (res) => {
             if (res?.error === false) {
-              context.alertBox("success", res?.message);
+              // Show processing popup
+              setCurrentOrderDetails(payLoad);
+              setShowProcessingPopup(true);
               
               const newOrder = res?.data || res?.order || res;
               const fullOrderId = newOrder?._id;
@@ -645,7 +676,7 @@ Advanced UI Techniques`;
               // Get the delivery address object
               const deliveryAddressObject = userData.address_details.find(addr => addr._id === selectedAddress);
               
-              // Send all notifications
+              // Send all notifications (popup will show progress)
               await sendAllNotifications(user, payLoad, deliveryAddressObject, fullOrderId);
               
               // 🚚 Store order data for tracking display
@@ -719,12 +750,14 @@ Advanced UI Techniques`;
 
     postData(`/api/order/create`, payLoad).then(async (res) => {
         if (res?.error === false) {
-            context.alertBox("success", res?.message);
+            // Show processing popup
+            setCurrentOrderDetails(payLoad);
+            setShowProcessingPopup(true);
             
             const newOrder = res?.data || res?.order || res;
             const fullOrderId = newOrder?._id;
 
-            // Send all notifications
+            // Send all notifications (popup will show progress)
             await sendAllNotifications(user, payLoad, deliveryAddressObject, fullOrderId);
 
             // 🚚 Store order data for tracking display
@@ -750,6 +783,18 @@ Advanced UI Techniques`;
         setOrderInProgress(false);
     });
   }
+
+  // Handle popup completion
+  const handleProcessingComplete = () => {
+    setShowProcessingPopup(false);
+    setCurrentOrderDetails(null);
+    setPopupStepUpdater(null);
+  };
+
+  // Handle popup step updates
+  const handleStepUpdate = (updater) => {
+    setPopupStepUpdater(() => updater);
+  };
 
   // Test function for debugging
   const testWasenderAPI = async (testPhone = null) => {
@@ -1131,6 +1176,14 @@ Advanced UI Techniques`;
           </div>
         </div>
       </form>
+
+      {/* Order Processing Popup */}
+      <OrderProcessingPopup 
+        isOpen={showProcessingPopup}
+        onComplete={handleProcessingComplete}
+        orderDetails={currentOrderDetails}
+        onStepUpdate={handleStepUpdate}
+      />
     </section>
   );
 };
