@@ -4,7 +4,7 @@ import Search from "../Search";
 import Badge from "@mui/material/Badge";
 import { styled } from "@mui/material/styles";
 import IconButton from "@mui/material/IconButton";
-import { MdOutlineShoppingCart } from "react-icons/md";
+import { MdShoppingCart } from "react-icons/md";
 import { IoGitCompareOutline } from "react-icons/io5";
 import { FaRegHeart } from "react-icons/fa6";
 import Tooltip from "@mui/material/Tooltip";
@@ -313,7 +313,7 @@ const Header = () => {
                     >
 
                       <StyledBadge badgeContent={context?.cartData?.length !== 0 ? context?.cartData?.length : 0} color="secondary">
-                        <MdOutlineShoppingCart />
+                        <MdShoppingCart />
                       </StyledBadge>
                     </IconButton>
                   </Tooltip>

@@ -144,7 +144,7 @@ const CartPage = () => {
 
             <Link to="/checkout">
               <Button className="btn-org btn-lg w-full flex gap-2">
-                <BsFillBagCheckFill className="text-[20px]" /> Checkout
+                <BsFillBagCheckFill className="text-[20px]" /> Buy now
               </Button>
             </Link>
           </div>

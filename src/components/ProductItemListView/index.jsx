@@ -7,7 +7,7 @@ import { FaRegHeart } from "react-icons/fa";
 import { IoGitCompareOutline } from "react-icons/io5";
 import { MdZoomOutMap } from "react-icons/md";
 import { MyContext } from "../../App";
-import { MdOutlineShoppingCart } from "react-icons/md";
+import { MdShoppingCart } from "react-icons/md";
 import { FaMinus } from "react-icons/fa6";
 import { FaPlus } from "react-icons/fa6";
 import { deleteData, editData, postData } from "../../utils/api";
@@ -400,7 +400,7 @@ const ProductItem = (props) => {
 
               <Button className="btn-org btn-border flex w-full btn-sm gap-2 " size="small"
                 onClick={() => addToCart(props?.item, context?.userData?._id, quantity)}>
-                <MdOutlineShoppingCart className="text-[18px]" /> Add to Cart
+                <MdShoppingCart className="text-[18px]" /> Add to Cart
               </Button>
 
               :

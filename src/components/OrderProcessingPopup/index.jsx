@@ -105,6 +105,19 @@ const OrderProcessingPopup = ({ isOpen, onComplete, orderDetails, onStepUpdate }
     processSteps();
   }, [isOpen, onStepUpdate]);
 
+  // Reset when popup opens
+  useEffect(() => {
+    if (isOpen) {
+      setCurrentStep(0);
+      setStepStatus({
+        order: 'pending',
+        sms: 'pending',
+        whatsapp: 'pending',
+        confirmation: 'pending'
+      });
+    }
+  }, [isOpen]);
+
   if (!isOpen) return null;
 
   return (

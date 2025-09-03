@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useState } from "react";
 import Button from "@mui/material/Button";
 import { QtyBox } from "../QtyBox";
 import Rating from "@mui/material/Rating";
-import { MdOutlineShoppingCart } from "react-icons/md";
+import { MdShoppingCart } from "react-icons/md";
 import { FaRegHeart } from "react-icons/fa";
 import { IoGitCompareOutline } from "react-icons/io5";
 import { MyContext } from "../../App";
@@ -433,7 +433,7 @@ export const ProductDetailsComponent = (props) => {
                   {
                     isAdded === true ? <><FaCheckDouble /> Added</> :
                       <>
-                        <MdOutlineShoppingCart className="text-[18px] sm:text-[20px]" /> Add to Cart
+                        <MdShoppingCart className="text-[18px] sm:text-[20px]" /> Add to Cart
                       </>
                   }
                 </>
