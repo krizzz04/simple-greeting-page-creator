@@ -453,7 +453,7 @@ Hi *${customerName}*!
 Your order is now being processed by our team! 🚀
 
 📱 *Track Your Order:*
-Visit: www.roarofthesouth.in
+Visit: www.roarofsouth.in
 
 🚚 *Delivery Updates:*
 • Order confirmed ✅
