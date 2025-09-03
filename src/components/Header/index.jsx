@@ -59,19 +59,23 @@ const Header = () => {
       localStorage.setItem('logo', res?.logo[0]?.logo)
     })
 
+  }, []); // Only run once on mount
 
-    setTimeout(() => {
-      const token = localStorage.getItem('accessToken');
+  // Separate effect for auth checking
+  useEffect(() => {
+    // Only redirect to login if not already on login page and no token
+    const token = localStorage.getItem('accessToken');
+    const currentPath = location.pathname;
 
-      if (token !== undefined && token !== null && token !== "") {
-        const url = window.location.href
-        history(location.pathname)
-      } else {
-        history("/login")
-      }
-    }, [1000])
+    if (token !== undefined && token !== null && token !== "" && token !== "undefined" && token !== "null") {
+      // User is logged in, no need to redirect
+      return;
+    } else if (currentPath !== "/login" && currentPath !== "/register" && currentPath !== "/verify" && currentPath !== "/forgot-password") {
+      // Only redirect to login if not already on auth pages
+      history("/login");
+    }
 
-  }, [context?.isLogin]);
+  }, [location.pathname]); // Only run when pathname changes
 
   const logout = () => {
     setAnchorEl(null);

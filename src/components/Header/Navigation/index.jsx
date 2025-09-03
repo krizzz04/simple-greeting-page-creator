@@ -52,7 +52,10 @@ const Navigation = (props) => {
             <ul className="flex items-center gap-3 nav">
               <li className="list-none">
                 <Link to="/" className="link transition text-[14px] font-[500]">
-                  <Button className="link transition !font-[500] !text-[rgba(0,0,0,0.8)] hover:!text-[#ff5252] !py-4">
+                  <Button 
+                    className="link transition !font-[500] !text-[rgba(0,0,0,0.8)] hover:!text-[#ff5252] !py-4"
+                    onClick={(e) => e.preventDefault()}
+                  >
                     Home
                   </Button>
                 </Link>
@@ -63,7 +66,10 @@ const Navigation = (props) => {
                   return (
                     <li className="list-none relative" key={index}>
                       <Link to={`/products?catId=${cat?._id}`} className="link transition text-[14px] font-[500]">
-                        <Button className="link transition !font-[500] !text-[rgba(0,0,0,0.8)] hover:!text-[#ff5252] !py-4">
+                        <Button 
+                          className="link transition !font-[500] !text-[rgba(0,0,0,0.8)] hover:!text-[#ff5252] !py-4"
+                          onClick={(e) => e.preventDefault()}
+                        >
                           {cat?.name}
                         </Button>
                       </Link>
@@ -77,10 +83,13 @@ const Navigation = (props) => {
                                 return (
                                   <li className="list-none w-full relative" key={index_}>
                                     <Link to={`/products?subCatId=${subCat?._id}`} className="w-full">
-                                      <Button className="!text-[rgba(0,0,0,0.8)]  w-full !text-left !justify-start !rounded-none">
+                                      <Button 
+                                        className="!text-[rgba(0,0,0,0.8)]  w-full !text-left !justify-start !rounded-none"
+                                        onClick={(e) => e.preventDefault()}
+                                      >
                                         {subCat?.name}
                                       </Button>
-
+                                      
                                       {
                                         subCat?.children?.length !== 0 &&
                                         <div className="submenu absolute top-[0%] left-[100%] min-w-[150px] bg-white shadow-md opacity-0 transition-all">
@@ -90,21 +99,19 @@ const Navigation = (props) => {
                                                 return (
                                                   <li className="list-none w-full" key={index__}>
                                                     <Link to={`/products?thirdLavelCatId=${thirdLavelCat?._id}`} className="w-full">
-                                                      <Button className="!text-[rgba(0,0,0,0.8)]  w-full !text-left !justify-start !rounded-none">
+                                                      <Button 
+                                                        className="!text-[rgba(0,0,0,0.8)]  w-full !text-left !justify-start !rounded-none"
+                                                        onClick={(e) => e.preventDefault()}
+                                                      >
                                                         {thirdLavelCat?.name}
                                                       </Button>
                                                     </Link>
                                                   </li>)
                                               })
                                             }
-
-
-
                                           </ul>
                                         </div>
                                       }
-
-
                                     </Link>
                                   </li>
                                 )

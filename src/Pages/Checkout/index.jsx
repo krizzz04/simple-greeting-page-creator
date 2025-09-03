@@ -9,7 +9,7 @@ import { MdDelete } from "react-icons/md";
 import Radio from '@mui/material/Radio';
 import { deleteData, fetchDataFromApi, postData, API_BASE_URL } from "../../utils/api";
 import axios from 'axios';
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate, Link, useLocation } from "react-router-dom";
 import CircularProgress from '@mui/material/CircularProgress';
 import DelhiveryTracking from '../../components/DelhiveryTracking';
 import OrderProcessingPopup from '../../components/OrderProcessingPopup';
@@ -34,8 +34,41 @@ const Checkout = () => {
   const [currentOrderDetails, setCurrentOrderDetails] = useState(null);
   const [popupStepUpdater, setPopupStepUpdater] = useState(null);
   const context = useContext(MyContext);
-
   const history = useNavigate();
+  const location = useLocation();
+
+  // Reset checkout state when route changes
+  useEffect(() => {
+    console.log("🔄 Route changed to:", location.pathname);
+    
+    // If we're not on checkout page, reset all state
+    if (location.pathname !== "/checkout") {
+      console.log("🔄 Resetting checkout state - navigating away from checkout");
+      setOrderPlaced(false);
+      setOrderData(null);
+      setShowProcessingPopup(false);
+      setCurrentOrderDetails(null);
+      setPopupStepUpdater(null);
+      setUserData(null);
+      setSelectedAddress("");
+      setTotalAmount(0);
+    }
+  }, [location.pathname]);
+
+  // Cleanup effect to handle component unmounting
+  useEffect(() => {
+    return () => {
+      // Cleanup when component unmounts
+      setUserData(null);
+      setSelectedAddress("");
+      setTotalAmount(0);
+      setOrderPlaced(false);
+      setOrderData(null);
+      setShowProcessingPopup(false);
+      setCurrentOrderDetails(null);
+      setPopupStepUpdater(null);
+    };
+  }, []);
 
   // Function to remove item from cart
   const removeFromCart = async (itemId) => {
@@ -110,7 +143,7 @@ const Checkout = () => {
       clearTimeout(timeoutId1);
       clearTimeout(timeoutId2);
     };
-  }, [context?.userData, context?.isLogin])
+  }, [context?.userData?._id, context?.isLogin]) // Only depend on specific user ID, not entire userData object
 
   useEffect(() => {
     const subtotal = context.cartData?.length !== 0 ?
@@ -1048,9 +1081,9 @@ Advanced UI Techniques`;
   }
 
   return (
-    <section className="py-3 lg:py-10 px-3">
+    <section className="py-3 lg:py-10 px-3 relative">
       {messagingInProgress && (
-        <div className="fixed top-4 right-4 bg-blue-500 text-white p-3 rounded-md shadow-lg z-50">
+        <div className="fixed top-4 right-4 bg-blue-500 text-white p-3 rounded-md shadow-lg z-40">
           <div className="flex items-center gap-2">
             <CircularProgress size={16} color="inherit" />
             <span>Sending notifications...</span>
