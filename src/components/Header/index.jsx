@@ -123,23 +123,28 @@ const Header = () => {
 
         <div className="header py-2 lg:py-4 border-b-[1px] border-gray-250">
           <div className="container flex items-center justify-between">
-            {
-              context?.windowWidth < 992 &&
-              <Button className="!w-[35px] !min-w-[35px] !h-[35px] !rounded-full !text-gray-800" onClick={() => setIsOpenCatPanel(true)}><HiOutlineMenu size={22} /></Button>
-            }
+            {/* Mobile Menu Button */}
+            {context?.windowWidth < 992 && (
+              <Button className="!w-[35px] !min-w-[35px] !h-[35px] !rounded-full !text-gray-800" onClick={() => setIsOpenCatPanel(true)}>
+                <HiOutlineMenu size={22} />
+              </Button>
+            )}
 
+            {/* Logo */}
             <div className="col1 w-[40%] lg:w-[25%] flex justify-center lg:justify-start">
               <Link to={"/"}>
                 <img src={localStorage.getItem('logo') || "/logo.jpg"} className="max-w-[60px] lg:max-w-[90px]" alt="Logo" />
               </Link>
             </div>
 
+            {/* Search Bar */}
             <div className={`col2 fixed top-0 left-0 w-full h-full lg:w-[40%] lg:static p-2 lg:p-0 bg-white z-50 ${context?.windowWidth > 992 && '!block'} ${context?.openSearchPanel === true ? 'block' : 'hidden'}`}>
               <Search />
             </div>
 
-            <div className="col3 w-[10%] lg:w-[30%] flex items-center pl-7">
-              <ul className="flex items-center justify-end gap-0 lg:gap-3 w-full">
+            {/* Right Side Icons */}
+            <div className="col3 w-[60%] lg:w-[30%] flex items-center justify-end">
+              <ul className="flex items-center gap-2 lg:gap-3">
                 {context.isLogin === false && context?.windowWidth > 992 ? (
                   <li className="list-none">
                     <Link
@@ -292,8 +297,8 @@ const Header = () => {
                 {!context?.isLogin && context?.windowWidth < 992 && (
                   <li>
                     <Link to="/login">
-                      <Button className="!text-gray-700 !font-medium !px-3 !py-1 !min-w-0 !text-sm">
-                        <FaRegUser className="!text-base !mr-1" />
+                      <Button className="!bg-primary !text-white !font-medium !px-4 !py-2 !min-w-0 !text-sm !rounded-lg hover:!bg-orange-600 transition-all duration-300 shadow-md">
+                        <FaRegUser className="!text-base !mr-2" />
                         Login
                       </Button>
                     </Link>
