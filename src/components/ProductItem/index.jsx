@@ -328,7 +328,7 @@ const ProductItem = (props) => {
       onClick={() => navigate(`/product/${props?.item?._id}`)}
     >
       <div className="group imgWrapper w-[100%]  overflow-hidden  rounded-md rounded-bl-none rounded-br-none relative">
-        <div className="img h-[280px] overflow-hidden">
+        <div className="img h-[200px] sm:h-[220px] lg:h-[240px] overflow-hidden">
           <img
             src={props?.item?.images?.[0] || "/homeBannerPlaceholder.jpg"}
             className="w-full"
@@ -497,21 +497,23 @@ const ProductItem = (props) => {
         </div>
       </div>
 
-      <div className="info p-3 py-5 relative pb-[80px] h-[220px]">
-        <h6 className="text-[13px] !font-[400]">
+      <div className="info p-3 py-3 relative pb-[80px] min-h-[180px]">
+        <h6 className="text-[13px] !font-[400] mb-1">
           <span className="link transition-all">
             {props?.item?.brand}
           </span>
         </h6>
-        <h3 className="text-[12px] lg:text-[13px] title mt-1 font-[500] mb-1 text-[#000]">
+        <h3 className="text-[12px] lg:text-[13px] title font-[500] mb-2 text-[#000] leading-tight">
           <Link to={`/product/${props?.item?._id}`} className="link transition-all">
             {props?.item?.name?.substr(0, 25) + '...'}
           </Link>
         </h3>
 
-        <Rating name="size-small" defaultValue={props?.item?.rating} size="small" readOnly />
+        <div className="mb-2">
+          <Rating name="size-small" defaultValue={props?.item?.rating} size="small" readOnly />
+        </div>
 
-        <div className="flex items-center gap-4 justify-between">
+        <div className="flex items-center gap-4 justify-between mb-2">
           <span className="oldPrice line-through text-gray-500 text-[12px] lg:text-[14px] font-[500]">
             {props?.item?.oldPrice?.toLocaleString('en-US', { style: 'currency', currency: 'INR' })}
           </span>
@@ -521,12 +523,12 @@ const ProductItem = (props) => {
         </div>
 
 
-        <div className="!absolute bottom-[15px] left-0 pl-3 pr-3 w-full">
+        <div className="!absolute bottom-[10px] left-0 pl-3 pr-3 w-full">
 
           {
             isAdded === false ?
 
-              <div className="flex flex-col gap-2">
+              <div className="flex flex-col gap-1.5">
                 <Button 
                   className="btn-org addToCartBtn btn-border flex w-full btn-sm gap-2 " 
                   size="small"
