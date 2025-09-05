@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useState, useCallback } from "react";
 import { Button } from "@mui/material";
 import { BsFillBagCheckFill } from "react-icons/bs";
 import { MyContext } from '../../App';
@@ -24,7 +24,7 @@ const Checkout = () => {
   const [isChecked, setIsChecked] = useState(0);
   const [selectedAddress, setSelectedAddress] = useState("");
   const [totalAmount, setTotalAmount] = useState();
-  const [isLoading, setIsloading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [messagingInProgress, setMessagingInProgress] = useState(false);
   const [orderInProgress, setOrderInProgress] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState("online"); // "online" or "cod"
@@ -34,6 +34,7 @@ const Checkout = () => {
   const [currentOrderDetails, setCurrentOrderDetails] = useState(null);
   const [popupStepUpdater, setPopupStepUpdater] = useState(null);
   const [showCodConfirmation, setShowCodConfirmation] = useState(false);
+  const [currentStep, setCurrentStep] = useState(1); // 1: Order Summary, 2: Delivery Address, 3: Payment
   const context = useContext(MyContext);
   const history = useNavigate();
   const location = useLocation();
@@ -96,6 +97,19 @@ const Checkout = () => {
       context?.alertBox("error", "Failed to remove item from cart");
     }
   };
+
+  // Ensure Razorpay is loaded
+  useEffect(() => {
+    const checkRazorpay = () => {
+      if (typeof window.Razorpay === 'undefined') {
+        console.log("⏳ Waiting for Razorpay to load...");
+        setTimeout(checkRazorpay, 100);
+      } else {
+        console.log("✅ Razorpay loaded successfully");
+      }
+    };
+    checkRazorpay();
+  }, []);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -785,6 +799,13 @@ Advanced UI Techniques`;
         },
       };
 
+      // Check if Razorpay is loaded
+      if (typeof window.Razorpay === 'undefined') {
+        context?.alertBox("error", "Payment gateway is not loaded. Please refresh the page and try again.");
+        setOrderInProgress(false);
+        return;
+      }
+
       var pay = new window.Razorpay(options);
       pay.open();
     }
@@ -827,7 +848,7 @@ Advanced UI Techniques`;
     setShowCodConfirmation(false);
     
     const user = context?.userData;
-    setIsloading(true);
+    setIsLoading(true);
     setOrderInProgress(true);
 
     const deliveryAddressObject = userData.address_details.find(addr => addr._id === selectedAddress);
@@ -878,7 +899,7 @@ Advanced UI Techniques`;
             history("/order/failed");
         }
     }).finally(() => {
-        setIsloading(false);
+        setIsLoading(false);
         setOrderInProgress(false);
     });
   };
@@ -887,10 +908,155 @@ Advanced UI Techniques`;
     setShowCodConfirmation(false);
   };
 
-  // Handle popup step updates
-  const handleStepUpdate = (updater) => {
-    setPopupStepUpdater(() => updater);
+  // Step navigation functions
+  const nextStep = () => {
+    if (currentStep < 3) {
+      setCurrentStep(currentStep + 1);
+    }
   };
+
+  const prevStep = () => {
+    if (currentStep > 1) {
+      setCurrentStep(currentStep - 1);
+    }
+  };
+
+  const goToStep = (step) => {
+    setCurrentStep(step);
+  };
+
+  // Handle place order based on payment method
+  const handlePlaceOrder = () => {
+    if (orderInProgress || messagingInProgress) {
+      context?.alertBox("warning", "Order is already being processed...");
+      return;
+    }
+
+    if (!userData?.address_details || userData.address_details.length === 0) {
+      context?.alertBox("error", "Please add a delivery address first.");
+      return;
+    }
+
+    if (!selectedAddress) {
+      context?.alertBox("error", "Please select a delivery address.");
+      return;
+    }
+
+    // Route to appropriate payment method
+    if (paymentMethod === 'razorpay') {
+      handleRazorpayPayment();
+    } else if (paymentMethod === 'paypal') {
+      // PayPal is handled by the PayPal button container
+      context?.alertBox("info", "Please use the PayPal button below to complete your payment.");
+    } else if (paymentMethod === 'cod') {
+      cashOnDelivery();
+    } else {
+      context?.alertBox("error", "Please select a payment method.");
+    }
+  };
+
+  // Handle Razorpay payment
+  const handleRazorpayPayment = () => {
+    if (orderInProgress || messagingInProgress) {
+      context?.alertBox("warning", "Order is already being processed...");
+      return;
+    }
+
+    if (!userData?.address_details || userData.address_details.length === 0) {
+      context?.alertBox("error", "Please add a delivery address first.");
+      return;
+    }
+
+    if (!selectedAddress) {
+      context?.alertBox("error", "Please select a delivery address.");
+      return;
+    }
+
+    setOrderInProgress(true);
+    
+    var options = {
+      key: VITE_APP_RAZORPAY_KEY_ID,
+      amount: parseInt(totalAmount * 100),
+      currency: "INR",
+      order_receipt: context?.userData?.name,
+      name: "Roar of South",
+      description: "Order Payment",
+      handler: function (response) {
+        const paymentId = response.razorpay_payment_id;
+        const user = context?.userData
+
+        const payLoad = {
+          userId: user?._id,
+          products: context?.cartData,
+          paymentId: paymentId,
+          payment_status: "COMPLETED",
+          delivery_address: selectedAddress,
+          totalAmt: totalAmount,
+          date: new Date().toLocaleString("en-US", {
+            month: "short",
+            day: "2-digit",
+            year: "numeric",
+          })
+        };
+
+        postData(`/api/order/create`, payLoad).then(async (res) => {
+          if (res?.error === false) {
+            // Show processing popup
+            setCurrentOrderDetails(payLoad);
+            setShowProcessingPopup(true);
+            
+            const newOrder = res?.data || res?.order || res;
+            const fullOrderId = newOrder?._id;
+            
+            // Get the delivery address object
+            const deliveryAddressObject = userData.address_details.find(addr => addr._id === selectedAddress);
+            
+            // Send all notifications (popup will show progress)
+            await sendAllNotifications(user, payLoad, deliveryAddressObject, fullOrderId);
+            
+            // 🚚 Store order data for tracking display
+            const orderWithTracking = {
+              ...newOrder,
+              products: context?.cartData, // Include the cart data
+              delivery_address: deliveryAddressObject
+            };
+            localStorage.setItem(`order_${fullOrderId}`, JSON.stringify(orderWithTracking));
+            
+            // 🚚 Show tracking information on checkout page
+            setOrderData(orderWithTracking);
+            setOrderPlaced(true);
+            
+            deleteData(`/api/cart/emptyCart/${user?._id}`).then(() => {
+              context?.getCartItems();
+            })
+          } else {
+            context.alertBox("error", res?.message);
+            history("/order/failed");
+          }
+        }).finally(() => {
+          setOrderInProgress(false);
+        });
+      },
+      theme: {
+        color: "#ff5252",
+      },
+    };
+
+    // Check if Razorpay is loaded
+    if (typeof window.Razorpay === 'undefined') {
+      context?.alertBox("error", "Payment gateway is not loaded. Please refresh the page and try again.");
+      setOrderInProgress(false);
+      return;
+    }
+
+    var pay = new window.Razorpay(options);
+    pay.open();
+  };
+
+  // Handle popup step updates
+  const handleStepUpdate = useCallback((updater) => {
+    setPopupStepUpdater(() => updater);
+  }, []);
 
   // Test function for debugging
   const testWasenderAPI = async (testPhone = null) => {
@@ -1098,321 +1264,425 @@ Advanced UI Techniques`;
   }
 
   return (
-    <section className="py-3 lg:py-10 px-3 relative">
-      {messagingInProgress && (
-        <div className="fixed top-4 right-4 bg-blue-500 text-white p-3 rounded-md shadow-lg z-40">
-          <div className="flex items-center gap-2">
-            <CircularProgress size={16} color="inherit" />
-            <span>Sending notifications...</span>
+    <section className="min-h-screen bg-gray-50 py-8">
+      <div className="max-w-4xl mx-auto px-4">
+        {/* Header */}
+        <div className="bg-white rounded-2xl shadow-lg p-6 mb-6">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <button
+                onClick={() => history(-1)}
+                className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+              >
+                <svg className="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                </svg>
+              </button>
+              <div>
+                <h1 className="text-2xl font-bold text-gray-800">Checkout</h1>
+                <p className="text-gray-600">Complete your purchase</p>
+              </div>
+            </div>
+            <div className="hidden md:block">
+              <img src="/logo.jpg" alt="Logo" className="h-12 w-auto" />
+            </div>
           </div>
         </div>
-      )}
-      
-      <form onSubmit={checkout}>
-        <div className="w-full max-w-4xl m-auto">
-          <div className="bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden">
-            {/* Header */}
-            <div className="bg-gradient-to-r from-primary to-orange-500 p-6 text-white">
-              <h1 className="text-2xl font-bold text-center">Checkout</h1>
-              <p className="text-center text-white/90 mt-2">Complete your order</p>
-            </div>
 
-            <div className="p-6">
-              {/* Address Selection */}
-              <div className="bg-white p-4 rounded-lg border border-gray-200 mb-4">
-                <div className="flex items-center justify-between mb-3">
-                  <h3 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
-                    <svg className="w-4 h-4 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                    </svg>
-                    Delivery Address
-                  </h3>
-                  {userData?.address_details?.length !== 0 && (
-                    <Button 
-                      variant="outlined"
-                      onClick={() => {
-                        context?.setOpenAddressPanel(true);
-                        context?.setAddressMode("add");
-                      }} 
-                      className="btn-org btn-xs !border-primary !text-primary hover:!bg-primary hover:!text-white transition-all duration-300"
-                    >
-                      <FaPlus className="mr-1" />
-                      Add New
-                    </Button>
-                  )}
+        {/* Step Indicator */}
+        <div className="bg-white rounded-2xl shadow-lg p-6 mb-6">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4 flex-1">
+              <div className={`flex items-center gap-2 ${currentStep >= 1 ? 'text-primary' : 'text-gray-400'}`}>
+                <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${
+                  currentStep >= 1 ? 'bg-primary text-white' : 'bg-gray-200 text-gray-600'
+                }`}>
+                  1
                 </div>
+                <span className="hidden sm:block font-medium">Order Summary</span>
+              </div>
+              <div className={`flex-1 h-1 ${currentStep >= 2 ? 'bg-primary' : 'bg-gray-200'}`}></div>
+              <div className={`flex items-center gap-2 ${currentStep >= 2 ? 'text-primary' : 'text-gray-400'}`}>
+                <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${
+                  currentStep >= 2 ? 'bg-primary text-white' : 'bg-gray-200 text-gray-600'
+                }`}>
+                  2
+                </div>
+                <span className="hidden sm:block font-medium">Delivery Address</span>
+              </div>
+              <div className={`flex-1 h-1 ${currentStep >= 3 ? 'bg-primary' : 'bg-gray-200'}`}></div>
+              <div className={`flex items-center gap-2 ${currentStep >= 3 ? 'text-primary' : 'text-gray-400'}`}>
+                <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${
+                  currentStep >= 3 ? 'bg-primary text-white' : 'bg-gray-200 text-gray-600'
+                }`}>
+                  3
+                </div>
+                <span className="hidden sm:block font-medium">Payment</span>
+              </div>
+            </div>
+          </div>
+        </div>
 
-                {/* Address Dropdown */}
-                {userData?.address_details?.length !== 0 ? (
-                  <div className="space-y-3">
-                    <div className="relative">
-                      <select 
-                        value={selectedAddress} 
-                        onChange={(e) => setSelectedAddress(e.target.value)}
-                        className="w-full p-3 pr-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary bg-white text-gray-700 appearance-none cursor-pointer transition-all duration-300"
-                      >
-                        <option value="">Choose delivery address</option>
-                        {userData?.address_details?.map((address, index) => (
-                          <option key={address._id} value={address._id}>
-                            {address?.addressType} - {address?.address_line1?.substring(0, 25)}...
-                          </option>
-                        ))}
-                      </select>
-                      <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
-                        <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                        </svg>
-                      </div>
+        {/* Step Content */}
+        <div className="bg-white rounded-2xl shadow-lg p-6">
+          {/* Step 1: Order Summary */}
+          {currentStep === 1 && (
+            <div>
+              <h2 className="text-xl font-bold text-gray-800 mb-6 flex items-center gap-2">
+                <svg className="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                </svg>
+                Order Summary
+              </h2>
+              
+              <div className="space-y-4 mb-6">
+                {context?.cartData?.map((item, index) => (
+                  <div key={item._id || index} className="flex items-center gap-4 p-4 bg-gray-50 rounded-xl">
+                    <img
+                      src={item?.image || "/homeBannerPlaceholder.jpg"}
+                      alt={item?.productTitle}
+                      className="w-16 h-16 object-cover rounded-lg"
+                    />
+                    <div className="flex-1">
+                      <h3 className="font-semibold text-gray-800">{item?.productTitle}</h3>
+                      <p className="text-gray-600 text-sm">Quantity: {item?.quantity}</p>
+                      <p className="text-primary font-bold">₹{item?.price}</p>
                     </div>
-                    
-                    {/* Selected Address Details */}
-                    {selectedAddress && (
-                      <div className="bg-gray-50 p-3 rounded-lg border border-gray-200">
-                        {(() => {
-                          const selectedAddr = userData?.address_details?.find(addr => addr._id === selectedAddress);
-                          return selectedAddr ? (
-                            <div className="flex items-start justify-between">
-                              <div className="flex-1">
-                                <p className="font-medium text-gray-800 text-sm">{userData?.name}</p>
-                                <p className="text-xs text-gray-600">
-                                  {selectedAddr?.address_line1}, {selectedAddr?.city}
-                                </p>
-                                <p className="text-xs text-gray-600">+{selectedAddr?.mobile}</p>
-                              </div>
-                              <Button 
-                                variant="text" 
-                                size="small"
-                                onClick={() => editAddress(selectedAddr._id)}
-                                className="!text-primary hover:!bg-primary/10 !min-w-0 !p-1"
-                              >
-                                <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                                </svg>
-                              </Button>
-                            </div>
-                          ) : null;
-                        })()}
-                      </div>
-                    )}
                   </div>
-                ) : (
-                  <div className="text-center py-6">
-                    <h4 className="text-base font-medium text-gray-700 mb-2">No Addresses Found</h4>
-                    <p className="text-sm text-gray-500 mb-3">Add a delivery address to continue</p>
-                    <Button 
-                      className="btn-org btn-sm"
-                      onClick={() => {
-                        context?.setOpenAddressPanel(true);
-                        context?.setAddressMode("add");
-                      }}
-                    >
-                      <FaPlus className="mr-1" />
-                      Add Address
-                    </Button>
-                  </div>
-                )}
+                ))}
               </div>
 
-              {/* Order Summary */}
-              <div className="mb-6">
-                <h2 className="text-xl font-semibold text-gray-800 mb-4 flex items-center gap-2">
-                  <svg className="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                  </svg>
-                  Order Summary
-                </h2>
+              <div className="border-t pt-6">
+                <div className="space-y-3 mb-6">
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Subtotal</span>
+                    <span className="font-semibold">₹{context.cartData?.length !== 0 ? 
+                      context.cartData?.map(item => parseInt(item.price) * item.quantity)
+                        .reduce((total, value) => total + value, 0) : 0}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Shipping</span>
+                    <span className="font-semibold text-green-600">Free</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Tax</span>
+                    <span className="font-semibold">₹0</span>
+                  </div>
+                  <div className="border-t pt-3">
+                    <div className="flex justify-between">
+                      <span className="text-lg font-bold text-gray-800">Total</span>
+                      <span className="text-lg font-bold text-primary">₹{totalAmount}</span>
+                    </div>
+                  </div>
+                </div>
 
-                <div className="bg-gray-50 rounded-lg p-4">
-                  <div className="space-y-3 max-h-48 overflow-y-auto">
-                    {context?.cartData?.length !== 0 && context?.cartData?.map((item, index) => (
-                      <div className="flex items-center justify-between py-2 border-b border-gray-200 last:border-b-0" key={index}>
-                        <div className="flex items-center gap-3 flex-1">
-                          <div className="w-12 h-12 object-cover overflow-hidden rounded-md">
-                            <img
-                              src={item?.image}
-                              alt={item?.productTitle}
-                              className="w-full h-full object-cover"
-                            />
-                          </div>
+                <button
+                  onClick={nextStep}
+                  className="w-full btn-org py-4 rounded-xl font-semibold text-lg transition-all duration-300"
+                >
+                  Continue to Delivery Address
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Step 2: Delivery Address */}
+          {currentStep === 2 && (
+            <div>
+              <h2 className="text-xl font-bold text-gray-800 mb-6 flex items-center gap-2">
+                <svg className="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+                Delivery Address
+              </h2>
+              
+              {userData?.address_details?.length > 0 ? (
+                <div className="space-y-4 mb-6">
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="font-semibold text-gray-800">Select Delivery Address</h3>
+                    <button
+                      onClick={() => history("/my-account/add-address")}
+                      className="text-primary hover:text-orange-600 font-medium text-sm"
+                    >
+                      + Add New Address
+                    </button>
+                  </div>
+                  
+                  <div className="grid gap-4">
+                    {userData.address_details.map((address) => (
+                      <div
+                        key={address._id}
+                        className={`p-4 border-2 rounded-xl cursor-pointer transition-all duration-300 ${
+                          selectedAddress === address._id
+                            ? 'border-primary bg-orange-50'
+                            : 'border-gray-200 hover:border-gray-300'
+                        }`}
+                        onClick={() => setSelectedAddress(address._id)}
+                      >
+                        <div className="flex items-start justify-between">
                           <div className="flex-1">
-                            <h4 className="text-sm font-medium text-gray-800" title={item?.productTitle}>
-                              {item?.productTitle?.substr(0, 25) + (item?.productTitle?.length > 25 ? '...' : '')}
-                            </h4>
-                            <span className="text-xs text-gray-500">Qty: {item?.quantity}</span>
+                            <div className="flex items-center gap-2 mb-2">
+                              <span className="font-semibold text-gray-800">{address.name}</span>
+                              {address.isDefault && (
+                                <span className="bg-primary text-white text-xs px-2 py-1 rounded-full">
+                                  Default
+                                </span>
+                              )}
+                            </div>
+                            <p className="text-gray-600 text-sm mb-1">{address.phone}</p>
+                            <p className="text-gray-600 text-sm">
+                              {address.street}, {address.city}, {address.state} {address.pincode}
+                            </p>
                           </div>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <span className="text-sm font-medium text-green-600">₹{item?.quantity * item?.price}</span>
-                          <Button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              removeFromCart(item._id);
-                            }}
-                            className="!min-w-[24px] !w-[24px] !h-[24px] !rounded-full !bg-red-50 hover:!bg-red-100 !text-red-500"
-                            size="small"
-                          >
-                            <MdDelete className="text-xs" />
-                          </Button>
+                          <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
+                            selectedAddress === address._id
+                              ? 'border-primary bg-primary'
+                              : 'border-gray-300'
+                          }`}>
+                            {selectedAddress === address._id && (
+                              <div className="w-2 h-2 bg-white rounded-full"></div>
+                            )}
+                          </div>
                         </div>
                       </div>
                     ))}
                   </div>
                 </div>
-              </div>
+              ) : (
+                <div className="text-center py-8 mb-6">
+                  <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                  </div>
+                  <h3 className="text-lg font-semibold text-gray-800 mb-2">No Address Found</h3>
+                  <p className="text-gray-600 mb-4">Please add a delivery address to continue</p>
+                  <button
+                    onClick={() => history("/my-account/add-address")}
+                    className="btn-org px-6 py-3 rounded-xl font-semibold"
+                  >
+                    Add Address
+                  </button>
+                </div>
+              )}
 
-              {/* Payment Method Selection */}
-              <div className="mb-6">
-                <h2 className="text-xl font-semibold text-gray-800 mb-4 flex items-center gap-2">
-                  <svg className="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
-                  </svg>
-                  Payment Method
-                </h2>
-                
-                <div className="grid md:grid-cols-2 gap-4">
-                  {/* Online Payment Option */}
-                  <div className={`relative p-4 rounded-xl border-2 transition-all duration-300 cursor-pointer ${
-                    paymentMethod === "online" 
-                      ? "border-green-500 bg-green-50 shadow-lg" 
-                      : "border-gray-200 bg-white hover:border-green-300 hover:bg-green-25"
-                  }`} onClick={() => setPaymentMethod("online")}>
-                    <div className="absolute -top-3 -right-3 bg-gradient-to-r from-green-500 to-emerald-600 text-white px-3 py-1 rounded-full text-xs font-bold shadow-lg">
-                      🎉 ₹200 OFF
-                    </div>
-                    
+              <div className="flex gap-3">
+                <button
+                  onClick={prevStep}
+                  className="flex-1 bg-gray-100 text-gray-700 hover:bg-gray-200 font-semibold py-4 rounded-xl transition-all duration-300"
+                >
+                  Back
+                </button>
+                <button
+                  onClick={nextStep}
+                  disabled={!selectedAddress}
+                  className="flex-1 btn-org py-4 rounded-xl font-semibold disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300"
+                >
+                  Continue to Payment
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Step 3: Payment Options */}
+          {currentStep === 3 && (
+            <div>
+              <h2 className="text-xl font-bold text-gray-800 mb-6 flex items-center gap-2">
+                <svg className="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+                </svg>
+                Payment Method
+              </h2>
+              
+              <div className="space-y-4 mb-6">
+                <div
+                  className={`p-4 border-2 rounded-xl cursor-pointer transition-all duration-300 ${
+                    paymentMethod === 'razorpay'
+                      ? 'border-primary bg-orange-50'
+                      : 'border-gray-200 hover:border-gray-300'
+                  }`}
+                  onClick={() => setPaymentMethod('razorpay')}
+                >
+                  <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                      <Radio
-                        checked={paymentMethod === "online"}
-                        onChange={() => setPaymentMethod("online")}
-                        name="payment-method"
-                        color="success"
-                        className="!text-green-600"
-                      />
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-2">
-                          <span className="text-base font-semibold text-gray-800">Digital Payment</span>
-                          <span className="bg-green-100 text-green-700 px-2 py-1 rounded-md text-xs font-bold">
-                            RECOMMENDED
-                          </span>
-                        </div>
-                        <p className="text-sm text-gray-600 mb-3">Pay securely with your favorite apps</p>
-                        
-                        <div className="flex items-center gap-3">
-                          <div className="bg-white p-2 rounded-lg shadow-sm">
-                            <img src="https://developers.google.com/static/pay/api/images/brand-guidelines/google-pay-mark.png" alt="Google Pay" className="w-6 h-6 object-contain" />
-                          </div>
-                          <div className="bg-white p-2 rounded-lg shadow-sm">
-                            <SiPhonepe className="text-2xl text-purple-600" />
-                          </div>
-                          <div className="bg-white p-2 rounded-lg shadow-sm">
-                            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/24/Paytm_Logo_%28standalone%29.svg/2560px-Paytm_Logo_%28standalone%29.svg.png" alt="Paytm" className="w-6 h-6 object-contain" />
-                          </div>
-                        </div>
+                      <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                        <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+                        </svg>
                       </div>
+                      <div>
+                        <h3 className="font-semibold text-gray-800">Online Payment</h3>
+                        <p className="text-gray-600 text-sm">Credit/Debit Card, UPI, Net Banking</p>
+                      </div>
+                    </div>
+                    <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
+                      paymentMethod === 'razorpay'
+                        ? 'border-primary bg-primary'
+                        : 'border-gray-300'
+                    }`}>
+                      {paymentMethod === 'razorpay' && (
+                        <div className="w-2 h-2 bg-white rounded-full"></div>
+                      )}
                     </div>
                   </div>
+                </div>
 
-                  {/* Cash on Delivery Option */}
-                  <div className={`relative p-4 rounded-xl border-2 transition-all duration-300 cursor-pointer ${
-                    paymentMethod === "cod" 
-                      ? "border-orange-500 bg-orange-50 shadow-lg" 
-                      : "border-gray-200 bg-white hover:border-orange-300 hover:bg-orange-25"
-                  }`} onClick={() => setPaymentMethod("cod")}>
+                <div
+                  className={`p-4 border-2 rounded-xl cursor-pointer transition-all duration-300 ${
+                    paymentMethod === 'paypal'
+                      ? 'border-primary bg-orange-50'
+                      : 'border-gray-200 hover:border-gray-300'
+                  }`}
+                  onClick={() => setPaymentMethod('paypal')}
+                >
+                  <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                      <Radio
-                        checked={paymentMethod === "cod"}
-                        onChange={() => setPaymentMethod("cod")}
-                        name="payment-method"
-                        color="warning"
-                        className="!text-orange-600"
-                      />
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-2">
-                          <span className="text-base font-semibold text-gray-800">Cash on Delivery</span>
-                          <span className="bg-orange-100 text-orange-700 px-2 py-1 rounded-md text-xs font-bold">
-                            PAY LATER
-                          </span>
-                        </div>
-                        <p className="text-sm text-gray-600">Pay when you receive your order</p>
+                      <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                        <img src="/paypal.png" alt="PayPal" className="w-6 h-6" />
                       </div>
+                      <div>
+                        <h3 className="font-semibold text-gray-800">PayPal</h3>
+                        <p className="text-gray-600 text-sm">Pay with PayPal account</p>
+                      </div>
+                    </div>
+                    <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
+                      paymentMethod === 'paypal'
+                        ? 'border-primary bg-primary'
+                        : 'border-gray-300'
+                    }`}>
+                      {paymentMethod === 'paypal' && (
+                        <div className="w-2 h-2 bg-white rounded-full"></div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                <div
+                  className={`p-4 border-2 rounded-xl cursor-pointer transition-all duration-300 ${
+                    paymentMethod === 'cod'
+                      ? 'border-primary bg-orange-50'
+                      : 'border-gray-200 hover:border-gray-300'
+                  }`}
+                  onClick={() => setPaymentMethod('cod')}
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
+                        <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
+                        </svg>
+                      </div>
+                      <div>
+                        <h3 className="font-semibold text-gray-800">Cash on Delivery</h3>
+                        <p className="text-gray-600 text-sm">Pay when you receive your order</p>
+                      </div>
+                    </div>
+                    <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
+                      paymentMethod === 'cod'
+                        ? 'border-primary bg-primary'
+                        : 'border-gray-300'
+                    }`}>
+                      {paymentMethod === 'cod' && (
+                        <div className="w-2 h-2 bg-white rounded-full"></div>
+                      )}
                     </div>
                   </div>
                 </div>
               </div>
 
-              {/* Order Total */}
-              <div className="bg-gradient-to-br from-gray-50 to-white p-6 rounded-xl border border-gray-200 mb-6">
-                <h3 className="text-lg font-semibold text-gray-800 mb-4">Order Summary</h3>
-                
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="text-gray-600">Subtotal:</span>
-                    <span className="font-medium">₹{context.cartData?.length !== 0 ? 
+              <div className="border-t pt-6">
+                <div className="space-y-3 mb-6">
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Subtotal</span>
+                    <span className="font-semibold">₹{context.cartData?.length !== 0 ? 
                       context.cartData?.map(item => parseInt(item.price) * item.quantity)
                         .reduce((total, value) => total + value, 0) : 0}</span>
                   </div>
-                  
-                  {paymentMethod === "online" && (
-                    <div className="flex items-center justify-between p-3 bg-green-50 rounded-lg border border-green-200">
-                      <div className="flex items-center gap-2">
-                        <span className="text-green-600">🎉</span>
-                        <span className="text-sm text-green-700 font-medium">Digital Payment Discount</span>
-                      </div>
-                      <span className="text-sm text-green-700 font-bold">-₹200</span>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Shipping</span>
+                    <span className="font-semibold text-green-600">Free</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-600">Tax</span>
+                    <span className="font-semibold">₹0</span>
+                  </div>
+                  <div className="border-t pt-3">
+                    <div className="flex justify-between">
+                      <span className="text-lg font-bold text-gray-800">Total</span>
+                      <span className="text-lg font-bold text-primary">₹{totalAmount}</span>
                     </div>
-                  )}
-                  
-                  <div className="flex items-center justify-between py-3 border-t border-gray-200 font-bold text-lg">
-                    <span className="text-gray-800">Total Amount:</span>
-                    <span className="text-green-600">₹{totalAmount}</span>
                   </div>
                 </div>
-              </div>
 
-              {/* Payment Buttons */}
-              <div className="flex flex-col gap-3">
-                {paymentMethod === "online" && (
-                  <>
-                    <Button 
-                      type="submit" 
-                      className="btn-org btn-lg w-full flex gap-2 items-center justify-center" 
-                      disabled={!userData?.address_details || userData.address_details.length === 0 || isLoading || messagingInProgress || orderInProgress}
+                {/* Payment Buttons */}
+                <div className="space-y-4">
+                  {paymentMethod === 'razorpay' && (
+                    <button
+                      onClick={handlePlaceOrder}
+                      disabled={!selectedAddress || isLoading || orderInProgress}
+                      className="w-full btn-org py-4 rounded-xl font-semibold disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 flex items-center justify-center gap-2"
                     >
-                      <FaGooglePay className="text-2xl text-white" /> 
-                      {(messagingInProgress || orderInProgress) ? "Processing..." : "Pay now (₹200 OFF)"}
-                    </Button>
+                      {isLoading || orderInProgress ? (
+                        <div className="flex items-center justify-center gap-2">
+                          <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                          Processing...
+                        </div>
+                      ) : (
+                        <>
+                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+                          </svg>
+                          Pay with Razorpay
+                        </>
+                      )}
+                    </button>
+                  )}
 
+                  {paymentMethod === 'paypal' && (
                     <div 
                       id="paypal-button-container" 
                       className={(!userData?.address_details || userData.address_details.length === 0 || isLoading || messagingInProgress || orderInProgress) ? 'pointer-events-none opacity-50' : ''}
                     ></div>
-                  </>
-                )}
+                  )}
 
-                {paymentMethod === "cod" && (
-                  <Button 
-                    type="button" 
-                    className="btn-dark btn-lg w-full flex gap-2 items-center justify-center" 
-                    onClick={cashOnDelivery} 
-                    disabled={isLoading || messagingInProgress || orderInProgress || !userData?.address_details || userData.address_details.length === 0}
-                  >
-                    {
-                      (isLoading || messagingInProgress || orderInProgress) ? <CircularProgress size={24} color="inherit" /> :
+                  {paymentMethod === 'cod' && (
+                    <button
+                      onClick={handlePlaceOrder}
+                      disabled={!selectedAddress || isLoading || orderInProgress}
+                      className="w-full bg-green-600 hover:bg-green-700 text-white py-4 rounded-xl font-semibold disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 flex items-center justify-center gap-2"
+                    >
+                      {isLoading || orderInProgress ? (
+                        <div className="flex items-center justify-center gap-2">
+                          <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                          Processing...
+                        </div>
+                      ) : (
                         <>
-                          <BsFillBagCheckFill className="text-lg" />
+                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
+                          </svg>
                           Cash on Delivery
                         </>
-                    }
-                  </Button>
-                )}
+                      )}
+                    </button>
+                  )}
+                </div>
+
+                <div className="flex gap-3 mt-4">
+                  <button
+                    onClick={prevStep}
+                    className="flex-1 bg-gray-100 text-gray-700 hover:bg-gray-200 font-semibold py-4 rounded-xl transition-all duration-300"
+                  >
+                    Back
+                  </button>
+                </div>
               </div>
-
-
             </div>
-          </div>
+          )}
         </div>
-      </form>
+      </div>
 
       {/* Order Processing Popup */}
       <OrderProcessingPopup 

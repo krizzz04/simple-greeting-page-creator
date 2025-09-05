@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { CircularProgress } from '@mui/material';
 import { FaWhatsapp, FaSms, FaCheckCircle, FaClock } from 'react-icons/fa';
 
@@ -12,19 +12,19 @@ const OrderProcessingPopup = ({ isOpen, onComplete, orderDetails, onStepUpdate }
   });
 
   // Function to update step status externally
-  const updateStepStatus = (stepId, status) => {
+  const updateStepStatus = useCallback((stepId, status) => {
     setStepStatus(prev => ({
       ...prev,
       [stepId]: status
     }));
-  };
+  }, []);
 
   // Expose update function to parent
   useEffect(() => {
     if (onStepUpdate) {
       onStepUpdate(updateStepStatus);
     }
-  }, [onStepUpdate]);
+  }, [onStepUpdate, updateStepStatus]);
 
   const steps = [
     {
