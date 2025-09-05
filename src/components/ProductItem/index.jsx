@@ -328,10 +328,10 @@ const ProductItem = (props) => {
       onClick={() => navigate(`/product/${props?.item?._id}`)}
     >
       <div className="group imgWrapper w-[100%]  overflow-hidden  rounded-md rounded-bl-none rounded-br-none relative">
-        <div className="img h-[200px] sm:h-[220px] lg:h-[240px] overflow-hidden">
+        <div className="img h-[200px] sm:h-[220px] lg:h-[240px] overflow-hidden relative">
           <img
             src={props?.item?.images?.[0] || "/homeBannerPlaceholder.jpg"}
-            className="w-full"
+            className={`w-full ${props?.item?.countInStock === 0 ? 'grayscale opacity-60' : ''}`}
             alt={props?.item?.name || "Product"}
           />
 
@@ -339,11 +339,19 @@ const ProductItem = (props) => {
             props?.item?.images?.length > 1 &&
             <img
               src={props?.item?.images?.[1] || "/homeBannerPlaceholder.jpg"}
-              className="w-full transition-all duration-700 absolute top-0 left-0 opacity-0 group-hover:opacity-100 group-hover:scale-105"
+              className={`w-full transition-all duration-700 absolute top-0 left-0 opacity-0 group-hover:opacity-100 group-hover:scale-105 ${props?.item?.countInStock === 0 ? 'grayscale opacity-60' : ''}`}
               alt={props?.item?.name || "Product"}
             />
           }
 
+          {/* Out of Stock Watermark */}
+          {props?.item?.countInStock === 0 && (
+            <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-40 z-10">
+              <div className="bg-red-500 text-white px-4 py-2 rounded-lg font-bold text-sm transform -rotate-12 shadow-lg">
+                OUT OF STOCK
+              </div>
+            </div>
+          )}
 
         </div>
 
@@ -522,6 +530,26 @@ const ProductItem = (props) => {
           </span>
         </div>
 
+        {/* Stock Indicator */}
+        <div className="mb-2">
+          {props?.item?.countInStock === 0 ? (
+            <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">
+              <span className="w-2 h-2 bg-red-500 rounded-full mr-1"></span>
+              Out of Stock
+            </span>
+          ) : props?.item?.countInStock <= 5 ? (
+            <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+              <span className="w-2 h-2 bg-yellow-500 rounded-full mr-1"></span>
+              Only {props?.item?.countInStock} left
+            </span>
+          ) : (
+            <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+              <span className="w-2 h-2 bg-green-500 rounded-full mr-1"></span>
+              In Stock
+            </span>
+          )}
+        </div>
+
 
         <div className="!absolute bottom-[10px] left-0 pl-3 pr-3 w-full">
 
@@ -529,27 +557,49 @@ const ProductItem = (props) => {
             isAdded === false ?
 
               <div className="flex flex-col gap-1.5">
-                <Button 
-                  className="btn-org addToCartBtn btn-border flex w-full btn-sm gap-2 " 
-                  size="small"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    addToCart(props?.item, context?.userData?._id, quantity);
-                  }}
-                >
-                  <MdShoppingCart className="text-[18px]" /> Add to Cart
-                </Button>
-                
-                <Button 
-                  className="btn-dark buyNowBtn btn-border flex w-full btn-sm gap-2" 
-                  size="small"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    buyNow(props?.item, context?.userData?._id);
-                  }}
-                >
-                  <BsLightningCharge className="text-[18px]" /> Buy Now
-                </Button>
+                {props?.item?.countInStock === 0 ? (
+                  <div className="flex flex-col gap-1.5">
+                    <Button 
+                      className="btn-gray addToCartBtn btn-border flex w-full btn-sm gap-2 cursor-not-allowed" 
+                      size="small"
+                      disabled
+                    >
+                      <MdShoppingCart className="text-[18px]" /> Out of Stock
+                    </Button>
+                    
+                    <Button 
+                      className="btn-gray buyNowBtn btn-border flex w-full btn-sm gap-2 cursor-not-allowed" 
+                      size="small"
+                      disabled
+                    >
+                      <BsLightningCharge className="text-[18px]" /> Not Available
+                    </Button>
+                  </div>
+                ) : (
+                  <div className="flex flex-col gap-1.5">
+                    <Button 
+                      className="btn-org addToCartBtn btn-border flex w-full btn-sm gap-2 " 
+                      size="small"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        addToCart(props?.item, context?.userData?._id, quantity);
+                      }}
+                    >
+                      <MdShoppingCart className="text-[18px]" /> Add to Cart
+                    </Button>
+                    
+                    <Button 
+                      className="btn-dark buyNowBtn btn-border flex w-full btn-sm gap-2" 
+                      size="small"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        buyNow(props?.item, context?.userData?._id);
+                      }}
+                    >
+                      <BsLightningCharge className="text-[18px]" /> Buy Now
+                    </Button>
+                  </div>
+                )}
               </div>
 
               :

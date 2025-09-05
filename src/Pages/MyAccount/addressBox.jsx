@@ -38,7 +38,7 @@ const AddressBox = (props) => {
             <span className="inline-block p-1 bg-[#e7e7e7] text-[12px] rounded-sm">{props?.address?.addressType}</span>
 
             <h4 className="pt-2 flex items-center gap-4 text-[14px]">
-                <span>{context?.userData?.name} </span>
+                <span>{props?.address?.name || context?.userData?.name} </span>
                 <span>+{props?.address?.mobile}</span>
             </h4>
 

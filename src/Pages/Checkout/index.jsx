@@ -1073,7 +1073,7 @@ Advanced UI Techniques`;
                         </svg>
                         <div>
                           <p className="font-semibold text-gray-800 text-lg">
-                            {orderData.delivery_address?.name || 'Customer'}
+                            {orderData.delivery_address?.name || orderData.userId?.name || 'Customer'}
                           </p>
                         </div>
                       </div>
@@ -1371,7 +1371,7 @@ Advanced UI Techniques`;
                               return selectedAddr ? (
                                 <div className="flex items-start justify-between">
                                   <div className="flex-1">
-                                    <p className="font-medium text-gray-800">{userData?.name}</p>
+                                    <p className="font-medium text-gray-800">{selectedAddr?.name || userData?.name}</p>
                                     <p className="text-sm text-gray-600 mt-1">
                                       {selectedAddr?.address_line1}, {selectedAddr?.city}
                                     </p>

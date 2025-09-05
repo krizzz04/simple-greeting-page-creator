@@ -268,19 +268,28 @@ const ProductItem = (props) => {
     <div className="productItem p-4 shadow-md bg-[#f1f1f1] rounded-md overflow-hidden border-1 border-[rgba(0,0,0,0.1)] flex items-center flex-col lg:flex-row">
       <div className="group imgWrapper w-full lg:w-[25%]  overflow-hidden  rounded-md relative">
         <Link to={`/product/${props?.item?._id}`}>
-          <div className="img  overflow-hidden">
+          <div className="img overflow-hidden relative">
             <img
               src={props?.item?.images[0]}
-              className="w-full"
+              className={`w-full ${props?.item?.countInStock === 0 ? 'grayscale opacity-60' : ''}`}
             />
 
            {
               props?.item?.images?.length > 1 &&
               <img
                 src={`${API_URL}/download/${props?.item?.images[1]}`}
-                className="w-full transition-all duration-700 absolute top-0 left-0 opacity-0 group-hover:opacity-100 group-hover:scale-105"
+                className={`w-full transition-all duration-700 absolute top-0 left-0 opacity-0 group-hover:opacity-100 group-hover:scale-105 ${props?.item?.countInStock === 0 ? 'grayscale opacity-60' : ''}`}
               />
             }
+
+            {/* Out of Stock Watermark */}
+            {props?.item?.countInStock === 0 && (
+              <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-40 z-10">
+                <div className="bg-red-500 text-white px-3 py-1 rounded-lg font-bold text-xs transform -rotate-12 shadow-lg">
+                  OUT OF STOCK
+                </div>
+              </div>
+            )}
 
           </div>
         </Link>
@@ -394,14 +403,40 @@ const ProductItem = (props) => {
           </span>
         </div>
 
+        {/* Stock Indicator */}
+        <div className="mb-2">
+          {props?.item?.countInStock === 0 ? (
+            <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">
+              <span className="w-2 h-2 bg-red-500 rounded-full mr-1"></span>
+              Out of Stock
+            </span>
+          ) : props?.item?.countInStock <= 5 ? (
+            <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+              <span className="w-2 h-2 bg-yellow-500 rounded-full mr-1"></span>
+              Only {props?.item?.countInStock} left
+            </span>
+          ) : (
+            <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+              <span className="w-2 h-2 bg-green-500 rounded-full mr-1"></span>
+              In Stock
+            </span>
+          )}
+        </div>
+
         <div className="mt-3 w-[180px]">
          {
             isAdded === false ?
 
-              <Button className="btn-org btn-border flex w-full btn-sm gap-2 " size="small"
-                onClick={() => addToCart(props?.item, context?.userData?._id, quantity)}>
-                <MdShoppingCart className="text-[18px]" /> Add to Cart
-              </Button>
+              props?.item?.countInStock === 0 ? (
+                <Button className="btn-gray btn-border flex w-full btn-sm gap-2 cursor-not-allowed" size="small" disabled>
+                  <MdShoppingCart className="text-[18px]" /> Out of Stock
+                </Button>
+              ) : (
+                <Button className="btn-org btn-border flex w-full btn-sm gap-2 " size="small"
+                  onClick={() => addToCart(props?.item, context?.userData?._id, quantity)}>
+                  <MdShoppingCart className="text-[18px]" /> Add to Cart
+                </Button>
+              )
 
               :
 
