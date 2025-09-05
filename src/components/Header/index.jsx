@@ -67,14 +67,11 @@ const Header = () => {
     const token = localStorage.getItem('accessToken');
     const currentPath = location.pathname;
 
-    // Pages that don't require authentication
-    const publicPages = ["/", "/products", "/product", "/search", "/about", "/login", "/register", "/verify", "/forgot-password"];
-
     if (token !== undefined && token !== null && token !== "" && token !== "undefined" && token !== "null") {
       // User is logged in, no need to redirect
       return;
-    } else if (!publicPages.some(page => currentPath.startsWith(page))) {
-      // Only redirect to login if trying to access protected pages
+    } else if (currentPath !== "/login" && currentPath !== "/register" && currentPath !== "/verify" && currentPath !== "/forgot-password") {
+      // Only redirect to login if not already on auth pages
       history("/login");
     }
 

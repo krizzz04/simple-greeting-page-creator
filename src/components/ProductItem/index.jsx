@@ -328,7 +328,7 @@ const ProductItem = (props) => {
       onClick={() => navigate(`/product/${props?.item?._id}`)}
     >
       <div className="group imgWrapper w-[100%]  overflow-hidden  rounded-md rounded-bl-none rounded-br-none relative">
-        <div className="img h-[240px] overflow-hidden">
+        <div className="img h-[280px] overflow-hidden">
           <img
             src={props?.item?.images?.[0] || "/homeBannerPlaceholder.jpg"}
             className="w-full"
@@ -497,13 +497,13 @@ const ProductItem = (props) => {
         </div>
       </div>
 
-      <div className="info p-3 py-3 relative pb-[80px] h-[200px]">
+      <div className="info p-3 py-5 relative pb-[80px] h-[220px]">
         <h6 className="text-[13px] !font-[400]">
           <span className="link transition-all">
             {props?.item?.brand}
           </span>
         </h6>
-        <h3 className="text-[12px] lg:text-[13px] title mt-0.5 font-[500] mb-1 text-[#000]">
+        <h3 className="text-[12px] lg:text-[13px] title mt-1 font-[500] mb-1 text-[#000]">
           <Link to={`/product/${props?.item?._id}`} className="link transition-all">
             {props?.item?.name?.substr(0, 25) + '...'}
           </Link>
