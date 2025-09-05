@@ -54,7 +54,6 @@ const Navigation = (props) => {
                 <Link to="/" className="link transition text-[14px] font-[500]">
                   <Button 
                     className="link transition !font-[500] !text-[rgba(0,0,0,0.8)] hover:!text-[#ff5252] !py-4"
-                    onClick={(e) => e.preventDefault()}
                   >
                     Home
                   </Button>
@@ -68,7 +67,6 @@ const Navigation = (props) => {
                       <Link to={`/products?catId=${cat?._id}`} className="link transition text-[14px] font-[500]">
                         <Button 
                           className="link transition !font-[500] !text-[rgba(0,0,0,0.8)] hover:!text-[#ff5252] !py-4"
-                          onClick={(e) => e.preventDefault()}
                         >
                           {cat?.name}
                         </Button>
@@ -85,7 +83,6 @@ const Navigation = (props) => {
                                     <Link to={`/products?subCatId=${subCat?._id}`} className="w-full">
                                       <Button 
                                         className="!text-[rgba(0,0,0,0.8)]  w-full !text-left !justify-start !rounded-none"
-                                        onClick={(e) => e.preventDefault()}
                                       >
                                         {subCat?.name}
                                       </Button>
@@ -101,7 +98,6 @@ const Navigation = (props) => {
                                                     <Link to={`/products?thirdLavelCatId=${thirdLavelCat?._id}`} className="w-full">
                                                       <Button 
                                                         className="!text-[rgba(0,0,0,0.8)]  w-full !text-left !justify-start !rounded-none"
-                                                        onClick={(e) => e.preventDefault()}
                                                       >
                                                         {thirdLavelCat?.name}
                                                       </Button>
