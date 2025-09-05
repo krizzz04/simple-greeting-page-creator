@@ -77,6 +77,11 @@ export const ProductDetailsComponent = (props) => {
 
   const addToCart = (product, userId, quantity) => {
 
+    // Check if product is out of stock
+    if (product?.countInStock === 0) {
+      context?.alertBox("error", "This product is currently out of stock");
+      return false;
+    }
 
     if (userId === undefined) {
       context?.alertBox("error", "you are not login please login first");
@@ -154,6 +159,12 @@ export const ProductDetailsComponent = (props) => {
   }
 
   const buyNow = (product, userId, quantity) => {
+    // Check if product is out of stock
+    if (product?.countInStock === 0) {
+      context?.alertBox("error", "This product is currently out of stock");
+      return false;
+    }
+
     if (userId === undefined) {
       context?.alertBox("error", "you are not login please login first");
       return false;
@@ -331,9 +342,16 @@ export const ProductDetailsComponent = (props) => {
 
         <div className="flex items-center">
           <span className="text-[13px] sm:text-[14px]">
-            In Stock:{" "}
-            <span className="text-green-600 text-[13px] sm:text-[14px] font-bold">
-              {props?.item?.countInStock} Items
+            {props?.item?.countInStock === 0 ? "Status: " : "In Stock: "}
+            <span className={`text-[13px] sm:text-[14px] font-bold ${
+              props?.item?.countInStock === 0 
+                ? "text-red-600" 
+                : "text-green-600"
+            }`}>
+              {props?.item?.countInStock === 0 
+                ? "Out of Stock" 
+                : `${props?.item?.countInStock} Items`
+              }
             </span>
           </span>
         </div>
@@ -411,46 +429,74 @@ export const ProductDetailsComponent = (props) => {
         </div>
       }
 
-      <div className="bg-blue-50 p-3 rounded-lg mb-4">
-        <p className="text-[13px] sm:text-[14px] text-blue-800 font-medium">
-          🚚 Free Shipping (Est. Delivery: 10-15 Days)
-        </p>
-      </div>
+      {props?.item?.countInStock === 0 ? (
+        <div className="bg-red-50 border border-red-200 p-3 rounded-lg mb-4">
+          <p className="text-[13px] sm:text-[14px] text-red-800 font-medium">
+            ⚠️ This product is currently out of stock. Please check back later or contact us for availability updates.
+          </p>
+        </div>
+      ) : (
+        <div className="bg-blue-50 p-3 rounded-lg mb-4">
+          <p className="text-[13px] sm:text-[14px] text-blue-800 font-medium">
+            🚚 Free Shipping (Est. Delivery: 10-15 Days)
+          </p>
+        </div>
+      )}
 
       <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 mb-4">
-        <div className="qtyBoxWrapper w-[80px] sm:w-[70px]">
+        <div className={`qtyBoxWrapper w-[80px] sm:w-[70px] ${props?.item?.countInStock === 0 ? 'opacity-50 pointer-events-none' : ''}`}>
           <QtyBox handleSelecteQty={handleSelecteQty} />
         </div>
 
         <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 w-full sm:w-auto">
-          <Button 
-            className="btn-org flex gap-2 !min-w-[140px] sm:!min-w-[150px] !h-[40px] sm:!h-[44px] !text-[14px] sm:!text-[15px]" 
-            onClick={() => addToCart(props?.item, context?.userData?._id, quantity)}
-          >
-            {
-              isLoading === true ? <CircularProgress size={20} /> :
-                <>
-                  {
-                    isAdded === true ? <><FaCheckDouble /> Added</> :
-                      <>
-                        <MdShoppingCart className="text-[18px] sm:text-[20px]" /> Add to Cart
-                      </>
-                  }
-                </>
-            }
-          </Button>
+          {props?.item?.countInStock === 0 ? (
+            <>
+              <Button 
+                className="btn-gray flex gap-2 !min-w-[140px] sm:!min-w-[150px] !h-[40px] sm:!h-[44px] !text-[14px] sm:!text-[15px] cursor-not-allowed" 
+                disabled
+              >
+                <MdShoppingCart className="text-[18px] sm:text-[20px]" /> Out of Stock
+              </Button>
 
-          <Button 
-            className="btn-dark flex gap-2 !min-w-[140px] sm:!min-w-[150px] !h-[40px] sm:!h-[44px] !text-[14px] sm:!text-[15px] !bg-green-600 hover:!bg-green-700" 
-            onClick={() => buyNow(props?.item, context?.userData?._id, quantity)}
-          >
-            {
-              isBuyNowLoading === true ? <CircularProgress size={20} /> :
-                <>
-                  <BsLightningCharge className="text-[18px] sm:text-[20px]" /> Buy Now
-                </>
-            }
-          </Button>
+              <Button 
+                className="btn-gray flex gap-2 !min-w-[140px] sm:!min-w-[150px] !h-[40px] sm:!h-[44px] !text-[14px] sm:!text-[15px] cursor-not-allowed" 
+                disabled
+              >
+                <BsLightningCharge className="text-[18px] sm:text-[20px]" /> Out of Stock
+              </Button>
+            </>
+          ) : (
+            <>
+              <Button 
+                className="btn-org flex gap-2 !min-w-[140px] sm:!min-w-[150px] !h-[40px] sm:!h-[44px] !text-[14px] sm:!text-[15px]" 
+                onClick={() => addToCart(props?.item, context?.userData?._id, quantity)}
+              >
+                {
+                  isLoading === true ? <CircularProgress size={20} /> :
+                    <>
+                      {
+                        isAdded === true ? <><FaCheckDouble /> Added</> :
+                          <>
+                            <MdShoppingCart className="text-[18px] sm:text-[20px]" /> Add to Cart
+                          </>
+                      }
+                    </>
+                }
+              </Button>
+
+              <Button 
+                className="btn-dark flex gap-2 !min-w-[140px] sm:!min-w-[150px] !h-[40px] sm:!h-[44px] !text-[14px] sm:!text-[15px] !bg-green-600 hover:!bg-green-700" 
+                onClick={() => buyNow(props?.item, context?.userData?._id, quantity)}
+              >
+                {
+                  isBuyNowLoading === true ? <CircularProgress size={20} /> :
+                    <>
+                      <BsLightningCharge className="text-[18px] sm:text-[20px]" /> Buy Now
+                    </>
+                }
+              </Button>
+            </>
+          )}
         </div>
       </div>
 
