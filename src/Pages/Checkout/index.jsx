@@ -166,14 +166,14 @@ const Checkout = () => {
         .reduce((total, value) => total + value, 0) : 0;
     
     // Apply ₹200 discount for online payment
-    const onlineDiscount = paymentMethod === "online" ? 200 : 0;
+    const onlineDiscount = (paymentMethod === "razorpay" || paymentMethod === "paypal") ? 200 : 0;
     const finalTotal = subtotal - onlineDiscount;
     
     setTotalAmount(finalTotal);
   }, [context.cartData, paymentMethod])
 
   useEffect(() => {
-    if (!VITE_APP_PAYPAL_CLIENT_ID || paymentMethod !== "online") return;
+    if (!VITE_APP_PAYPAL_CLIENT_ID || paymentMethod !== "paypal") return;
     
     // Clean up existing PayPal script
     const existingScript = document.querySelector('script[src*="paypal.com/sdk/js"]');
@@ -1093,7 +1093,7 @@ Advanced UI Techniques`;
         <div className="absolute inset-0 overflow-hidden">
           <div className="absolute -top-40 -right-40 w-80 h-80 bg-orange-200 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-pulse"></div>
           <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-red-200 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-pulse"></div>
-        </div>
+                </div>
 
         <div className="relative z-10 py-8 lg:py-16 px-4">
           <div className="container mx-auto max-w-4xl">
@@ -1191,41 +1191,41 @@ Advanced UI Techniques`;
                       </svg>
                       Track Your Package
                     </h3>
-                    <DelhiveryTracking 
-                      waybill={orderData.delhiveryWaybill} 
-                      orderId={orderData._id} 
-                    />
-                  </div>
+                  <DelhiveryTracking 
+                    waybill={orderData.delhiveryWaybill} 
+                    orderId={orderData._id} 
+                  />
+                </div>
                 ) : (
                   <div className="bg-gradient-to-br from-orange-50 to-white p-6 rounded-xl border border-orange-200 mb-8">
-                    <div className="text-center">
+                  <div className="text-center">
                       <div className="w-20 h-20 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4">
                         <svg className="w-10 h-10 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
-                      </div>
+                    </div>
                       <h3 className="text-xl font-semibold text-gray-800 mb-2">Order Processing</h3>
                       <p className="text-gray-600 max-w-md mx-auto">
                         Your order is being prepared for shipping. We'll send you tracking information via email and WhatsApp once the package is shipped.
                       </p>
-                    </div>
                   </div>
-                )}
+                </div>
+              )}
 
                 {/* Action Buttons */}
                 <div className="flex flex-col lg:flex-row gap-4 justify-center mt-8">
-                  <Button 
-                    onClick={() => {
-                      setOrderPlaced(false);
-                      setOrderData(null);
-                    }}
+                <Button 
+                  onClick={() => {
+                    setOrderPlaced(false);
+                    setOrderData(null);
+                  }}
                     className="btn-org btn-lg !min-w-[200px] !px-6 !py-3 !rounded-xl !font-semibold transition-all duration-300 transform hover:scale-105 shadow-lg"
-                  >
+                >
                     <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                     </svg>
-                    Place Another Order
-                  </Button>
+                  Place Another Order
+                </Button>
                   
                   <Link to="/my-orders" className="!block">
                     <Button className="btn-org btn-border btn-lg !min-w-[200px] !px-6 !py-3 !rounded-xl !font-semibold transition-all duration-300 transform hover:scale-105 shadow-lg">
@@ -1234,7 +1234,7 @@ Advanced UI Techniques`;
                       </svg>
                       View All Orders
                     </Button>
-                  </Link>
+                </Link>
                   
                   <Link to="/" className="!block">
                     <Button className="btn-org btn-border btn-lg !min-w-[200px] !px-6 !py-3 !rounded-xl !font-semibold transition-all duration-300 transform hover:scale-105 shadow-lg">
@@ -1243,7 +1243,7 @@ Advanced UI Techniques`;
                       </svg>
                       Back to Home
                     </Button>
-                  </Link>
+                </Link>
                 </div>
 
                 {/* Success Message */}
@@ -1281,8 +1281,8 @@ Advanced UI Techniques`;
               <div>
                 <h1 className="text-2xl font-bold text-gray-800">Checkout</h1>
                 <p className="text-gray-600">Complete your purchase</p>
-              </div>
-            </div>
+          </div>
+        </div>
             <div className="hidden md:block">
               <img src="/logo.jpg" alt="Logo" className="h-12 w-auto" />
             </div>
@@ -1291,37 +1291,37 @@ Advanced UI Techniques`;
 
         {/* Step Indicator */}
         <div className="bg-white rounded-2xl shadow-lg p-6 mb-6">
-          <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between">
             <div className="flex items-center gap-4 flex-1">
               <div className={`flex items-center gap-2 ${currentStep >= 1 ? 'text-primary' : 'text-gray-400'}`}>
                 <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${
                   currentStep >= 1 ? 'bg-primary text-white' : 'bg-gray-200 text-gray-600'
                 }`}>
                   1
-                </div>
-                <span className="hidden sm:block font-medium">Order Summary</span>
               </div>
+                <span className="hidden sm:block font-medium">Order Summary</span>
+                        </div>
               <div className={`flex-1 h-1 ${currentStep >= 2 ? 'bg-primary' : 'bg-gray-200'}`}></div>
               <div className={`flex items-center gap-2 ${currentStep >= 2 ? 'text-primary' : 'text-gray-400'}`}>
                 <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${
                   currentStep >= 2 ? 'bg-primary text-white' : 'bg-gray-200 text-gray-600'
                 }`}>
                   2
-                </div>
+                        </div>
                 <span className="hidden sm:block font-medium">Delivery Address</span>
-              </div>
+                    </div>
               <div className={`flex-1 h-1 ${currentStep >= 3 ? 'bg-primary' : 'bg-gray-200'}`}></div>
               <div className={`flex items-center gap-2 ${currentStep >= 3 ? 'text-primary' : 'text-gray-400'}`}>
                 <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${
                   currentStep >= 3 ? 'bg-primary text-white' : 'bg-gray-200 text-gray-600'
                 }`}>
                   3
-                </div>
-                <span className="hidden sm:block font-medium">Payment</span>
               </div>
+                <span className="hidden sm:block font-medium">Payment</span>
             </div>
           </div>
-        </div>
+          </div>
+              </div>
 
         {/* Step Content */}
         <div className="bg-white rounded-2xl shadow-lg p-6">
@@ -1340,7 +1340,7 @@ Advanced UI Techniques`;
                   <div key={item._id || index} className="flex items-center gap-4 p-4 bg-gray-50 rounded-xl">
                     <img
                       src={item?.image || "/homeBannerPlaceholder.jpg"}
-                      alt={item?.productTitle}
+                              alt={item?.productTitle}
                       className="w-16 h-16 object-cover rounded-lg"
                     />
                     <div className="flex-1">
@@ -1350,7 +1350,7 @@ Advanced UI Techniques`;
                     </div>
                   </div>
                 ))}
-              </div>
+                          </div>
 
               <div className="border-t pt-6">
                 <div className="space-y-3 mb-6">
@@ -1371,10 +1371,12 @@ Advanced UI Techniques`;
                   <div className="border-t pt-3">
                     <div className="flex justify-between">
                       <span className="text-lg font-bold text-gray-800">Total</span>
-                      <span className="text-lg font-bold text-primary">₹{totalAmount}</span>
+                      <span className="text-lg font-bold text-primary">₹{context.cartData?.length !== 0 ? 
+                        context.cartData?.map(item => parseInt(item.price) * item.quantity)
+                          .reduce((total, value) => total + value, 0) : 0}</span>
                     </div>
-                  </div>
-                </div>
+                          </div>
+                        </div>
 
                 <button
                   onClick={nextStep}
@@ -1382,8 +1384,8 @@ Advanced UI Techniques`;
                 >
                   Continue to Delivery Address
                 </button>
-              </div>
-            </div>
+                        </div>
+                      </div>
           )}
 
           {/* Step 2: Delivery Address */}
@@ -1421,18 +1423,23 @@ Advanced UI Techniques`;
                         onClick={() => setSelectedAddress(address._id)}
                       >
                         <div className="flex items-start justify-between">
-                          <div className="flex-1">
-                            <div className="flex items-center gap-2 mb-2">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-2">
                               <span className="font-semibold text-gray-800">{address.name}</span>
                               {address.isDefault && (
                                 <span className="bg-primary text-white text-xs px-2 py-1 rounded-full">
                                   Default
-                                </span>
+                        </span>
                               )}
-                            </div>
+                      </div>
                             <p className="text-gray-600 text-sm mb-1">{address.phone}</p>
                             <p className="text-gray-600 text-sm">
-                              {address.street}, {address.city}, {address.state} {address.pincode}
+                              {address.address_line1 || address.street}
+                              {address.address_line2 && `, ${address.address_line2}`}
+                              {address.landmark && `, ${address.landmark}`}
+                              {address.city && `, ${address.city}`}
+                              {address.state && `, ${address.state}`}
+                              {address.pincode && ` ${address.pincode}`}
                             </p>
                           </div>
                           <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
@@ -1482,8 +1489,8 @@ Advanced UI Techniques`;
                 >
                   Continue to Payment
                 </button>
-              </div>
-            </div>
+                        </div>
+                        </div>
           )}
 
           {/* Step 3: Payment Options */}
@@ -1511,10 +1518,35 @@ Advanced UI Techniques`;
                         <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
                         </svg>
-                      </div>
+                        </div>
                       <div>
-                        <h3 className="font-semibold text-gray-800">Online Payment</h3>
+                        <div className="flex items-center gap-2">
+                          <h3 className="font-semibold text-gray-800">Online Payment</h3>
+                          <span className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full font-medium">
+                            ₹200 OFF
+                          </span>
+                      </div>
                         <p className="text-gray-600 text-sm">Credit/Debit Card, UPI, Net Banking</p>
+                        <div className="flex items-center gap-2 mt-1">
+                          <img src="/visa.png" alt="Visa" className="w-6 h-4 object-contain" />
+                          <img src="/master_card.png" alt="Mastercard" className="w-6 h-4 object-contain" />
+                          <img src="/american_express.png" alt="American Express" className="w-6 h-4 object-contain" />
+                          {/* Google Pay */}
+                          <div className="w-6 h-4 bg-gradient-to-r from-blue-500 to-blue-600 rounded flex items-center justify-center relative overflow-hidden">
+                            <div className="absolute inset-0 bg-white opacity-20"></div>
+                            <span className="text-white text-xs font-bold relative z-10">G</span>
+                          </div>
+                          {/* PhonePe */}
+                          <div className="w-6 h-4 bg-gradient-to-r from-purple-600 to-purple-700 rounded flex items-center justify-center relative overflow-hidden">
+                            <div className="absolute inset-0 bg-white opacity-20"></div>
+                            <span className="text-white text-xs font-bold relative z-10">P</span>
+                          </div>
+                          {/* Paytm */}
+                          <div className="w-6 h-4 bg-gradient-to-r from-blue-600 to-blue-700 rounded flex items-center justify-center relative overflow-hidden">
+                            <div className="absolute inset-0 bg-white opacity-20"></div>
+                            <span className="text-white text-xs font-bold relative z-10">P</span>
+                          </div>
+                        </div>
                       </div>
                     </div>
                     <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
@@ -1538,15 +1570,20 @@ Advanced UI Techniques`;
                   onClick={() => setPaymentMethod('paypal')}
                 >
                   <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-3">
                       <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
                         <img src="/paypal.png" alt="PayPal" className="w-6 h-6" />
                       </div>
                       <div>
-                        <h3 className="font-semibold text-gray-800">PayPal</h3>
-                        <p className="text-gray-600 text-sm">Pay with PayPal account</p>
+                        <div className="flex items-center gap-2">
+                          <h3 className="font-semibold text-gray-800">PayPal</h3>
+                          <span className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full font-medium">
+                            ₹200 OFF
+                        </span>
                       </div>
+                        <p className="text-gray-600 text-sm">Pay with PayPal account</p>
                     </div>
+                  </div>
                     <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
                       paymentMethod === 'paypal'
                         ? 'border-primary bg-primary'
@@ -1556,8 +1593,8 @@ Advanced UI Techniques`;
                         <div className="w-2 h-2 bg-white rounded-full"></div>
                       )}
                     </div>
-                  </div>
                 </div>
+              </div>
 
                 <div
                   className={`p-4 border-2 rounded-xl cursor-pointer transition-all duration-300 ${
@@ -1575,7 +1612,12 @@ Advanced UI Techniques`;
                         </svg>
                       </div>
                       <div>
-                        <h3 className="font-semibold text-gray-800">Cash on Delivery</h3>
+                        <div className="flex items-center gap-2">
+                          <h3 className="font-semibold text-gray-800">Cash on Delivery</h3>
+                          <span className="bg-gray-100 text-gray-600 text-xs px-2 py-1 rounded-full font-medium">
+                            No Discount
+                          </span>
+                        </div>
                         <p className="text-gray-600 text-sm">Pay when you receive your order</p>
                       </div>
                     </div>
@@ -1603,18 +1645,24 @@ Advanced UI Techniques`;
                   <div className="flex justify-between">
                     <span className="text-gray-600">Shipping</span>
                     <span className="font-semibold text-green-600">Free</span>
-                  </div>
+                      </div>
                   <div className="flex justify-between">
                     <span className="text-gray-600">Tax</span>
                     <span className="font-semibold">₹0</span>
                   </div>
+                  {(paymentMethod === 'razorpay' || paymentMethod === 'paypal') && (
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Online Payment Discount</span>
+                      <span className="font-semibold text-green-600">-₹200</span>
+                    </div>
+                  )}
                   <div className="border-t pt-3">
                     <div className="flex justify-between">
                       <span className="text-lg font-bold text-gray-800">Total</span>
                       <span className="text-lg font-bold text-primary">₹{totalAmount}</span>
-                    </div>
                   </div>
                 </div>
+              </div>
 
                 {/* Payment Buttons */}
                 <div className="space-y-4">
@@ -1667,8 +1715,8 @@ Advanced UI Techniques`;
                         </>
                       )}
                     </button>
-                  )}
-                </div>
+                )}
+              </div>
 
                 <div className="flex gap-3 mt-4">
                   <button
@@ -1738,7 +1786,7 @@ Advanced UI Techniques`;
 
               {/* Buttons */}
               <div className="flex gap-3">
-                <Button 
+                  <Button 
                   onClick={handleCodCancel}
                   className="flex-1 bg-gray-100 text-gray-700 hover:bg-gray-200 font-semibold py-3 rounded-xl transition-all duration-300"
                 >
@@ -1749,8 +1797,8 @@ Advanced UI Techniques`;
                   className="flex-1 btn-org font-semibold py-3 rounded-xl transition-all duration-300 transform hover:scale-105"
                 >
                   Confirm Order
-                </Button>
-              </div>
+                  </Button>
+                </div>
             </div>
           </div>
         </div>
