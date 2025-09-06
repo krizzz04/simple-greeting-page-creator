@@ -27,6 +27,7 @@ const Checkout = () => {
   const [isLoading, setIsloading] = useState(false);
   const [messagingInProgress, setMessagingInProgress] = useState(false);
   const [orderInProgress, setOrderInProgress] = useState(false);
+  const [isAddressRefreshing, setIsAddressRefreshing] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState(""); // "online", "cod", or ""
   const [orderPlaced, setOrderPlaced] = useState(false);
   const [orderData, setOrderData] = useState(null);
@@ -148,7 +149,33 @@ const Checkout = () => {
       clearTimeout(timeoutId1);
       clearTimeout(timeoutId2);
     };
-  }, [context?.userData?._id, context?.isLogin]) // Only depend on specific user ID, not entire userData object
+  }, [context?.userData?._id, context?.userData?.address_details, context?.isLogin]) // Listen to address changes too
+
+  // Separate useEffect to handle address updates
+  useEffect(() => {
+    if (context?.userData?.address_details && context?.userData?.address_details.length > 0) {
+      console.log("🔄 Address list updated, refreshing checkout addresses");
+      setIsAddressRefreshing(true);
+      
+      // Small delay to show the refresh indicator
+      setTimeout(() => {
+        setUserData(context?.userData);
+        
+        // If no address is selected or selected address doesn't exist anymore, select the first one
+        if (!selectedAddress || !context?.userData?.address_details?.find(addr => addr._id === selectedAddress)) {
+          setSelectedAddress(context?.userData?.address_details[0]?._id);
+          console.log("📍 Auto-selected first address:", context?.userData?.address_details[0]?._id);
+        }
+        
+        setIsAddressRefreshing(false);
+        
+        // Show success message if this was triggered by an address addition
+        if (context?.userData?.address_details?.length > (userData?.address_details?.length || 0)) {
+          context?.alertBox("success", "New address added successfully! Please select it from the dropdown.");
+        }
+      }, 500);
+    }
+  }, [context?.userData?.address_details]);
 
   useEffect(() => {
     const subtotal = context.cartData?.length !== 0 ?
@@ -1326,6 +1353,14 @@ Advanced UI Techniques`;
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                         </svg>
                         Choose Address
+                        {isAddressRefreshing && (
+                          <span className="text-sm text-primary flex items-center gap-1">
+                            <svg className="w-4 h-4 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                            </svg>
+                            Updating...
+                          </span>
+                        )}
                       </h3>
                       {userData?.address_details?.length !== 0 && (
                         <Button 
@@ -1334,7 +1369,10 @@ Advanced UI Techniques`;
                             context?.setOpenAddressPanel(true);
                             context?.setAddressMode("add");
                           }} 
-                          className="btn-org btn-sm !border-primary !text-primary hover:!bg-primary hover:!text-white transition-all duration-300"
+                          disabled={isAddressRefreshing}
+                          className={`btn-org btn-sm !border-primary !text-primary hover:!bg-primary hover:!text-white transition-all duration-300 ${
+                            isAddressRefreshing ? 'opacity-50 cursor-not-allowed' : ''
+                          }`}
                         >
                           <FaPlus className="mr-1" />
                           Add New
@@ -1348,7 +1386,12 @@ Advanced UI Techniques`;
                           <select 
                             value={selectedAddress} 
                             onChange={(e) => setSelectedAddress(e.target.value)}
-                            className="w-full p-4 pr-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary bg-white text-gray-700 appearance-none cursor-pointer transition-all duration-300"
+                            disabled={isAddressRefreshing}
+                            className={`w-full p-4 pr-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary bg-white text-gray-700 appearance-none transition-all duration-300 ${
+                              isAddressRefreshing 
+                                ? 'cursor-not-allowed opacity-50' 
+                                : 'cursor-pointer'
+                            }`}
                           >
                             <option value="">Choose delivery address</option>
                             {userData?.address_details?.map((address, index) => (

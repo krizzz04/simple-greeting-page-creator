@@ -1,4 +1,8 @@
 import axios from "axios";
+import dotenv from 'dotenv';
+
+// Load environment variables
+dotenv.config();
 
 const DELHIVERY_MODE = process.env.DELHIVERY_MODE || "staging"; // staging or production
 const DELHIVERY_API_KEY = process.env.DELHIVERY_API_KEY;
