@@ -36,8 +36,8 @@ const OrderProcessingPopup = ({ isOpen, onComplete, orderDetails, onStepUpdate }
     },
     {
       id: 'sms',
-      title: 'Sending SMS',
-      description: 'Sending order confirmation via SMS...',
+      title: 'Sending mail',
+      description: 'Sending order confirmation via mail...',
       icon: FaSms,
       duration: 3000
     },
@@ -51,7 +51,7 @@ const OrderProcessingPopup = ({ isOpen, onComplete, orderDetails, onStepUpdate }
     {
       id: 'confirmation',
       title: 'Final Confirmation',
-      description: 'Sending final confirmation message...',
+      description: 'Confirming your order...',
       icon: FaCheckCircle,
       duration: 2000
     }
