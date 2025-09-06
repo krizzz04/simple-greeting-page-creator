@@ -75,7 +75,7 @@ const Footer = () => {
                 </div>
                 <div className="flex items-center space-x-2">
                   <MdPhone className="text-primary text-sm" />
-                  <span>+91 8073687598</span>
+                  <span>+91 8088504657 </span>
                 </div>
               </div>
             </div>
@@ -114,7 +114,7 @@ const Footer = () => {
                   },
                   { 
                     Icon: FaWhatsapp, 
-                    href: "https://wa.me/918073687598",
+                    href: "https://wa.me/918088504657 ",
                     color: "hover:text-green-600",
                     bgColor: "hover:bg-green-50",
                     borderColor: "hover:border-green-200"
@@ -441,8 +441,8 @@ const Footer = () => {
                     <MdPhone className="text-gray-500 text-sm" />
                     <span className="text-sm">
                       <strong>Phone/WhatsApp:</strong> 
-                      <a href="tel:+918073687598" className="text-blue-600 hover:underline ml-1">
-                        +91 8073687598
+                      <a href="tel:+918088504657 " className="text-blue-600 hover:underline ml-1">
+                        +91 8088504657 
                       </a>
                     </span>
                   </div>
@@ -553,7 +553,7 @@ const Footer = () => {
                 <p className="text-sm mb-2">If you have questions or concerns about this Privacy Policy or your information, please contact us:</p>
                 <ul className="list-none space-y-1 text-sm">
                   <li><strong>Email:</strong> <a href="mailto:roarofsouth2025@gmail.com" className="text-blue-600 hover:underline">roarofsouth2025@gmail.com</a></li>
-                  <li><strong>Phone:</strong> <a href="tel:+918073687598" className="text-blue-600 hover:underline">+91 8073687598</a></li>
+                  <li><strong>Phone:</strong> <a href="tel:+918088504657 " className="text-blue-600 hover:underline">+91 8088504657 </a></li>
                   <li><strong>Website:</strong> <a href="https://roarofsouth.vercel.app/" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">https://roarofsouth.vercel.app/</a></li>
                 </ul>
               </div>
@@ -650,8 +650,8 @@ const Footer = () => {
                 <p className="text-sm mb-2">If you have any questions or concerns regarding these Terms and Conditions, please contact us:</p>
                 <ul className="list-none space-y-1 text-sm">
                   <li><strong>Email:</strong> <a href="mailto:roarofsouth2025@gmail.com" className="text-blue-600 hover:underline">roarofsouth2025@gmail.com</a></li>
-                  <li><strong>Phone:</strong> <a href="tel:+918073687598" className="text-blue-600 hover:underline">+91 8073687598</a></li>
-                  <li><strong>Website:</strong> <a href="https://roarofsouth.vercel.app/" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">https://roarofsouth.vercel.app/</a></li>
+                  <li><strong>Phone:</strong> <a href="tel:+918088504657 " className="text-blue-600 hover:underline">+91 8088504657 </a></li>
+                  <li><strong>Website:</strong> <a href="https://roarofsouth.vercel.in/" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">https://roarofsouth.vercel.app/</a></li>
                 </ul>
               </div>
 
