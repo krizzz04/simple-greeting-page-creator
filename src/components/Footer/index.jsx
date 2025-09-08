@@ -100,7 +100,7 @@ const Footer = () => {
                 {[
                   { 
                     Icon: FaFacebookF, 
-                    href: "https://facebook.com",
+                    href: "https://www.facebook.com/share/1M6fuEGxTi/?mibextid=wwXIfr",
                     color: "hover:text-blue-600",
                     bgColor: "hover:bg-blue-50",
                     borderColor: "hover:border-blue-200"
