@@ -530,6 +530,14 @@ const ProductItem = (props) => {
           </span>
         </div>
 
+        {/* Prepaid Offer Badge */}
+        <div className="mb-2">
+          <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gradient-to-r from-green-100 to-emerald-100 text-green-800 border border-green-200">
+            <BsLightningCharge className="w-3 h-3 mr-1" />
+            ₹200 OFF on Prepaid
+          </span>
+        </div>
+
         {/* Stock Indicator */}
         <div className="mb-2">
           {props?.item?.countInStock === 0 ? (

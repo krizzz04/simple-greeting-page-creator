@@ -357,6 +357,26 @@ export const ProductDetailsComponent = (props) => {
         </div>
       </div>
 
+      {/* Prepaid Order Discount Highlight */}
+      <div className="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-lg p-4 mb-6">
+        <div className="flex items-center gap-3">
+          <div className="bg-green-500 text-white rounded-full p-2">
+            <BsLightningCharge className="text-lg" />
+          </div>
+          <div className="flex-1">
+            <h3 className="text-green-800 font-semibold text-lg mb-1">
+              🎉 Special Offer!
+            </h3>
+            <p className="text-green-700 text-sm font-medium">
+              Get <span className="font-bold text-green-800">₹200 OFF</span> on prepaid orders
+            </p>
+            <p className="text-green-600 text-xs mt-1">
+              Pay online and save extra! Valid on all prepaid payments.
+            </p>
+          </div>
+        </div>
+      </div>
+
       {
         props?.item?.productRam?.length !== 0 &&
         <div className="mb-4">
