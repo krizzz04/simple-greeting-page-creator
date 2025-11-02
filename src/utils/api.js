@@ -1,9 +1,9 @@
 import axios from "axios";
 
-// Production API URL configuration
-const API_BASE_URL = "https://tara-g1nf.onrender.com";
+// API base URL: prefer env, fallback to local dev server
+const API_BASE_URL = import.meta.env?.VITE_API_URL || "http://localhost:8000";
 
-console.log('🚀 Using Production API:', API_BASE_URL);
+console.log('🔗 API Base URL:', API_BASE_URL);
 
 // Export the URL
 export { API_BASE_URL };

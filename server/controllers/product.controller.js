@@ -28,18 +28,33 @@ export async function uploadImages(request, response) {
             use_filename: true,
             unique_filename: false,
             overwrite: false,
+            access_mode: 'public', // Make images publicly accessible to fix 401 errors
         };
 
         for (let i = 0; i < image?.length; i++) {
-
-            const img = await cloudinary.uploader.upload(
-                image[i].path,
-                options,
-                function (error, result) {
-                    imagesArr.push(result.secure_url);
-                    fs.unlinkSync(`uploads/${request.files[i].filename}`);
+            try {
+                const img = await cloudinary.uploader.upload(
+                    image[i].path,
+                    options
+                );
+                
+                if (img && img.secure_url) {
+                    imagesArr.push(img.secure_url);
+                    // Delete local file after successful upload
+                    if (fs.existsSync(image[i].path)) {
+                        fs.unlinkSync(image[i].path);
+                    }
+                } else {
+                    console.error(`Failed to upload image ${i}: No secure_url returned`);
                 }
-            );
+            } catch (uploadError) {
+                console.error(`Error uploading image ${i}:`, uploadError.message);
+                // Delete local file even if upload failed
+                if (fs.existsSync(image[i].path)) {
+                    fs.unlinkSync(image[i].path);
+                }
+                throw uploadError;
+            }
         }
 
         return response.status(200).json({
@@ -66,18 +81,33 @@ export async function uploadBannerImages(request, response) {
             use_filename: true,
             unique_filename: false,
             overwrite: false,
+            access_mode: 'public', // Make images publicly accessible to fix 401 errors
         };
 
         for (let i = 0; i < image?.length; i++) {
-
-            const img = await cloudinary.uploader.upload(
-                image[i].path,
-                options,
-                function (error, result) {
-                    bannerImage.push(result.secure_url);
-                    fs.unlinkSync(`uploads/${request.files[i].filename}`);
+            try {
+                const img = await cloudinary.uploader.upload(
+                    image[i].path,
+                    options
+                );
+                
+                if (img && img.secure_url) {
+                    bannerImage.push(img.secure_url);
+                    // Delete local file after successful upload
+                    if (fs.existsSync(image[i].path)) {
+                        fs.unlinkSync(image[i].path);
+                    }
+                } else {
+                    console.error(`Failed to upload banner image ${i}: No secure_url returned`);
                 }
-            );
+            } catch (uploadError) {
+                console.error(`Error uploading banner image ${i}:`, uploadError.message);
+                // Delete local file even if upload failed
+                if (fs.existsSync(image[i].path)) {
+                    fs.unlinkSync(image[i].path);
+                }
+                throw uploadError;
+            }
         }
 
         return response.status(200).json({

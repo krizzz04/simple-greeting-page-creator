@@ -43,9 +43,6 @@ export const addAddressController = async (request, response) => {
         const updateCartUser = await UserModel.updateOne({ _id: userId }, {
             $push: {
                 address_details: savedAddress?._id
-            },
-            $set: {
-                name: name // Update user's name with the address name
             }
         })
 
@@ -210,13 +207,6 @@ export async function editAddress(request, response) {
             },
             { new: true }
         )
-
-        // Update user's name with the address name
-        await UserModel.updateOne({ _id: userId }, {
-            $set: {
-                name: name
-            }
-        })
 
         return response.json({
             message: "Address Updated successfully",

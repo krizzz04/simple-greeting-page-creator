@@ -3,6 +3,48 @@ import ProductModel from '../models/product.modal.js';
 import UserModel from '../models/user.model.js';
 import AddressModel from "../models/address.model.js";
 import delhiveryService from "../config/delhiveryService.js";
+import razorpay from "../config/razorpay.js";
+
+// Helper function to capture Razorpay payment
+const captureRazorpayPayment = async (paymentId, amount) => {
+    try {
+        console.log('💳 Capturing Razorpay payment:', paymentId);
+        
+        if (!paymentId) {
+            throw new Error('Payment ID is required for capture');
+        }
+        
+        // Check if Razorpay is available
+        if (!razorpay) {
+            throw new Error('Razorpay is not configured. Please add RAZORPAY_KEY_ID and RAZORPAY_KEY_SECRET to your .env file');
+        }
+        
+        // Convert amount to paise (multiply by 100)
+        const amountInPaise = Math.round(amount * 100);
+        
+        // Capture the payment using Razorpay API
+        const captureResponse = await razorpay.payments.capture(paymentId, amountInPaise, 'INR');
+        
+        console.log('✅ Razorpay payment captured successfully:', {
+            paymentId: captureResponse.id,
+            status: captureResponse.status,
+            amount: captureResponse.amount,
+            currency: captureResponse.currency
+        });
+        
+        return {
+            success: true,
+            captureResponse: captureResponse
+        };
+        
+    } catch (error) {
+        console.error('❌ Razorpay capture failed:', error.message);
+        return {
+            success: false,
+            error: error.message
+        };
+    }
+};
 
 export const createOrderController = async (request, response) => {
     console.log('\n🚀 === ORDER CREATION STARTED ===');
@@ -11,7 +53,7 @@ export const createOrderController = async (request, response) => {
     
     try {
         // 1. Basic validation
-        const { userId, products, totalAmt } = request.body;
+        const { userId, products, totalAmt, paymentId, payment_status } = request.body;
         
         console.log('🔍 Validating required fields...');
         console.log('  - userId:', userId);
@@ -46,21 +88,59 @@ export const createOrderController = async (request, response) => {
         }
         
         console.log('✅ Basic validation passed');
+        console.log('🔍 Payment details:', {
+            paymentId: paymentId,
+            payment_status: payment_status,
+            hasPaymentId: !!paymentId,
+            isCompleted: payment_status === 'COMPLETED'
+        });
         
-        // 2. Create order data
+        // 2. Handle Razorpay payment capture if paymentId is provided
+        let paymentCaptureResult = null;
+        let paymentMethod = 'cod'; // Default to COD
+        
+        if (paymentId && payment_status === 'COMPLETED') {
+            console.log('💳 Processing Razorpay payment capture...');
+            paymentCaptureResult = await captureRazorpayPayment(paymentId, totalAmt);
+            
+            if (!paymentCaptureResult.success) {
+                console.error('❌ Payment capture failed:', paymentCaptureResult.error);
+                
+                // If Razorpay is not configured, allow order creation but warn user
+                if (paymentCaptureResult.error.includes('Razorpay is not configured')) {
+                    console.warn('⚠️ Proceeding with order creation without payment capture');
+                    console.warn('   Please configure Razorpay credentials to enable payment capture');
+                } else {
+                    return response.status(400).json({
+                        error: true,
+                        success: false,
+                        message: 'Payment capture failed: ' + paymentCaptureResult.error
+                    });
+                }
+            } else {
+                console.log('✅ Payment captured successfully');
+                paymentMethod = 'online'; // Set to online for Razorpay payments
+            }
+        } else if (paymentId && payment_status !== 'COMPLETED') {
+            // If paymentId exists but status is not COMPLETED, it might be a different payment method
+            console.log('💳 Payment ID provided but status is not COMPLETED:', payment_status);
+        }
+        
+        // 3. Create order data
         const orderData = {
             userId: userId,
             products: products,
-            paymentId: request.body.paymentId || '',
-            payment_status: request.body.payment_status || 'pending',
+            paymentId: paymentId || '',
+            payment_status: payment_status || 'pending',
             delivery_address: request.body.delivery_address || null,
             totalAmt: totalAmt,
-            date: request.body.date || new Date()
+            date: request.body.date || new Date(),
+            razorpayCaptureId: paymentCaptureResult?.captureResponse?.id || null
         };
         
         console.log('📦 Creating order...');
         
-        // 3. Save to database
+        // 4. Save to database
         const order = new OrderModel(orderData);
         const savedOrder = await order.save();
         
@@ -175,7 +255,7 @@ export const createOrderController = async (request, response) => {
                     state: deliveryAddress.state || '',
                     pincode: deliveryAddress.pincode.toString()
                 },
-                paymentMethod: request.body.payment_status === 'paid' ? 'online' : 'cod',
+                paymentMethod: paymentMethod, // Use the determined payment method
                 totalAmount: totalAmt,
                 products: products.map(product => ({
                     productId: product.productId,

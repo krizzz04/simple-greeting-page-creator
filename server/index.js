@@ -21,6 +21,7 @@ import blogRouter from './route/blog.route.js';
 import orderRouter from './route/order.route.js';
 import logoRouter from './route/logo.route.js';
 import delhiveryRouter from './route/delhiveryRoutes.js';
+import { v2 as cloudinary } from 'cloudinary';
 
 const app = express();
 const PORT = process.env.PORT || 8000;
@@ -29,9 +30,11 @@ const PORT = process.env.PORT || 8000;
 app.use(cors({
     origin: [
         'https://www.roarofsouth.in',
+        'https://roarofsouth-admin-1rcb.vercel.app',
         'https://roarofsouth.in',
         'http://localhost:3000',
         'http://localhost:8080',
+        'http://localhost:5173',
         'http://localhost:8081',
         'http://127.0.0.1:3000',
         'http://127.0.0.1:8080',
@@ -112,7 +115,8 @@ app.get('/debug', (req, res) => {
             '/api/blog',
             '/api/order',
             '/api/logo',
-            '/api/delhivery'
+            '/api/delhivery',
+            '/api/debug/cloudinary'
         ],
         request_info: {
             method: req.method,
@@ -120,6 +124,77 @@ app.get('/debug', (req, res) => {
             headers: req.headers,
             query: req.query
         }
+    });
+});
+
+// Cloudinary connectivity debug endpoint
+app.get('/api/debug/cloudinary', async (req, res) => {
+    try {
+        const cloudName = process.env.cloudinary_Config_Cloud_Name;
+        const apiKey = process.env.cloudinary_Config_api_key;
+        const apiSecret = process.env.cloudinary_Config_api_secret;
+
+        const missing = [];
+        if (!cloudName) missing.push('cloudinary_Config_Cloud_Name');
+        if (!apiKey) missing.push('cloudinary_Config_api_key');
+        if (!apiSecret) missing.push('cloudinary_Config_api_secret');
+
+        // Configure only if envs exist
+        if (missing.length === 0) {
+            cloudinary.config({
+                cloud_name: cloudName,
+                api_key: apiKey,
+                api_secret: apiSecret,
+                secure: true,
+            });
+
+            // Admin API ping
+            const pingResult = await cloudinary.api.ping();
+
+            return res.status(200).json({
+                error: false,
+                success: true,
+                connected: true,
+                message: 'Cloudinary connected',
+                details: pingResult,
+                config: {
+                    cloud_name_present: !!cloudName,
+                    api_key_present: !!apiKey,
+                    api_secret_present: !!apiSecret,
+                }
+            });
+        }
+
+        return res.status(200).json({
+            error: false,
+            success: true,
+            connected: false,
+            message: 'Cloudinary env variables missing',
+            missingEnv: missing,
+            config: {
+                cloud_name_present: !!cloudName,
+                api_key_present: !!apiKey,
+                api_secret_present: !!apiSecret,
+            }
+        });
+    } catch (err) {
+        return res.status(200).json({
+            error: false,
+            success: true,
+            connected: false,
+            message: 'Cloudinary ping failed',
+            reason: err?.message || 'Unknown error',
+        });
+    }
+});
+
+// Cloudinary cloud name helper (no secrets exposed)
+app.get('/api/debug/cloudinary-name', (req, res) => {
+    const cloudName = process.env.cloudinary_Config_Cloud_Name || null;
+    return res.status(200).json({
+        error: false,
+        success: true,
+        cloud_name: cloudName
     });
 });
 
