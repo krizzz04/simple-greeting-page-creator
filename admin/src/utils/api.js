@@ -1,5 +1,7 @@
 import axios from "axios";
-const apiUrl = import.meta.env.VITE_API_URL || "https://tara-g1nf.onrender.com";
+// API base URL: Always use production server
+// To use localhost, set VITE_API_URL=http://localhost:8000 in your environment
+const apiUrl = "https://tara-g1nf.onrender.com";
 
 export const postData = async (url, formData) => {
     try {

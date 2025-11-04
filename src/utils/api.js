@@ -1,7 +1,8 @@
 import axios from "axios";
 
-// API base URL: prefer env, fallback to production server
-const API_BASE_URL = import.meta.env?.VITE_API_URL || "https://tara-g1nf.onrender.com";
+// API base URL: Always use production server
+// To use localhost, set VITE_API_URL=http://localhost:8000 in your environment
+const API_BASE_URL = "https://tara-g1nf.onrender.com";
 
 console.log('🔗 API Base URL:', API_BASE_URL);
 
@@ -10,7 +11,10 @@ export { API_BASE_URL };
 
 export const postData = async (url, formData) => {
     try {
-        const response = await fetch(API_BASE_URL + url, {
+        const fullUrl = API_BASE_URL + url;
+        console.log('📤 POST Request to:', fullUrl);
+        
+        const response = await fetch(fullUrl, {
             method: 'POST',
             headers: {
                 'Authorization': `Bearer ${localStorage.getItem('accessToken')}`, // Include your API key in the Authorization header
@@ -41,6 +45,9 @@ export const postData = async (url, formData) => {
 
 export const getData = async (url) => {
     try {
+        const fullUrl = API_BASE_URL + url;
+        console.log('📥 GET Request to:', fullUrl);
+        
         const params={
             headers: {
                 'Authorization': `Bearer ${localStorage.getItem('accessToken')}`, // Include your API key in the Authorization header
@@ -49,7 +56,7 @@ export const getData = async (url) => {
         
         } 
 
-        const { data } = await axios.get(API_BASE_URL + url,params)
+        const { data } = await axios.get(fullUrl,params)
         return data;
     } catch (error) {
         console.log(error);

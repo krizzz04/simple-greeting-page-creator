@@ -7,14 +7,15 @@ export default defineConfig({
   plugins: [react()],
   server: {
     port: 8080,
-    proxy: {
-      '/api': {
-        target: 'https://tara-g1nf.onrender.com',
-        changeOrigin: true,
-        secure: false,
-        ws: true,
-      }
-    }
+    // Proxy removed - using full API URLs instead of relative paths
+    // proxy: {
+    //   '/api': {
+    //     target: 'https://tara-g1nf.onrender.com',
+    //     changeOrigin: true,
+    //     secure: false,
+    //     ws: true,
+    //   }
+    // }
   },
   build: {
     outDir: 'dist',
