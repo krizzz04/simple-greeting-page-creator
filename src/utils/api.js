@@ -1,7 +1,7 @@
 import axios from "axios";
 
 // API base URL: prefer env, fallback to local dev server
-const API_BASE_URL = import.meta.env?.VITE_API_URL || "http://localhost:8000";
+const API_BASE_URL = import.meta.env?.VITE_API_URL || "https://tara-g1nf.onrender.com";
 
 console.log('🔗 API Base URL:', API_BASE_URL);
 
