@@ -9,7 +9,7 @@ export default defineConfig({
     port: 8080,
     proxy: {
       '/api': {
-        target: 'http://localhost:8000',
+        target: 'https://tara-g1nf.onrender.com',
         changeOrigin: true,
         secure: false,
         ws: true,
